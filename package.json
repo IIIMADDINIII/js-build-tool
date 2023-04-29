@@ -1,0 +1,44 @@
+{
+  "name": "node-package-template",
+  "version": "0.0.1",
+  "description": "Tamlate for creating a NodeJs package",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.mjs"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.ts",
+        "default": "./dist/cjs/index.mjs"
+      }
+    }
+  },
+  "scripts": {
+    "clean": "pnpm dlx rimraf ./node_modules/ && pnpm install && pnpm exec gulp clean",
+    "build": "pnpm install && pnpm exec gulp build",
+    "buildCi": "pnpm install --frozen-lockfile && pnpm exec gulp buildCi"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IIIMADDINIII/node-package-template"
+  },
+  "author": "IIIMADDINIII <martin@elend.name>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/IIIMADDINIII/node-package-template/issues"
+  },
+  "homepage": "https://github.com/IIIMADDINIII/node-package-template#readme",
+  "devDependencies": {
+    "@types/node": "^18.16.0",
+    "typescript": "^5.0.4",
+    "rollup": "^3.21.0",
+    "gulp": "^4.0.2",
+    "gulp-execa": "^4.5.0",
+    "rollup-config-iiimaddiniii": "^0.2.0"
+  },
+  "dependencies": {
+    "tslib": "^2.5.0"
+  },
+  "rollup": {}
+}
