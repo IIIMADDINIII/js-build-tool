@@ -11,7 +11,7 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 let cwd = process.cwd();
 let src = path.resolve(cwd, "gulpfile.mjs");
-let dest = path.resolve(__dirname, "../../../../gulpfile.mjs");
+let dest = path.resolve(__dirname, "../../../../../../../gulpfile.mjs");
 let args = "\"" + process.argv.slice(2).join("\" \"") + "\"";
 let command = `gulp -f "${dest}" --cwd "${cwd}" ${args}`;
 

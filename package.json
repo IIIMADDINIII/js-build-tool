@@ -17,11 +17,11 @@
   },
   "type": "module",
   "scripts": {
-    "clean": "pnpm dlx rimraf ./node_modules/ && pnpm install && pnpm exec gulp clean",
-    "build": "pnpm install && pnpm exec gulp build",
-    "buildCi": "pnpm install --frozen-lockfile && pnpm exec gulp buildCi",
-    "test": "pnpm run gulp test",
-    "gulp": "pnpm dlx @iiimaddiniii/js-build-tool"
+    "clean": "pnpm run gulp clean",
+    "build": "pnpm run gulp build",
+    "buildCi": "pnpm run gulp buildCi",
+    "test": "pnpm run gulp build",
+    "gulp": "pnpm dlx @iiimaddiniii/js-build-tool@0.0.6"
   },
   "repository": {
     "type": "git",
@@ -38,12 +38,13 @@
     "@types/gulp": "^4.0.11",
     "typescript": "^5.1.3",
     "rollup": "^3.24.1",
-    "gulp": "^4.0.2",
     "gulp-execa": "^5.0.0",
     "rollup-config-iiimaddiniii": "^0.2.3",
     "tslib": "^2.5.3"
   },
-  "dependencies": {},
+  "dependencies": {
+    "gulp": "^4.0.2"
+  },
   "rollup": {
     "packageDependencies": true,
     "resolveNode": true
