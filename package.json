@@ -1,23 +1,22 @@
 {
-  "name": "node-package-template",
+  "name": "@iiimaddiniii/js-build-tool",
   "version": "0.0.1",
-  "description": "Tamlate for creating a NodeJs package",
+  "description": "Tool for building my javascript projects",
+  "bin": {
+    "": "./dist/index.js"
+  },
   "exports": {
     ".": {
-      "import": {
-        "types": "./dist/esm/index.d.ts",
-        "default": "./dist/esm/index.mjs"
-      },
-      "require": {
-        "types": "./dist/cjs/index.d.ts",
-        "default": "./dist/cjs/index.mjs"
-      }
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
     }
   },
+  "type": "commonjs",
   "scripts": {
     "clean": "pnpm dlx rimraf ./node_modules/ && pnpm install && pnpm exec gulp clean",
     "build": "pnpm install && pnpm exec gulp build",
-    "buildCi": "pnpm install --frozen-lockfile && pnpm exec gulp buildCi"
+    "buildCi": "pnpm install --frozen-lockfile && pnpm exec gulp buildCi",
+    "test": "pnpm dlx @iiimaddiniii/js-build-tool test"
   },
   "repository": {
     "type": "git",

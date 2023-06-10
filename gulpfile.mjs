@@ -5,7 +5,7 @@ import * as fs from "fs/promises";
 let prod = false;
 
 export async function clean() {
-  await exec("git clean -e !/node_modules/ -dfX");
+  await exec("git clean -dfX");
 }
 
 export async function bundle() {
@@ -14,7 +14,6 @@ export async function bundle() {
     env.prod = "true";
   }
   await exec("pnpm exec rollup --config node:iiimaddiniii", { env });
-  fs.writeFile("./dist/esm/package.json", `{"type":"module"}`);
 }
 
 export async function build() {
