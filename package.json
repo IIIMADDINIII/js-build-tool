@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Tool for building my javascript projects",
   "bin": {
-    "": "./dist/index.js"
+    "js-build-tool": "./dist/index.js"
   },
   "exports": {
     ".": {
@@ -16,7 +16,7 @@
     "clean": "pnpm dlx rimraf ./node_modules/ && pnpm install && pnpm exec gulp clean",
     "build": "pnpm install && pnpm exec gulp build",
     "buildCi": "pnpm install --frozen-lockfile && pnpm exec gulp buildCi",
-    "test": "pnpm dlx @iiimaddiniii/js-build-tool test"
+    "test": "pnpm dlx @iiimaddiniii/js-build-tool"
   },
   "repository": {
     "type": "git",
