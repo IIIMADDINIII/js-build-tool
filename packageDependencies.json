@@ -1,7 +1,5 @@
 {
   "dependencies": {
-    "gulp": "^4.0.2",
-    "gulp-execa": "^5.0.0",
-    "rimraf": "^5.0.1"
+    "gulp": "^4.0.2"
   }
 }

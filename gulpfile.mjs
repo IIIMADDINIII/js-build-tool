@@ -1,7 +1,6 @@
-//import { gulp, execa } from "@iiimaddiniii/js-build-tool";
-import { gulp } from "@iiimaddiniii/js-build-tool/gulp";
-import { execa } from "@iiimaddiniii/js-build-tool/execa";
-import { rimraf } from "rimraf";
+import gulp from "@iiimaddiniii/js-build-tool/gulp";
+import { exec } from "@iiimaddiniii/js-build-tool/execa";
+import { rimraf } from "@iiimaddiniii/js-build-tool/rimraf";
 import * as fs from "fs/promises";
 import * as path from "path";
 
@@ -9,7 +8,7 @@ let prod = false;
 let cwd = process.cwd();
 
 export async function clean() {
-  await execa.exec("git clean -dfX");
+  await exec("git clean -dfX");
 }
 
 export async function bundle() {
@@ -17,7 +16,7 @@ export async function bundle() {
   if (prod) {
     env.prod = "true";
   }
-  await execa.exec("pnpm exec rollup --config node:iiimaddiniii", { env });
+  await exec("pnpm exec rollup --config node:iiimaddiniii", { env });
 }
 
 export async function build() {
@@ -30,7 +29,7 @@ export async function build() {
   await rimraf([tmpBuildDir, destDir]);
   await fs.mkdir(tmpBuildDir);
   await fs.copyFile(src, dest);
-  await execa.exec("pnpm install --node-linker=hoisted", { cwd: tmpBuildDir });
+  await exec("pnpm install --node-linker=hoisted", { cwd: tmpBuildDir });
   await fs.rename(srcDir, destDir);
   return;
 }

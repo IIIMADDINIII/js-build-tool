@@ -33,7 +33,7 @@
     "build": "pnpm run gulp build",
     "buildCi": "pnpm run gulp buildCi",
     "test": "pnpm run gulp build",
-    "gulp": "pnpm --package=rimraf --package=@iiimaddiniii/js-build-tool@0.0.9 dlx js-build-tool"
+    "gulp": "pnpm --package=@iiimaddiniii/js-build-tool@0.0.12 dlx js-build-tool"
   },
   "repository": {
     "type": "git",
@@ -60,9 +60,8 @@
   "rollup": {
     "allowDevDependencies": true,
     "externalPackages": [
-      "gulp",
-      "gulp-execa",
-      "rimraf"
-    ]
+      "gulp"
+    ],
+    "resolveNode": true
   }
 }
