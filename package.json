@@ -42,7 +42,7 @@
     "rollup-config-iiimaddiniii": "^0.2.3",
     "tslib": "^2.5.3"
   },
-  "dependencies": {
+  "peerDependencies": {
     "gulp": "^4.0.2"
   },
   "rollup": {
