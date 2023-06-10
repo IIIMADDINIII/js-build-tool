@@ -1,4 +1,4 @@
-import gulp from "gulp";
+import { gulp } from "@iiimaddiniii/js-build-tool";
 import { exec } from "gulp-execa";
 import * as fs from "fs/promises";
 

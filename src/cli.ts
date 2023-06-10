@@ -16,4 +16,9 @@ let args = "\"" + process.argv.slice(2).join("\" \"") + "\"";
 let command = `gulp -f "${dest}" --cwd "${cwd}" ${args}`;
 
 fs.copyFileSync(src, dest);
-cp.execSync(command, { stdio: "inherit" });
+try {
+  cp.execSync(command, { stdio: "inherit" });
+} catch (e) {
+  if ((typeof e !== "object") || (e === null) || !("status" in e) || (typeof e.status !== "number")) process.exit(-1);
+  process.exit(e.status);
+}
