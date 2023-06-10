@@ -6,3 +6,4 @@
 /switches.d.ts
 /tsconfig.json
 /tsconfig.tsbuildinfo
+/.tmpBuild/

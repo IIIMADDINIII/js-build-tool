@@ -1,9 +1,12 @@
 //import { gulp, execa } from "@iiimaddiniii/js-build-tool";
 import { gulp } from "@iiimaddiniii/js-build-tool/gulp";
 import { execa } from "@iiimaddiniii/js-build-tool/execa";
+import { rimraf } from "rimraf";
 import * as fs from "fs/promises";
+import * as path from "path";
 
 let prod = false;
+let cwd = process.cwd();
 
 export async function clean() {
   await execa.exec("git clean -dfX");
@@ -18,7 +21,18 @@ export async function bundle() {
 }
 
 export async function build() {
-  return await bundle();
+  await bundle();
+  let tmpBuildDir = path.resolve(cwd, ".tmpBuild");
+  let src = path.resolve(cwd, "packageDependencies.json");
+  let dest = path.resolve(tmpBuildDir, "package.json");
+  let srcDir = path.resolve(tmpBuildDir, "node_modules");
+  let destDir = path.resolve(cwd, "modules");
+  await rimraf([tmpBuildDir, destDir]);
+  await fs.mkdir(tmpBuildDir);
+  await fs.copyFile(src, dest);
+  await execa.exec("pnpm install --node-linker=hoisted", { cwd: tmpBuildDir });
+  await fs.rename(srcDir, destDir);
+  return;
 }
 
 export async function buildCi() {

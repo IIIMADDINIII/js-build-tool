@@ -11,10 +11,13 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 let cwd = process.cwd();
 let src = path.resolve(cwd, "gulpfile.mjs");
+let modules = path.resolve(__dirname, "modules");
+let nodeModules = path.resolve(__dirname, "node_modules");
 let dest = path.resolve(__dirname, "../../../../../../../gulpfile.mjs");
 let args = "\"" + process.argv.slice(2).join("\" \"") + "\"";
 let command = `gulp -f "${dest}" --cwd "${cwd}" ${args}`;
-
+fs.rmSync(nodeModules, { recursive: true, force: true });
+fs.renameSync(modules, nodeModules);
 fs.copyFileSync(src, dest);
 try {
   cp.execSync(command, { stdio: "inherit" });
