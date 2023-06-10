@@ -40,11 +40,12 @@
     "rollup": "^3.24.1",
     "gulp": "^4.0.2",
     "gulp-execa": "^5.0.0",
-    "rollup-config-iiimaddiniii": "^0.2.2",
+    "rollup-config-iiimaddiniii": "^0.2.3",
     "tslib": "^2.5.3"
   },
   "dependencies": {},
   "rollup": {
-    "packageDependencies": true
+    "packageDependencies": true,
+    "resolveNode": true
   }
 }

@@ -1,11 +1,12 @@
-import { gulp } from "@iiimaddiniii/js-build-tool";
-import { exec } from "gulp-execa";
+import { execa, gulp } from "@iiimaddiniii/js-build-tool";
+//import gulp from "gulp";
+//import * as execa from "gulp-execa";
 import * as fs from "fs/promises";
 
 let prod = false;
 
 export async function clean() {
-  await exec("git clean -dfX");
+  await execa.exec("git clean -dfX");
 }
 
 export async function bundle() {
@@ -13,7 +14,7 @@ export async function bundle() {
   if (prod) {
     env.prod = "true";
   }
-  await exec("pnpm exec rollup --config node:iiimaddiniii", { env });
+  await execa.exec("pnpm exec rollup --config node:iiimaddiniii", { env });
 }
 
 export async function build() {

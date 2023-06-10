@@ -21,8 +21,8 @@ devDependencies:
     specifier: ^3.24.1
     version: 3.24.1
   rollup-config-iiimaddiniii:
-    specifier: ^0.2.2
-    version: 0.2.2(@types/node@20.2.6)(rollup@3.24.1)(typescript@5.1.3)
+    specifier: ^0.2.3
+    version: 0.2.3(@types/node@20.2.6)(rollup@3.24.1)(typescript@5.1.3)
   tslib:
     specifier: ^2.5.3
     version: 2.5.3
@@ -2355,8 +2355,8 @@ packages:
     engines: {node: '>=0.12'}
     dev: true
 
-  /rollup-config-iiimaddiniii@0.2.2(@types/node@20.2.6)(rollup@3.24.1)(typescript@5.1.3):
-    resolution: {integrity: sha512-Kzufm+bpyqYE37wYFYwpYhX+oKWA9JfzppnUjGRMMLewaqDbjmsNctsG99qaY9YZ5dWvjecHXfwbx+Dw7pALCQ==}
+  /rollup-config-iiimaddiniii@0.2.3(@types/node@20.2.6)(rollup@3.24.1)(typescript@5.1.3):
+    resolution: {integrity: sha512-5dV1VSgKnlEtZv0UdyPlQbJC5NFHwZgl2bTJWVLWBR3Ots3esFA2HrSaffgDbJ7Xx2Qe7JIDXM+3buKk//suXQ==}
     dependencies:
       '@rollup/plugin-commonjs': 24.1.0(rollup@3.24.1)
       '@rollup/plugin-json': 6.0.0(rollup@3.24.1)
