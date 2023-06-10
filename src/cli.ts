@@ -2,14 +2,18 @@
 /// <reference types="rollup-config-iiimaddiniii/switches" />
 
 
+import * as cp from "child_process";
+import * as fs from "fs";
 import * as path from "path";
 import * as url from 'url';
 //const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 let cwd = process.cwd();
-let packageDir = path.resolve(__dirname, "..");
+let src = path.resolve(cwd, "gulpfile.mjs");
+let dest = path.resolve(__dirname, "../../../../gulpfile.mjs");
+let args = "\"" + process.argv.slice(2).join("\" \"") + "\"";
+let command = `gulp -f "${dest}" --cwd "${cwd}" ${args}`;
 
-
-
-console.log(cwd, packageDir, process.argv);
+fs.copyFileSync(src, dest);
+cp.execSync(command, { stdio: "inherit" });
