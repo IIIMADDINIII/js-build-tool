@@ -1,6 +1,6 @@
-import { gulp, execa } from "@iiimaddiniii/js-build-tool";
-//import gulp from "gulp";
-//import * as execa from "gulp-execa";
+//import { gulp, execa } from "@iiimaddiniii/js-build-tool";
+import { gulp } from "@iiimaddiniii/js-build-tool/gulp";
+import { execa } from "@iiimaddiniii/js-build-tool/execa";
 import * as fs from "fs/promises";
 
 let prod = false;

@@ -1,2 +1,2 @@
 import * as gulp from "gulp";
-export { gulp };
+export default gulp;
