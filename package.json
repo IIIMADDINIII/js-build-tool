@@ -13,6 +13,14 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./gulp": {
+      "types": "./dist/gulp.d.ts",
+      "import": "./dist/gulp.js"
+    },
+    "./execa": {
+      "types": "./dist/execa.d.ts",
+      "import": "./dist/execa.js"
     }
   },
   "type": "module",
@@ -38,15 +46,12 @@
     "@types/gulp": "^4.0.11",
     "typescript": "^5.1.3",
     "rollup": "^3.24.1",
-    "gulp-execa": "^5.0.0",
     "rollup-config-iiimaddiniii": "^0.2.3",
     "tslib": "^2.5.3"
   },
-  "peerDependencies": {
-    "gulp": "^4.0.2"
+  "dependencies": {
+    "gulp": "^4.0.2",
+    "gulp-execa": "^5.0.0"
   },
-  "rollup": {
-    "packageDependencies": true,
-    "resolveNode": true
-  }
+  "rollup": {}
 }
