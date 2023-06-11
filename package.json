@@ -25,8 +25,9 @@
     "clean": "pnpm run gulp clean",
     "build": "pnpm run gulp build",
     "buildCi": "pnpm run gulp buildCi",
-    "test": "pnpm run gulp test",
-    "gulp": "pnpm --package=@iiimaddiniii/js-build-tool@0.1.8 dlx js-build-tool"
+    "testLeak": "pnpm --package=why-is-node-running --package=@iiimaddiniii/js-build-tool@0.1.9 dlx js-build-tool test",
+    "testP": "pnpm run gulp testProd",
+    "gulp": "pnpm --package=why-is-node-running --package=@iiimaddiniii/js-build-tool@0.1.9 dlx js-build-tool"
   },
   "repository": {
     "type": "git",
