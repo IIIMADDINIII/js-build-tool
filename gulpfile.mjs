@@ -46,11 +46,11 @@ async function packageModules() {
   await fs.rename(srcDir, destDir);
 }
 
-
-
-export const clean = gulp.default.series(preTasks, async function clean() {
+async function cleanGit() {
   await exec("git clean -dfX");
-});
+}
+
+export const clean = gulp.default.series(preTasks, cleanGit);
 
 export const build = gulp.default.series(preTasks, gulp.default.parallel(bundle, packageModules));
-export const buildCi = gulp.default.series(setProd, preTasks, gulp.default.parallel(bundle, packageModules));
+export const buildCi = gulp.default.series(setProd, preTasks, cleanGit, gulp.default.parallel(bundle, packageModules));
