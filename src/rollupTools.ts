@@ -147,30 +147,26 @@ async function loadConfigFile(rollupOptions: RollupOptions[] | RollupOptions) {
   }
 };
 
-async function rollupConfig(rollupOptions: RollupOptions[] | RollupOptions, commandOptions: CommandOptions): Promise<void> {
-  const command: Required<CommandOptions> = { failAfterWarnings: false, silent: false, ...commandOptions };
-  try {
-    let { options, warnings } = await loadConfigFile(rollupOptions);
+export function runRollup(rollupOptions: RollupOptions[] | RollupOptions, commandOptions: CommandOptions): () => Promise<void> {
+  async function runRollup(): Promise<void> {
+    const command: Required<CommandOptions> = { failAfterWarnings: false, silent: false, ...commandOptions };
     try {
-      for (const inputOptions of options) {
-        await build(inputOptions, warnings, command.silent);
-      }
-      if (command.failAfterWarnings && warnings.warningOccurred) {
+      let { options, warnings } = await loadConfigFile(rollupOptions);
+      try {
+        for (const inputOptions of options) {
+          await build(inputOptions, warnings, command.silent);
+        }
+        if (command.failAfterWarnings && warnings.warningOccurred) {
+          warnings.flush();
+          rollup.handleError(rollup.errorFailAfterWarnings(), true);
+        }
+      } catch (error) {
         warnings.flush();
-        rollup.handleError(rollup.errorFailAfterWarnings(), true);
+        rollup.handleError(error, true);
       }
     } catch (error) {
-      warnings.flush();
       rollup.handleError(error, true);
     }
-  } catch (error) {
-    rollup.handleError(error, true);
-  }
-}
-
-export function runRollup(options: any): () => Promise<void> {
-  async function runRollup(): Promise<void> {
-    await Promise.allSettled<void>(options.map(rollupConfig));
   }
   runRollup.displayName = "runRollup";
   return runRollup;
