@@ -66,7 +66,7 @@ export async function dirsMerge(sourceDir: string, destinationDir: string): Prom
       if ((typeof error !== "object") || (error === null) || !("code" in error) || (error.code !== "ENOENT")) throw error;
       let sourceStats = await fs.stat(sourceEntryPath);
       if (sourceStats.isDirectory()) {
-        await fs.symlink(destinationEntryPath, sourceEntryPath, "junction");
+        await fs.symlink(sourceEntryPath, destinationEntryPath, "junction");
       } else {
         await fs.rename(sourceEntryPath, destinationEntryPath);
       }
