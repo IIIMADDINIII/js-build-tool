@@ -1,17 +1,31 @@
-import gulp from "@iiimaddiniii/js-build-tool/gulp";
 import { exec } from "@iiimaddiniii/js-build-tool/execa";
 import { rimraf } from "@iiimaddiniii/js-build-tool/rimraf";
+import gulp from "@iiimaddiniii/js-build-tool/gulp";
 import * as fs from "fs/promises";
 import * as path from "path";
 
 let prod = false;
 let cwd = process.cwd();
 
-export async function clean() {
-  await exec("git clean -dfX");
+async function setProd() {
+  prod = true;
 }
 
-export async function bundle() {
+async function selectLatestPnpmVersion() {
+  await exec("corepack prepare pnpm@latest --activate");
+}
+
+async function installDependencies() {
+  if (prod) {
+    return await exec("pnpm install --frozen-lockfile");
+  }
+  await exec("pnpm install");
+}
+
+const preTasks = gulp.default.series(selectLatestPnpmVersion, installDependencies);
+
+async function bundle() {
+  await exec("pnpm install");
   let env = {};
   if (prod) {
     env.prod = "true";
@@ -19,8 +33,7 @@ export async function bundle() {
   await exec("pnpm exec rollup --config node:iiimaddiniii", { env });
 }
 
-export async function build() {
-  await bundle();
+async function packageModules() {
   let tmpBuildDir = path.resolve(cwd, ".tmpBuild");
   let src = path.resolve(cwd, "packageDependencies.json");
   let dest = path.resolve(tmpBuildDir, "package.json");
@@ -31,11 +44,13 @@ export async function build() {
   await fs.copyFile(src, dest);
   await exec("pnpm install --node-linker=hoisted", { cwd: tmpBuildDir });
   await fs.rename(srcDir, destDir);
-  return;
 }
 
-export async function buildCi() {
-  prod = true;
-  await clean();
-  await bundle();
-}
+
+
+export const clean = gulp.default.series(preTasks, async function clean() {
+  await exec("git clean -dfX");
+});
+
+export const build = gulp.default.series(preTasks, gulp.default.parallel(bundle, packageModules));
+export const buildCi = gulp.default.series(setProd, preTasks, gulp.default.parallel(bundle, packageModules));
