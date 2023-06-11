@@ -113,7 +113,6 @@ function getTypescriptDefaultOptions(options: DefaultConfigsExports): NoDefaults
     declarationMap: options.generateDeclaration,
     lib,
   };
-  console.log(options.sourceMap, isProd, options);
   if (!options.sourceMap) {
     ret.sourceMap = false;
     ret.inlineSources = undefined;
@@ -255,10 +254,10 @@ async function generateExport(exportName: string, options: DefaultConfigsExports
   options.inputFileDir = getDefault(options.inputFileDir, "./src/");
   options.inputFileExt = getDefault(options.inputFileExt, ".ts");
   options.inputFileName = getDefault(options.inputFileName, getDefaultFileName(exportName, options.defaultExportName));
-  options.plugins = getDefault(options.plugins, await getDefaultPlugins(options));
   options.prod = getDefault(options.prod, isProd());
   options.sourceMap = getDefault(options.sourceMap, !options.prod);
   options.sourceMapType = getDefault(options.sourceMapType, "external");
+  options.plugins = getDefault(options.plugins, await getDefaultPlugins(options));
   options.minify = getDefault(options.minify, options.prod);
   options.terserPlugin = conditionalMerge(options.terserPlugin, {});
   if (options.minify) {

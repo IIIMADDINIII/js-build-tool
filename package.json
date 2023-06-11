@@ -26,7 +26,7 @@
     "build": "pnpm run gulp build",
     "buildCi": "pnpm run gulp buildCi",
     "test": "pnpm run gulp test",
-    "gulp": "pnpm --package=@iiimaddiniii/js-build-tool@0.1.7 dlx js-build-tool"
+    "gulp": "pnpm --package=@iiimaddiniii/js-build-tool@0.1.8 dlx js-build-tool"
   },
   "repository": {
     "type": "git",
