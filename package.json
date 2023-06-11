@@ -25,6 +25,10 @@
     "./rimraf": {
       "types": "./dist/rimraf.d.ts",
       "import": "./dist/rimraf.js"
+    },
+    "./rollup": {
+      "types": "./dist/rollup.d.ts",
+      "import": "./dist/rollup.js"
     }
   },
   "type": "module",
@@ -33,7 +37,7 @@
     "build": "pnpm run gulp build",
     "buildCi": "pnpm run gulp buildCi",
     "test": "pnpm run gulp build",
-    "gulp": "pnpm --package=@iiimaddiniii/js-build-tool@0.0.18 dlx js-build-tool"
+    "gulp": "pnpm --package=@iiimaddiniii/js-build-tool@0.1.0 dlx js-build-tool"
   },
   "repository": {
     "type": "git",
