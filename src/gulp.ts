@@ -1,5 +1,6 @@
-import * as gulp from "gulp";
+import gulp from "gulp";
 
+export default gulp;
 export const src: typeof gulp.src = gulp.src;
 export const dest: typeof gulp.dest = gulp.dest;
 export const symlink: typeof gulp.symlink = gulp.symlink;
