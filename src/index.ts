@@ -2,7 +2,8 @@ import type { TaskFunction } from "gulp";
 import gulp from "gulp";
 import { exec } from "gulp-execa";
 import * as path from "path";
-import { rollup } from "rollup";
+
+export * from "./rollupTools.js";
 
 const { series } = gulp;
 
@@ -56,37 +57,3 @@ export async function cleanWithGit(): Promise<void> {
 cleanWithGit.displayName = "cleanWithGit";
 
 
-async function rollupConfig(options: any): Promise<void> {
-  let bundle: any;
-  try {
-    try {
-      bundle = await rollup(options);
-      let results = await Promise.allSettled(options.output.map(async (opts: any) => {
-        try {
-          await bundle.write(opts);
-        } catch (error) {
-          console.error(error);
-          throw error;
-        }
-      }));
-      for (let res of results) {
-        if (res.status == "rejected") throw res.reason;
-      }
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
-  } finally {
-    if (bundle) {
-      await bundle.close();
-    }
-  }
-}
-
-export function runRollup(options: any): () => Promise<void> {
-  async function runRollup(): Promise<void> {
-    await Promise.allSettled<void>(options.map(rollupConfig));
-  }
-  runRollup.displayName = "runRollup";
-  return runRollup;
-}
