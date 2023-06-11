@@ -15,6 +15,7 @@ export function run(rollupOptions: RollupOptions[] | RollupOptions, commandOptio
 export function build(options?: DefaultConfigs, commandOptions?: CommandOptions) {
   async function rollupBuild() {
     await toolBuild(options, commandOptions);
+    console.log("done");
   }
   rollupBuild.displayName = "rollupBuild";
   return rollupBuild;
