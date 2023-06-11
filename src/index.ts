@@ -18,12 +18,14 @@ export function isProd(): boolean {
 export async function setProd(): Promise<void> {
   prod = true;
 }
+setProd.displayName = "setProd";
 
 export function selectPnpm(version: string = "latest"): () => Promise<void> {
   return async function selectPnpm() {
     await exec(`corepack prepare pnpm@${version} --activate`);
   };
 }
+selectPnpm.displayName = "selectPnpm";
 
 export async function installDependencies(): Promise<void> {
   if (isProd()) {
@@ -32,15 +34,19 @@ export async function installDependencies(): Promise<void> {
     await exec("pnpm install");
   }
 }
+installDependencies.displayName = "installDependencies";
 
 export function selectPnpmAndInstall(version: string = "latest"): TaskFunction {
   return series(setProd, selectPnpm(version), installDependencies);
 }
+selectPnpmAndInstall.displayName = "selectPnpmAndInstall";
 
 export function prodSelectPnpmAndInstall(version: string = "latest"): TaskFunction {
   return series(setProd, selectPnpm(version), installDependencies);
 }
+prodSelectPnpmAndInstall.displayName = "prodSelectPnpmAndInstall";
 
 export async function cleanWithGit(): Promise<void> {
   await exec("git clean -dfX");
 }
+cleanWithGit.displayName = "cleanWithGit";

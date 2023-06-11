@@ -1,28 +1,9 @@
 import { exec } from "@iiimaddiniii/js-build-tool/execa";
 import { rimraf } from "@iiimaddiniii/js-build-tool/rimraf";
-import gulp from "@iiimaddiniii/js-build-tool/gulp";
+import { series, parallel } from "@iiimaddiniii/js-build-tool/gulp";
+import { prodSelectPnpmAndInstall, selectPnpmAndInstall, cleanWithGit } from "@iiimaddiniii/js-build-tool";
 import * as fs from "fs/promises";
 import * as path from "path";
-
-let prod = false;
-let cwd = process.cwd();
-
-async function setProd() {
-  prod = true;
-}
-
-async function selectLatestPnpmVersion() {
-  await exec("corepack prepare pnpm@latest --activate");
-}
-
-async function installDependencies() {
-  if (prod) {
-    return await exec("pnpm install --frozen-lockfile");
-  }
-  await exec("pnpm install");
-}
-
-const preTasks = gulp.default.series(selectLatestPnpmVersion, installDependencies);
 
 async function bundle() {
   await exec("pnpm install");
@@ -46,11 +27,6 @@ async function packageModules() {
   await fs.rename(srcDir, destDir);
 }
 
-async function cleanGit() {
-  await exec("git clean -dfX");
-}
-
-export const clean = gulp.default.series(preTasks, cleanGit);
-
-export const build = gulp.default.series(preTasks, gulp.default.parallel(bundle, packageModules));
-export const buildCi = gulp.default.series(setProd, preTasks, cleanGit, gulp.default.parallel(bundle, packageModules));
+export const clean = series(selectPnpmAndInstall, cleanWithGit);
+export const build = series(selectPnpmAndInstall, parallel(bundle, packageModules));
+export const buildCi = series(prodSelectPnpmAndInstall, cleanWithGit, parallel(bundle, packageModules));
