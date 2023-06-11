@@ -7,21 +7,26 @@
   },
   "exports": {
     "./cli": {
-      "types": "./dist/cli.d.ts",
-      "import": "./dist/cli.js"
+      "import": {
+        "types": "./dist/cli.d.ts",
+        "default": "./dist/cli.js"
+      }
     },
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
     }
   },
+  "types": "./dist/index.d.ts",
   "type": "module",
   "scripts": {
     "clean": "pnpm run gulp clean",
     "build": "pnpm run gulp build",
     "buildCi": "pnpm run gulp buildCi",
     "test": "pnpm run gulp test",
-    "gulp": "pnpm --package=@iiimaddiniii/js-build-tool@0.1.6 dlx js-build-tool"
+    "gulp": "pnpm --package=@iiimaddiniii/js-build-tool@0.1.7 dlx js-build-tool"
   },
   "repository": {
     "type": "git",
@@ -51,7 +56,8 @@
     "@rollup/pluginutils": "^5.0.2",
     "rollup-plugin-consts": "^1.1.0",
     "rollup-plugin-include-sourcemaps": "^0.7.0",
-    "@schemastore/package": "^0.0.8"
+    "@schemastore/package": "^0.0.8",
+    "@iiimaddiniii/js-build-tool": "^0.1.7"
   },
   "dependencies": {},
   "rollup": {

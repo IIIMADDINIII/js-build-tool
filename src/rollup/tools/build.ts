@@ -8,26 +8,16 @@ import * as path from "path";
 import type { OutputOptions, Plugin, RollupOptions } from "rollup";
 import { consts } from 'rollup-plugin-consts';
 import sourceMaps, { SourcemapsPluginOptions } from 'rollup-plugin-include-sourcemaps';
-import { getPackageJson, isProd } from "../../tools.js";
+import { getPackageDependencies, getPackageDevDependencies, getPackageType, isProd, topLevelExports } from "../../tools.js";
 import { ManageDependenciesConfig, manageDependencies } from "../plugins.js";
 import { run, type CommandOptions } from "./run.js";
 
-export async function topLevelExports(): Promise<string[]> {
-  let packageJson = await getPackageJson();
-  if (!("exports" in packageJson) || (typeof packageJson.exports !== "object") || (packageJson.exports === null)) throw new Error("Package Exports must be an object");
-  // only return entries wich have more than only an type definition
-  return Object.entries(packageJson.exports)
-    .filter(([_key, value]) => {
-      if (typeof value !== "object" || value === null) return true;
-      let keys = Object.keys(value);
-      return keys.length > 1 || !keys.includes("types");
-    })
-    .map(([key, _value]) => key);
-}
 
-type NoDefaults<T extends {}> = T & { noDefaults?: boolean; };
-
-type OutputFormat = "es" | "commonjs";
+export type NoDefaults<T extends {}> = T & { noDefaults?: boolean; };
+export type OutputFormat = "es" | "commonjs";
+export type ExecutionEnvironment = "node" | "browser";
+export type ExportType = "app" | "lib";
+export type SourceMapType = "external" | "inline";
 
 export interface DefaultConfigsOutput {
   hookOutputOptions?(options: DefaultConfigsOutput): Promise<DefaultConfigsOutput | undefined> | DefaultConfigsOutput | undefined;
@@ -43,10 +33,6 @@ export interface DefaultConfigsOutput {
   mjsOutputExt?: string;
   singleOutputExt?: string;
 }
-
-export type ExecutionEnvironment = "node" | "browser";
-export type ExportType = "app" | "lib";
-export type SourceMapType = "external" | "inline";
 
 export interface DefaultConfigsExports extends Partial<DefaultConfigsOutput> {
   hookOptions?(exportName: string, options: DefaultConfigsExports): Promise<[string, DefaultConfigsExports] | undefined> | [string, DefaultConfigsExports] | undefined;
@@ -79,6 +65,11 @@ export interface DefaultConfigsExports extends Partial<DefaultConfigsOutput> {
   sourceMapsPlugin?: NoDefaults<SourcemapsPluginOptions>;
   nodeResolvePlugin?: NoDefaults<RollupNodeResolveOptions>;
 };
+
+export interface DefaultConfigs extends DefaultConfigsExports {
+  exports?: string[] | { [key: string]: DefaultConfigsExports; };
+  additionalExports?: string[] | { [key: string]: DefaultConfigsExports; };
+}
 
 async function runHookOptions(exportName: string, options: DefaultConfigsExports): Promise<[string, DefaultConfigsExports]> {
   if (options.hookOptions) {
@@ -122,6 +113,7 @@ function getTypescriptDefaultOptions(options: DefaultConfigsExports): NoDefaults
     declarationMap: options.generateDeclaration,
     lib,
   };
+  console.log(options.sourceMap, isProd, options);
   if (!options.sourceMap) {
     ret.sourceMap = false;
     ret.inlineSources = undefined;
@@ -134,11 +126,10 @@ async function getManageDependenciesDefaultOptions(options: DefaultConfigsExport
   options.blacklistDependencies = getDefault(options.blacklistDependencies, []);
   options.allowedDevDependencies = getDefault(options.allowedDevDependencies, []);
   options.blacklistDevDependencies = getDefault(options.blacklistDevDependencies, true);
-  let packageJson = await getPackageJson();
-  let deps = Object.keys(getDefault(packageJson.dependencies, {}));
+  let deps = Object.keys(await getPackageDependencies());
   let blacklist = [...options.blacklistDependencies];
   if (options.blacklistDevDependencies) {
-    let devDeps = new Set(Object.keys(getDefault(packageJson.devDependencies, {})));
+    let devDeps = new Set(Object.keys(await getPackageDevDependencies()));
     for (let allowed of options.allowedDevDependencies) {
       devDeps.delete(allowed);
     }
@@ -227,8 +218,7 @@ async function generateOutput(options: DefaultConfigsOutput, isSingleFormat: boo
 }
 
 async function getDefaultOutputs(name: string): Promise<DefaultConfigsOutput[]> {
-  let packageJson = await getPackageJson();
-  let type = packageJson.type;
+  let type = await getPackageType();
   if (type === "module") {
     return [{
       outputFileName: name,
@@ -284,10 +274,6 @@ async function generateExport(exportName: string, options: DefaultConfigsExports
   };
 };
 
-export interface DefaultConfigs extends DefaultConfigsExports {
-  exports?: string[] | { [key: string]: DefaultConfigsExports; };
-  additionalExports?: string[] | { [key: string]: DefaultConfigsExports; };
-}
 
 function mergeExports(a: DefaultConfigsExports | undefined, b: DefaultConfigsExports): DefaultConfigsExports {
   if (a === undefined) {

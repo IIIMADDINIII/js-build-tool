@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 devDependencies:
+  '@iiimaddiniii/js-build-tool':
+    specifier: ^0.1.7
+    version: 0.1.7
   '@rollup/plugin-commonjs':
     specifier: ^25.0.1
     version: 25.0.1(rollup@3.24.1)
@@ -61,6 +64,11 @@ devDependencies:
     version: 5.1.3
 
 packages:
+
+  /@iiimaddiniii/js-build-tool@0.1.7:
+    resolution: {integrity: sha512-XCp53iNHOzjEatW3ql7PkCN0MauJ/SQYaze0W9ENi5yrb26/mNYkhf7csR4uxScaN5nGm1nHaBHcsPDKnUOQwA==}
+    hasBin: true
+    dev: true
 
   /@isaacs/cliui@8.0.2:
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}

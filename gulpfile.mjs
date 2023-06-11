@@ -55,7 +55,14 @@ async function bundleTest() {
   });
 }
 
+let filename = file("packageDependencies.json");
+let content = await fs.readFile(filename);
+let jsonData = JSON.parse(content);
+let deps = Object.keys(jsonData.dependencies);
+
+const bund = rollup.tasks.build({ blacklistDevDependencies: false, externalDependencies: deps }, { failAfterWarnings: false });
+
 export const clean = series(tasks.selectPnpmAndInstall(), tasks.cleanWithGit);
 export const build = series(tasks.selectPnpmAndInstall(), parallel(bundle, packageModules));
 export const buildCi = series(tasks.prodSelectPnpmAndInstall(), tasks.cleanWithGit, parallel(bundle, packageModules));
-export const test = series(tasks.selectPnpmAndInstall(), parallel(rollup.tasks.build(), packageModules));
+export const test = series(tasks.selectPnpmAndInstall(), parallel(bund, packageModules));
