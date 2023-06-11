@@ -23,6 +23,9 @@ devDependencies:
   '@rollup/pluginutils':
     specifier: ^5.0.2
     version: 5.0.2(rollup@3.24.1)
+  '@schemastore/package':
+    specifier: ^0.0.8
+    version: 0.0.8
   '@types/gulp':
     specifier: ^4.0.11
     version: 4.0.11
@@ -253,6 +256,10 @@ packages:
       estree-walker: 2.0.2
       picomatch: 2.3.1
       rollup: 3.24.1
+    dev: true
+
+  /@schemastore/package@0.0.8:
+    resolution: {integrity: sha512-1jMrmFLUZBeQ7zdxe3ez1LSLYrUH4eY3gAPisW1rbNZ62zoYy8sudo9fXSS182s8f7p6TRy7wD6ybZvz9SUT1Q==}
     dev: true
 
   /@sinclair/typebox@0.25.24:

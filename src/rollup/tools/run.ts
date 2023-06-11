@@ -114,7 +114,7 @@ async function build(inputOptions: RollupOptions, warnings: Warnings, silent = f
   }
 }
 
-interface CommandOptions {
+export interface CommandOptions {
   failAfterWarnings?: boolean;
   silent?: boolean;
 }
@@ -147,27 +147,23 @@ async function loadConfigFile(rollupOptions: RollupOptions[] | RollupOptions) {
   }
 };
 
-export function runRollup(rollupOptions: RollupOptions[] | RollupOptions, commandOptions: CommandOptions): () => Promise<void> {
-  async function runRollup(): Promise<void> {
-    const command: Required<CommandOptions> = { failAfterWarnings: false, silent: false, ...commandOptions };
+export async function run(rollupOptions: RollupOptions[] | RollupOptions, commandOptions: CommandOptions): Promise<void> {
+  const command: Required<CommandOptions> = { failAfterWarnings: false, silent: false, ...commandOptions };
+  try {
+    let { options, warnings } = await loadConfigFile(rollupOptions);
     try {
-      let { options, warnings } = await loadConfigFile(rollupOptions);
-      try {
-        for (const inputOptions of options) {
-          await build(inputOptions, warnings, command.silent);
-        }
-        if (command.failAfterWarnings && warnings.warningOccurred) {
-          warnings.flush();
-          rollup.handleError(rollup.errorFailAfterWarnings(), true);
-        }
-      } catch (error) {
+      for (const inputOptions of options) {
+        await build(inputOptions, warnings, command.silent);
+      }
+      if (command.failAfterWarnings && warnings.warningOccurred) {
         warnings.flush();
-        rollup.handleError(error, true);
+        rollup.handleError(rollup.errorFailAfterWarnings(), true);
       }
     } catch (error) {
+      warnings.flush();
       rollup.handleError(error, true);
     }
+  } catch (error) {
+    rollup.handleError(error, true);
   }
-  runRollup.displayName = "runRollup";
-  return runRollup;
 }

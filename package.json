@@ -20,8 +20,8 @@
     "clean": "pnpm run gulp clean",
     "build": "pnpm run gulp build",
     "buildCi": "pnpm run gulp buildCi",
-    "test": "pnpm run gulp build",
-    "gulp": "pnpm --package=@iiimaddiniii/js-build-tool@0.1.2 dlx js-build-tool"
+    "test": "pnpm run gulp test",
+    "gulp": "pnpm --package=@iiimaddiniii/js-build-tool@0.1.3 dlx js-build-tool"
   },
   "repository": {
     "type": "git",
@@ -50,7 +50,8 @@
     "@rollup/plugin-json": "^6.0.0",
     "@rollup/pluginutils": "^5.0.2",
     "rollup-plugin-consts": "^1.1.0",
-    "rollup-plugin-include-sourcemaps": "^0.7.0"
+    "rollup-plugin-include-sourcemaps": "^0.7.0",
+    "@schemastore/package": "^0.0.8"
   },
   "dependencies": {},
   "rollup": {
