@@ -13,22 +13,6 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
-    },
-    "./gulp": {
-      "types": "./dist/gulp.d.ts",
-      "import": "./dist/gulp.js"
-    },
-    "./execa": {
-      "types": "./dist/execa.d.ts",
-      "import": "./dist/execa.js"
-    },
-    "./rimraf": {
-      "types": "./dist/rimraf.d.ts",
-      "import": "./dist/rimraf.js"
-    },
-    "./rollup": {
-      "types": "./dist/rollup.d.ts",
-      "import": "./dist/rollup.js"
     }
   },
   "type": "module",
@@ -58,14 +42,35 @@
     "tslib": "^2.5.3",
     "gulp": "^4.0.2",
     "gulp-execa": "^5.0.0",
-    "rimraf": "^5.0.1"
+    "rimraf": "^5.0.1",
+    "@rollup/plugin-commonjs": "^25.0.1",
+    "@rollup/plugin-node-resolve": "^15.1.0",
+    "@rollup/plugin-terser": "^0.4.3",
+    "@rollup/plugin-typescript": "^11.1.1",
+    "@rollup/plugin-json": "^6.0.0",
+    "@rollup/pluginutils": "^5.0.2",
+    "rollup-plugin-consts": "^1.1.0",
+    "rollup-plugin-include-sourcemaps": "^0.7.0"
   },
   "dependencies": {},
   "rollup": {
     "allowDevDependencies": true,
     "externalPackages": [
+      "@iiimaddiniii/js-build-tool",
+      "typescript",
+      "rollup",
+      "tslib",
       "gulp",
-      "@iiimaddiniii/js-build-tool"
+      "gulp-execa",
+      "rimraf",
+      "@rollup/plugin-commonjs",
+      "@rollup/plugin-node-resolve",
+      "@rollup/plugin-terser",
+      "@rollup/plugin-typescript",
+      "@rollup/plugin-json",
+      "@rollup/pluginutils",
+      "rollup-plugin-consts",
+      "rollup-plugin-include-sourcemaps"
     ],
     "resolveNode": true,
     "doNotGenerateDeclarationInProduction": true

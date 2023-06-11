@@ -1,8 +1,8 @@
-import { exec } from "@iiimaddiniii/js-build-tool/execa";
-import { series } from "@iiimaddiniii/js-build-tool/gulp";
-import { rollup } from "@iiimaddiniii/js-build-tool/rollup";
 import type { TaskFunction } from "gulp";
+import { series } from "gulp";
+import { exec } from "gulp-execa";
 import * as path from "path";
+import { rollup } from "rollup";
 
 let prod = false;
 export const cwd = process.cwd();

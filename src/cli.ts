@@ -3,26 +3,68 @@
 
 
 import * as cp from "child_process";
-import * as fs from "fs";
+import * as fs from "fs/promises";
 import * as path from "path";
 import * as url from 'url';
-//const __filename = url.fileURLToPath(import.meta.url);
-const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
-let cwd = process.cwd();
-let src = path.resolve(cwd, "gulpfile.mjs");
-let modules = path.resolve(__dirname, "../modules");
-let nodeModules = path.resolve(__dirname, "../node_modules");
-let bin = path.resolve(nodeModules, ".bin");
-let dest = path.resolve(__dirname, "../../../../../../../gulpfile.mjs");
-let args = "\"" + process.argv.slice(2).join("\" \"") + "\"";
-let command = `gulp -f "${dest}" --cwd "${cwd}" ${args}`;
-fs.rmSync(nodeModules, { recursive: true, force: true });
-fs.renameSync(modules, nodeModules);
-fs.copyFileSync(src, dest);
-try {
-  cp.execSync(command, { stdio: "inherit", cwd: bin });
-} catch (e) {
-  if ((typeof e !== "object") || (e === null) || !("status" in e) || (typeof e.status !== "number")) process.exit(-1);
-  process.exit(e.status);
+async function run() {
+  const gulpFile = "gulpfile.mjs";
+  const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+  const cwd = process.cwd();
+  const packagePath = path.resolve(__dirname, "..");
+  const dlxPath = findDlxPath(packagePath);
+  await copyNodeModules(packagePath, dlxPath);
+  await copyGulpFile(cwd, dlxPath, gulpFile);
+  runGulp(cwd, dlxPath, gulpFile);
 }
+
+async function copyNodeModules(packagePath: string, dlxPath: string) {
+  const modules = path.resolve(packagePath, "modules");
+  const nodeModules = path.resolve(dlxPath, "node_modules");
+  await dirsMerge(modules, nodeModules);
+}
+
+async function copyGulpFile(cwd: string, dlxPath: string, gulpFile: string) {
+  let src = path.resolve(cwd, gulpFile);
+  let dest = path.resolve(dlxPath, gulpFile);
+  await fs.copyFile(src, dest);
+}
+
+function runGulp(cwd: string, dlxPath: string, gulpFile: string) {
+  const args = "\"" + process.argv.slice(2).join("\" \"") + "\"";
+  const gulpfile = path.resolve(dlxPath, gulpFile);
+  const bin = path.resolve(dlxPath, "node_modules/.bin");
+  try {
+    let command = `gulp -f "${gulpfile}" --cwd "${cwd}" ${args}`;
+    cp.execSync(command, { stdio: "inherit", cwd: bin });
+  } catch (e) {
+    if ((typeof e !== "object") || (e === null) || !("status" in e) || (typeof e.status !== "number")) process.exit(-1);
+    process.exit(e.status);
+  }
+
+}
+
+function findDlxPath(packagePath: string): string {
+  return packagePath.slice(0, packagePath.indexOf("node_modules"));
+}
+
+export async function dirsMerge(sourceDir: string, destinationDir: string): Promise<void> {
+  const sourceEntryNames = await fs.readdir(sourceDir);
+  await Promise.all(sourceEntryNames.map(async (sourceEntryName) => {
+    const sourceEntryPath = path.join(sourceDir, sourceEntryName);
+    const destinationEntryPath = path.join(destinationDir, sourceEntryName);
+    try {
+      const destStats = await fs.stat(destinationEntryPath);
+      if (destStats.isDirectory()) {
+        await dirsMerge(sourceEntryPath, destinationEntryPath);
+      } else {
+        return;
+      }
+    } catch (error) {
+      if ((typeof error !== "object") || (error === null) || !("code" in error) || (error.code !== "ENOENT")) throw error;
+      await fs.rename(sourceEntryPath, destinationEntryPath);
+    }
+  }));
+}
+
+run().catch(console.error);
