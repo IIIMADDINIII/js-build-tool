@@ -13,9 +13,7 @@ async function run() {
   const cwd = process.cwd();
   const packagePath = path.resolve(__dirname, "..");
   const dlxPath = findDlxPath(packagePath);
-  let date = new Date();
   await copyNodeModules(packagePath, dlxPath);
-  console.log(date.getTime() - (new Date()).getTime());
   await copyGulpFile(cwd, dlxPath, gulpFile);
   runGulp(cwd, dlxPath, gulpFile);
 }

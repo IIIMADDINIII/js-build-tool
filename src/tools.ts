@@ -35,5 +35,5 @@ export async function getPackageJson(cache: boolean = true): Promise<JSONSchemaF
   return json;
 }
 
-export * as rollup from "./rollup/tools.js";
+
 

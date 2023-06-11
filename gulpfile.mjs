@@ -1,7 +1,6 @@
 import { exec } from "gulp-execa";
 import { rimraf } from "rimraf";
-import gulp from "gulp";
-import { file, cleanWithGit, selectPnpmAndInstall, prodSelectPnpmAndInstall, isProd, runRollup } from "@iiimaddiniii/js-build-tool";
+import { file, tasks, isProd, rollup, series, parallel } from "@iiimaddiniii/js-build-tool";
 import * as fs from "fs/promises";
 import * as path from "path";
 
@@ -12,8 +11,6 @@ import terser from "@rollup/plugin-terser";
 import typescript from "@rollup/plugin-typescript";
 import { consts } from 'rollup-plugin-consts';
 import sourceMaps from 'rollup-plugin-include-sourcemaps';
-
-const { series, parallel } = gulp;
 
 async function bundle() {
   await exec("pnpm install");
@@ -47,7 +44,7 @@ async function bundleTest() {
     sourceMaps(),
     nodeResolve(),
   ];
-  await runRollup({
+  await rollup.run({
     input: `./src/index.ts`,
     output: {
       file: `./dist/index.js`,
@@ -55,10 +52,10 @@ async function bundleTest() {
       sourcemap: true,
     },
     plugins
-  })();
+  });
 }
 
-export const clean = series(selectPnpmAndInstall(), cleanWithGit);
-export const build = series(selectPnpmAndInstall(), parallel(bundle, packageModules));
-export const buildCi = series(prodSelectPnpmAndInstall(), cleanWithGit, parallel(bundle, packageModules));
-export const test = series(selectPnpmAndInstall(), parallel(bundleTest, packageModules));
+export const clean = series(tasks.selectPnpmAndInstall(), tasks.cleanWithGit);
+export const build = series(tasks.selectPnpmAndInstall(), parallel(bundle, packageModules));
+export const buildCi = series(tasks.prodSelectPnpmAndInstall(), tasks.cleanWithGit, parallel(bundle, packageModules));
+//export const test = series(tasks.selectPnpmAndInstall(), parallel(rollup.tasks.run(), packageModules));
