@@ -58,4 +58,4 @@ async function bundleTest() {
 export const clean = series(tasks.selectPnpmAndInstall(), tasks.cleanWithGit);
 export const build = series(tasks.selectPnpmAndInstall(), parallel(bundle, packageModules));
 export const buildCi = series(tasks.prodSelectPnpmAndInstall(), tasks.cleanWithGit, parallel(bundle, packageModules));
-//export const test = series(tasks.selectPnpmAndInstall(), parallel(rollup.tasks.run(), packageModules));
+export const test = series(tasks.selectPnpmAndInstall(), parallel(rollup.tasks.build(), packageModules));

@@ -75,14 +75,6 @@ function prettyBytes(number: number) {
   return numberString + ' ' + unit;
 }
 
-function printTimings(timings: SerializedTimings) {
-  for (const [label, [time, memory, total]] of Object.entries(timings)) {
-    const appliedColor = label[0] === '#' ? (label[1] === '#' ? rollup.bold : rollup.underline) : (text: string) => text;
-    const row = `${label}: ${time.toFixed(0)}ms, ${prettyBytes(memory)} / ${prettyBytes(total)}`;
-    console.info(appliedColor(row));
-  }
-}
-
 async function build(inputOptions: RollupOptions, warnings: Warnings, silent = false) {
   let outputOptions = inputOptions.output;
   if (outputOptions === undefined) outputOptions = [];
@@ -111,6 +103,21 @@ async function build(inputOptions: RollupOptions, warnings: Warnings, silent = f
     if (bundle && bundle.getTimings) {
       printTimings(bundle.getTimings());
     }
+  }
+}
+
+function printTimings(timings: SerializedTimings) {
+  for (const [label, [time, memory, total]] of Object.entries(timings)) {
+    let appliedColor = (text: string) => text;
+    if (label[0] === '#') {
+      if (label[1] === '#') {
+        appliedColor = rollup.bold;
+      } else {
+        appliedColor = rollup.underline;
+      }
+    }
+    const row = `${label}: ${time.toFixed(0)}ms, ${prettyBytes(memory)} / ${prettyBytes(total)}`;
+    console.info(appliedColor(row));
   }
 }
 
@@ -147,8 +154,9 @@ async function loadConfigFile(rollupOptions: RollupOptions[] | RollupOptions) {
   }
 };
 
-export async function run(rollupOptions: RollupOptions[] | RollupOptions, commandOptions: CommandOptions): Promise<void> {
-  const command: Required<CommandOptions> = { failAfterWarnings: false, silent: false, ...commandOptions };
+export async function run(rollupOptions?: RollupOptions[] | RollupOptions, commandOptions?: CommandOptions): Promise<void> {
+  if (rollupOptions === undefined) throw new Error("Rollup config is Empty");
+  const command: Required<CommandOptions> = { failAfterWarnings: true, silent: false, ...commandOptions };
   try {
     let { options, warnings } = await loadConfigFile(rollupOptions);
     try {
