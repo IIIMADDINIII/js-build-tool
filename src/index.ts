@@ -1,8 +1,10 @@
 import type { TaskFunction } from "gulp";
-import { series } from "gulp";
+import gulp from "gulp";
 import { exec } from "gulp-execa";
 import * as path from "path";
 import { rollup } from "rollup";
+
+const { series } = gulp;
 
 let prod = false;
 export const cwd = process.cwd();

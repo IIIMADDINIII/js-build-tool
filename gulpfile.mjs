@@ -1,9 +1,11 @@
-import { exec } from "@iiimaddiniii/js-build-tool/execa";
-import { rimraf } from "@iiimaddiniii/js-build-tool/rimraf";
-import { series, parallel } from "@iiimaddiniii/js-build-tool/gulp";
+import { exec } from "gulp-execa";
+import { rimraf } from "rimraf";
+import gulp from "gulp";
 import { file, cleanWithGit, selectPnpmAndInstall, prodSelectPnpmAndInstall, isProd } from "@iiimaddiniii/js-build-tool";
 import * as fs from "fs/promises";
 import * as path from "path";
+
+const { series, parallel } = gulp;
 
 async function bundle() {
   await exec("pnpm install");
