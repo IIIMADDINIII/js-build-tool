@@ -21,11 +21,12 @@ export async function setProd(): Promise<void> {
 setProd.displayName = "setProd";
 
 export function selectPnpm(version: string = "latest"): () => Promise<void> {
-  return async function selectPnpm() {
+  async function selectPnpm() {
     await exec(`corepack prepare pnpm@${version} --activate`);
   };
+  selectPnpm.displayName = "selectPnpm";
+  return selectPnpm;
 }
-selectPnpm.displayName = "selectPnpm";
 
 export async function installDependencies(): Promise<void> {
   if (isProd()) {
