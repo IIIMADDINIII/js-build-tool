@@ -10,7 +10,7 @@ async function packageModules() {
   let srcDir = tools.file(".tmpBuild/node_modules");
   let destDir = tools.file("modules/node_modules");
   let destParent = tools.file("modules");
-  await rimraf([tmpBuildDir, destDir]);
+  await rimraf([tmpBuildDir, destParent]);
   await fs.mkdir(tmpBuildDir);
   await fs.copyFile(src, dest);
   await exec("pnpm install --node-linker=hoisted", { cwd: tmpBuildDir });
