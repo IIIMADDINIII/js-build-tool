@@ -8,7 +8,8 @@ import * as path from "path";
 import type { OutputOptions, Plugin, RollupOptions } from "rollup";
 import { consts } from 'rollup-plugin-consts';
 import sourceMaps, { SourcemapsPluginOptions } from 'rollup-plugin-include-sourcemaps';
-import { getPackageDependencies, getPackageDevDependencies, getPackageType, isProd, topLevelExports } from "../../tools.js";
+import { isProd } from "../../tools/misc.js";
+import { getPackageDependencies, getPackageDevDependencies, getPackageType, topLevelExports } from "../../tools/package.js";
 import { ManageDependenciesConfig, manageDependencies } from "../plugins.js";
 import { run, type CommandOptions } from "./run.js";
 

@@ -1,6 +1,7 @@
 
 import * as fs from "fs/promises";
-import gulp from "gulp";
+import gulp, { TaskFunction } from "gulp";
+import { exec } from "gulp-execa";
 import * as path from "path";
 
 export const series: typeof gulp.series = gulp.series;
@@ -30,4 +31,25 @@ export async function read(relPath: string): Promise<string> {
 
 export async function readJson(relPath: string): Promise<any> {
   return JSON.parse(await read(relPath));
+}
+
+export async function selectPnpm(version: string = "latest"): Promise<void> {
+  await exec(`corepack prepare pnpm@${version} --activate`);
+}
+
+export async function installDependencies(): Promise<void> {
+  if (isProd()) {
+    await exec("pnpm install --frozen-lockfile");
+  } else {
+    await exec("pnpm install");
+  }
+}
+
+export async function cleanWithGit(): Promise<void> {
+  await exec("git clean -dfX");
+}
+
+export function setDisplayName<T extends TaskFunction>(name: string, task: T): T {
+  task.displayName = name;
+  return task;
 }
