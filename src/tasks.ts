@@ -36,22 +36,21 @@ export function cleanWithGit(): () => Promise<void> {
   });
 }
 
-
 export function runScript(script: string, args: string[] = []): () => Promise<void> {
   return setDisplayName("runScript", async function runScript() {
     tool.runScript(script, args);
   });
 }
 
-export function runWorkspaceScript(script: string, args: string[] = []): () => Promise<void> {
+export function runWorkspaceScript(script: string, filter: string = "*", args: string[] = []): () => Promise<void> {
   return setDisplayName("runWorkspaceScript", async function runWorkspaceScript() {
-    await tool.runWorkspaceScript(script, args);
+    await tool.runWorkspaceScript(script, filter, args);
   });
 }
 
-export function runWorkspaceScriptParallel(script: string, args: string[] = []): () => Promise<void> {
+export function runWorkspaceScriptParallel(script: string, filter: string = "*", args: string[] = []): () => Promise<void> {
   return setDisplayName("runWorkspaceScriptParallel", async function runWorkspaceScriptParallel() {
-    await tool.runWorkspaceScriptParallel(script, args);
+    await tool.runWorkspaceScriptParallel(script, filter, args);
   });
 }
 

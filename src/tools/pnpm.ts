@@ -20,12 +20,12 @@ export async function runScript(script: string, args: string[] = []) {
   await exec("pnpm run " + script + " " + arg);
 }
 
-export async function runWorkspaceScript(script: string, args: string[] = []) {
+export async function runWorkspaceScript(script: string, filter: string = "*", args: string[] = []) {
   let arg = args.length > 0 ? "\"" + args.join("\" \"") + "\"" : "";
-  await exec("pnpm run -r --reporter=append-only --aggregate-output " + script + " " + arg);
+  await exec("pnpm run --filter=" + filter + " --reporter=append-only --aggregate-output " + script + " " + arg);
 }
 
-export async function runWorkspaceScriptParallel(script: string, args: string[] = []) {
+export async function runWorkspaceScriptParallel(script: string, filter: string = "*", args: string[] = []) {
   let arg = args.length > 0 ? "\"" + args.join("\" \"") + "\"" : "";
-  await exec("pnpm run -r --parallel --reporter=append-only --aggregate-output " + script + " " + arg);
+  await exec("pnpm run --filter=" + filter + " --parallel --reporter=append-only --aggregate-output " + script + " " + arg);
 }
