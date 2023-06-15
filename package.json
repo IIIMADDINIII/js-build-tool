@@ -1,6 +1,6 @@
 {
   "name": "@iiimaddiniii/js-build-tool",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Tool for building my javascript projects",
   "bin": {
     "js-build-tool": "./dist/cli.js"
