@@ -58,27 +58,5 @@
     "@schemastore/package": "^0.0.8",
     "@iiimaddiniii/js-build-tool": "^0.1.7"
   },
-  "dependencies": {},
-  "rollup": {
-    "allowDevDependencies": true,
-    "externalPackages": [
-      "@iiimaddiniii/js-build-tool",
-      "typescript",
-      "rollup",
-      "tslib",
-      "gulp",
-      "gulp-execa",
-      "rimraf",
-      "@rollup/plugin-commonjs",
-      "@rollup/plugin-node-resolve",
-      "@rollup/plugin-terser",
-      "@rollup/plugin-typescript",
-      "@rollup/plugin-json",
-      "@rollup/pluginutils",
-      "rollup-plugin-consts",
-      "rollup-plugin-include-sourcemaps"
-    ],
-    "resolveNode": true,
-    "doNotGenerateDeclarationInProduction": true
-  }
+  "dependencies": {}
 }

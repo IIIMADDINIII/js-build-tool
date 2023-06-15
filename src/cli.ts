@@ -13,15 +13,35 @@ async function run() {
   const cwd = process.cwd();
   const packagePath = path.resolve(__dirname, "..");
   const dlxPath = findDlxPath(packagePath);
-  await copyNodeModules(packagePath, dlxPath);
+  await symlinkPackages(packagePath, dlxPath);
   await copyGulpFile(cwd, dlxPath, gulpFile);
   runGulp(cwd, dlxPath, gulpFile);
 }
 
-async function copyNodeModules(packagePath: string, dlxPath: string) {
-  const modules = path.resolve(packagePath, "modules");
-  const nodeModules = path.resolve(dlxPath, "node_modules");
-  await dirsMerge(modules, nodeModules);
+type SymlinkPackages = { [key: string]: true | SymlinkPackages; };
+const SymlinkPackages: SymlinkPackages = {
+  "typescript": true,
+  "rollup": true,
+  "tslib": true,
+  "gulp": true,
+  "gulp-execa": true,
+  "rimraf": true,
+  "@rollup": {
+    "plugin-commonjs": true,
+    "plugin-node-resolve": true,
+    "plugin-terser": true,
+    "plugin-typescript": true,
+    "plugin-json": true,
+    "@rollup/pluginutils": true
+  },
+  "rollup-plugin-consts": true,
+  "rollup-plugin-include-sourcemaps": true
+};
+
+async function symlinkPackages(packagePath: string, dlxPath: string) {
+  const modules = path.resolve(packagePath, "modules/node_modules");
+  const dlxNodeModules = path.resolve(dlxPath, "node_modules");
+  await linkDirs(modules, dlxNodeModules, SymlinkPackages);
 }
 
 async function copyGulpFile(cwd: string, dlxPath: string, gulpFile: string) {
@@ -48,26 +68,21 @@ function findDlxPath(packagePath: string): string {
   return packagePath.slice(0, packagePath.indexOf("node_modules"));
 }
 
-export async function dirsMerge(sourceDir: string, destinationDir: string): Promise<void> {
-  const sourceEntryNames = await fs.readdir(sourceDir);
-  await Promise.all(sourceEntryNames.map(async (sourceEntryName) => {
-    const sourceEntryPath = path.join(sourceDir, sourceEntryName);
-    const destinationEntryPath = path.join(destinationDir, sourceEntryName);
+export async function linkDirs(sourceDir: string, destinationDir: string, dirs: SymlinkPackages): Promise<void> {
+  const sourceEntryNames = Object.entries(dirs);
+  await Promise.all(sourceEntryNames.map(async ([folder, children]) => {
+    const sourceEntryPath = path.join(sourceDir, folder);
+    const destinationEntryPath = path.join(destinationDir, folder);
     try {
       const destStats = await fs.stat(destinationEntryPath);
-      if (destStats.isDirectory()) {
-        await dirsMerge(sourceEntryPath, destinationEntryPath);
+      if (destStats.isDirectory() && typeof children === "object") {
+        await linkDirs(sourceEntryPath, destinationEntryPath, children);
       } else {
         return;
       }
     } catch (error) {
       if ((typeof error !== "object") || (error === null) || !("code" in error) || (error.code !== "ENOENT")) throw error;
-      let sourceStats = await fs.stat(sourceEntryPath);
-      if (sourceStats.isDirectory()) {
-        await fs.symlink(sourceEntryPath, destinationEntryPath, "junction");
-      } else {
-        await fs.rename(sourceEntryPath, destinationEntryPath);
-      }
+      await fs.symlink(sourceEntryPath, destinationEntryPath, "junction");
     }
   }));
 }
