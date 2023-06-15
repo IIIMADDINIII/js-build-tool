@@ -170,8 +170,10 @@ export async function run(rollupOptions?: RollupOptions[] | RollupOptions, comma
     } catch (error) {
       warnings.flush();
       rollup.handleError(error, true);
+      throw error;
     }
   } catch (error) {
     rollup.handleError(error, true);
+    throw error;
   }
 }

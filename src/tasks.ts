@@ -1,21 +1,24 @@
 
-import { series, setDisplayName, cleanWithGit as toolCleanWithGit, installDependencies as toolInstallDependencies, selectPnpm as toolSelectPnpm, setProd as toolSetProd, type TaskFunction } from "./tools.js";
+import * as tool from "./tools.js";
+import { TaskFunction, series, setDisplayName } from "./tools.js";
+
+export * as rollup from "./rollup/tasks.js";
 
 export function setProd(): () => Promise<void> {
   return setDisplayName("setProd", async function setProd() {
-    toolSetProd();
+    tool.setProd();
   });
 }
 
 export function selectPnpm(version: string = "latest"): () => Promise<void> {
   return setDisplayName("selectPnpm", async function selectPnpm() {
-    await toolSelectPnpm(version);
+    await tool.selectPnpm(version);
   });
 }
 
 export function installDependencies(): () => Promise<void> {
   return setDisplayName("installDependencies", async function installDependencies() {
-    await toolInstallDependencies();
+    await tool.installDependencies();
   });
 }
 
@@ -29,9 +32,28 @@ export function prodSelectPnpmAndInstall(version: string = "latest"): TaskFuncti
 
 export function cleanWithGit(): () => Promise<void> {
   return setDisplayName("cleanWithGit", async function selectPnpm() {
-    await toolCleanWithGit();
+    await tool.cleanWithGit();
   });
 }
 
-export * as rollup from "./rollup/tasks.js";
+
+export function runScript(script: string, args: string[] = []): () => Promise<void> {
+  return setDisplayName("runScript", async function runScript() {
+    tool.runScript(script, args);
+  });
+}
+
+export function runWorkspaceScript(script: string, args: string[] = []): () => Promise<void> {
+  return setDisplayName("runWorkspaceScript", async function runWorkspaceScript() {
+    await tool.runWorkspaceScript(script, args);
+  });
+}
+
+export function runWorkspaceScriptParallel(script: string, args: string[] = []): () => Promise<void> {
+  return setDisplayName("runWorkspaceScriptParallel", async function runWorkspaceScriptParallel() {
+    await tool.runWorkspaceScriptParallel(script, args);
+  });
+}
+
+
 

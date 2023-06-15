@@ -14,10 +14,13 @@ export const cwd = process.cwd();
 export const packageDir = cwd;
 
 export function isProd(): boolean {
-  return prod;
+  let prodEnv = process.env["prod"];
+  if (prodEnv === undefined) return prod;
+  return prod || (prodEnv.trim().toLowerCase() == "true");
 }
 
 export function setProd(): void {
+  process.env["prod"] = "true";
   prod = true;
 }
 
@@ -31,18 +34,6 @@ export async function read(relPath: string): Promise<string> {
 
 export async function readJson(relPath: string): Promise<any> {
   return JSON.parse(await read(relPath));
-}
-
-export async function selectPnpm(version: string = "latest"): Promise<void> {
-  await exec(`corepack prepare pnpm@${version} --activate`);
-}
-
-export async function installDependencies(): Promise<void> {
-  if (isProd()) {
-    await exec("pnpm install --frozen-lockfile");
-  } else {
-    await exec("pnpm install");
-  }
 }
 
 export async function cleanWithGit(): Promise<void> {
