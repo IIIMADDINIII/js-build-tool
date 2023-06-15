@@ -18,8 +18,13 @@ async function run() {
   runGulp(cwd, dlxPath, gulpFile);
 }
 
-type SymlinkPackages = { [key: string]: true | SymlinkPackages; };
+type SymlinkPackages = { [key: string]: boolean | SymlinkPackages; };
 const SymlinkPackages: SymlinkPackages = {
+  ".bin": {
+    "gulp": false,
+    "gulp.CMD": false,
+    "gulp.ps1": false,
+  },
   "typescript": true,
   "rollup": true,
   "tslib": true,
@@ -61,7 +66,6 @@ function runGulp(cwd: string, dlxPath: string, gulpFile: string) {
     if ((typeof e !== "object") || (e === null) || !("status" in e) || (typeof e.status !== "number")) process.exit(-1);
     process.exit(e.status);
   }
-
 }
 
 function findDlxPath(packagePath: string): string {
@@ -82,7 +86,11 @@ export async function linkDirs(sourceDir: string, destinationDir: string, dirs: 
       }
     } catch (error) {
       if ((typeof error !== "object") || (error === null) || !("code" in error) || (error.code !== "ENOENT")) throw error;
-      await fs.symlink(sourceEntryPath, destinationEntryPath, "junction");
+      if (typeof children === "object" || children) {
+        await fs.symlink(sourceEntryPath, destinationEntryPath, "junction");
+      } else {
+        await fs.rename(sourceEntryPath, destinationEntryPath);
+      }
     }
   }));
 }
