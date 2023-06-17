@@ -37,7 +37,7 @@ export async function readJson(relPath: string): Promise<any> {
 }
 
 export async function cleanWithGit(): Promise<void> {
-  await exec("git clean -dfX");
+  await exec("git -c core.longpaths=true clean -dfX");
 }
 
 export function setDisplayName<T extends TaskFunction>(name: string, task: T): T {

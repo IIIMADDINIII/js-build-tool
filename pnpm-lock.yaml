@@ -15,8 +15,8 @@ devDependencies:
     specifier: ^6.1.1
     version: 6.1.1
   '@iiimaddiniii/js-build-tool':
-    specifier: ^0.2.4
-    version: 0.2.4
+    specifier: ^0.2.5
+    version: 0.2.5
   '@rollup/plugin-commonjs':
     specifier: ^25.0.1
     version: 25.0.1(rollup@3.25.1)
@@ -355,8 +355,8 @@ packages:
       - supports-color
     dev: true
 
-  /@iiimaddiniii/js-build-tool@0.2.4:
-    resolution: {integrity: sha512-lf0nteQT/q3xMTlxSVF0gqoUYNWXvYJJA3IKmqs9PGVizO00M3TC1VvWR7SrvtMHH+9+zRyqiOhhBo1JULPt3w==}
+  /@iiimaddiniii/js-build-tool@0.2.5:
+    resolution: {integrity: sha512-0hRJ8xXtVM5oQDSGePVm9gtnm2MW+EQ7Gk+SKoToK9z6/oJ/AYWD4eKYx0x0WI8pBbL2PAPYdMJlsk7w5IQ41g==}
     hasBin: true
     dev: true
 

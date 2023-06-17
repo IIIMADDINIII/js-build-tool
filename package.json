@@ -28,7 +28,7 @@
     "clean": "pnpm run gulp clean",
     "build": "pnpm run gulp build",
     "buildCi": "pnpm run gulp buildCi",
-    "gulp": "pnpm --package=@iiimaddiniii/js-build-tool@0.2.1 dlx js-build-tool"
+    "gulp": "pnpm --package=@iiimaddiniii/js-build-tool@0.2.5 dlx js-build-tool"
   },
   "repository": {
     "type": "git",
@@ -59,7 +59,7 @@
     "rollup-plugin-consts": "^1.1.0",
     "rollup-plugin-include-sourcemaps": "^0.7.0",
     "@schemastore/package": "^0.0.8",
-    "@iiimaddiniii/js-build-tool": "^0.2.4",
+    "@iiimaddiniii/js-build-tool": "^0.2.5",
     "@electron-forge/core": "^6.1.1",
     "@electron-forge/maker-wix": "^6.1.1",
     "@electron-forge/maker-zip": "^6.1.1"

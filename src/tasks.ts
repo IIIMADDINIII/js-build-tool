@@ -54,9 +54,11 @@ export function runWorkspaceScriptParallel(script: string, filter: string = "*",
   });
 }
 
-export function exit(): () => Promise<never> {
+export function exit(): () => Promise<void> {
   return setDisplayName("exit", async function exit() {
-    process.exit();
+    setTimeout(() => {
+      process.exit();
+    }, 50);
   });
 }
 
