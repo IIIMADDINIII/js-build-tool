@@ -40,7 +40,12 @@ const SymlinkPackages: SymlinkPackages = {
     "@rollup/pluginutils": true
   },
   "rollup-plugin-consts": true,
-  "rollup-plugin-include-sourcemaps": true
+  "rollup-plugin-include-sourcemaps": true,
+  "@electron-forge": {
+    "core": true,
+    "maker-wix": true,
+    "maker-zip": true,
+  },
 };
 
 async function symlinkPackages(packagePath: string, dlxPath: string) {

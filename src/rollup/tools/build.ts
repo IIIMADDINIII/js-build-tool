@@ -208,7 +208,7 @@ async function generateOutput(options: DefaultConfigsOutput, isSingleFormat: boo
   options.isSingleFormat = getDefault(options.isSingleFormat, isSingleFormat);
   options.outputFileDir = getDefault(options.outputFileDir, getDefaultOutput(options, options.singleOutputDir, options.mjsOutputDir, options.cjsOutputDir));
   options.outputFileExt = getDefault(options.outputFileExt, getDefaultOutput(options, options.singleOutputExt, options.mjsOutputExt, options.cjsOutputExt));
-  let sm: boolean | "inline" = sourceMap ? sourceMapType === "inline" ? "inline" : true : false;
+  let sm: boolean | "inline" = sourceMap ? (sourceMapType === "inline" ? "inline" : true) : false;
   let file = path.resolve(options.outputFileDir, options.outputFileName + options.outputFileExt);
   return {
     file,
@@ -302,6 +302,7 @@ export async function calculatePackageJsonTypes(config?: RollupOptions[]): Promi
   // let packageJson = await getPackageJson();
   // let packageType: OutputFormat = "commonjs";
   // if (packageJson.type === "module") packageType = "es";
+  // ToDo: Optimize so package.json files are only created at the necessary levels
   for (let options of config) {
     let outputs = options.output;
     if (outputs === undefined) continue;
