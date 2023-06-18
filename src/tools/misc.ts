@@ -1,9 +1,17 @@
 
+import { fetchLatestRelease, fetchReleaseByTag } from "fetch-github-release";
 import * as fs from "fs/promises";
 import gulp, { TaskFunction } from "gulp";
 import { exec } from "gulp-execa";
 import * as path from "path";
+import * as url from 'url';
 
+
+function findDlxPath(packagePath: string): string {
+  return packagePath.slice(0, packagePath.indexOf("node_modules"));
+}
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+export const dlxPath = findDlxPath(__dirname);
 export const series: typeof gulp.series = gulp.series;
 export const parallel: typeof gulp.parallel = gulp.parallel;
 export type { TaskFunction } from "gulp";
@@ -43,4 +51,16 @@ export async function cleanWithGit(): Promise<void> {
 export function setDisplayName<T extends TaskFunction>(name: string, task: T): T {
   task.displayName = name;
   return task;
+}
+
+export function addToPath(folder: string): void {
+  process.env["path"] = folder + ";" + process.env["path"];
+}
+
+export async function downloadLatestGithubRelease(options: Parameters<typeof fetchLatestRelease>[0]) {
+  await fetchLatestRelease(options);
+}
+
+export async function downloadGithubRelease(options: Parameters<typeof fetchReleaseByTag>[0]) {
+  await fetchReleaseByTag(options);
 }

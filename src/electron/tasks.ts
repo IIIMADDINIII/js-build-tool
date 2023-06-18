@@ -15,3 +15,9 @@ export function start() {
     await tools.start();
   });
 }
+
+export function prepareWixTools(releaseTag?: string) {
+  return setDisplayName("prepareWixTools", async function prepareWixTools() {
+    await tools.prepareWixTools(releaseTag);
+  });
+}

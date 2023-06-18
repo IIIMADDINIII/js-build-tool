@@ -1,6 +1,3 @@
-// Reference Switches so that the const:production and const:development packages are defined
-// <reference types="@iiimaddiniii/js-build-tool/switches" />
-
 
 import * as cp from "child_process";
 import * as fs from "fs/promises";
@@ -46,6 +43,7 @@ const SymlinkPackages: SymlinkPackages = {
     "maker-wix": true,
     "maker-zip": true,
   },
+  "fetch-github-release": true,
 };
 
 async function symlinkPackages(packagePath: string, dlxPath: string) {
