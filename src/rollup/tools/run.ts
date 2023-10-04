@@ -137,9 +137,9 @@ async function getConfigList(config: RollupOptions[] | RollupOptions): Promise<R
   return Array.isArray(config) ? config : [config];
 }
 
-async function loadConfigFile(rollupOptions: RollupOptions[] | RollupOptions) {
+async function loadConfigFile(rollupOptions: RollupOptions[] | RollupOptions, commandOptions: CommandOptions) {
   const configs = await getConfigList(rollupOptions);
-  const warnings = loadConfigFile_js.batchWarnings();
+  const warnings = loadConfigFile_js.batchWarnings(commandOptions.silent);
   try {
     const normalizedConfigs = [];
     for (const config of configs) {
@@ -158,7 +158,7 @@ export async function run(rollupOptions?: RollupOptions[] | RollupOptions, comma
   if (rollupOptions === undefined) throw new Error("Rollup config is Empty");
   const command: Required<CommandOptions> = { failAfterWarnings: true, silent: false, ...commandOptions };
   try {
-    let { options, warnings } = await loadConfigFile(rollupOptions);
+    let { options, warnings } = await loadConfigFile(rollupOptions, command);
     try {
       for (const inputOptions of options) {
         await build(inputOptions, warnings, command.silent);
