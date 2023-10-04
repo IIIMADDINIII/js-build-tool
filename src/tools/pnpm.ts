@@ -9,9 +9,9 @@ export async function selectPnpm(version: string = "latest"): Promise<void> {
 
 export async function installDependencies(): Promise<void> {
   if (isProd()) {
-    await exec("pnpm install --frozen-lockfile");
+    await exec("pnpm install --frozen-lockfile --config.confirmModulesPurge=false");
   } else {
-    await exec("pnpm install");
+    await exec("pnpm install --config.confirmModulesPurge=false");
   }
 }
 
