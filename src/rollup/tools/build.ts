@@ -377,6 +377,7 @@ async function findTestFiles(options: DefaultConfigs): Promise<{ [key: string]: 
         inputFileExt: ext,
         singleOutputExt: ext === ".cts" ? ".cjs" : ".mjs",
         blacklistDevDependencies: false,
+        externalDependencies: ["ava"],
       };
     }));
     return testFiles;

@@ -21,6 +21,9 @@ const SymlinkPackages: SymlinkPackages = {
     "gulp": false,
     "gulp.CMD": false,
     "gulp.ps1": false,
+    "ava": false,
+    "ava.CMD": false,
+    "ava.ps1": false,
   },
   "typescript": true,
   "rollup": true,
@@ -44,7 +47,7 @@ const SymlinkPackages: SymlinkPackages = {
     "maker-zip": true,
   },
   "fetch-github-release": true,
-  "eva": true,
+  "ava": true,
 };
 
 async function symlinkPackages(packagePath: string, dlxPath: string) {
