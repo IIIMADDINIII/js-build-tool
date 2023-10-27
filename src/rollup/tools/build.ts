@@ -33,6 +33,7 @@ export interface DefaultConfigsOutput {
   cjsOutputExt?: string;
   mjsOutputExt?: string;
   singleOutputExt?: string;
+  testOutputDir?: string;
 }
 
 export interface DefaultConfigsExports extends Partial<DefaultConfigsOutput> {
@@ -65,9 +66,14 @@ export interface DefaultConfigsExports extends Partial<DefaultConfigsOutput> {
   typescriptPlugin?: NoDefaults<RollupTypescriptOptions>;
   sourceMapsPlugin?: NoDefaults<SourcemapsPluginOptions>;
   nodeResolvePlugin?: NoDefaults<RollupNodeResolveOptions>;
+  isTest?: boolean;
+  buildTest?: boolean;
 };
 
 export interface DefaultConfigs extends DefaultConfigsExports {
+  testsFolderInBasePath?: string;
+  testFilePrefix?: string;
+  inputBasePath?: string;
   exports?: string[] | { [key: string]: DefaultConfigsExports; };
   additionalExports?: string[] | { [key: string]: DefaultConfigsExports; };
 }
@@ -154,7 +160,8 @@ function getNodeResolveDefaultOptions(options: DefaultConfigsExports): NoDefault
 
 async function getDefaultPlugins(options: DefaultConfigsExports): Promise<Plugin[]> {
   options.manageDependenciesPlugin = conditionalMerge(options.manageDependenciesPlugin, await getManageDependenciesDefaultOptions(options));
-  options.constsPlugin = conditionalMerge(options.constsPlugin, { production: options.prod, development: !options.prod });
+  options.isTest = getDefault(options.isTest, false);
+  options.constsPlugin = conditionalMerge(options.constsPlugin, { production: options.prod, development: !options.prod, testing: options.isTest });
   options.jsonPlugin = conditionalMerge(options.jsonPlugin, {});
   options.commonjsPlugin = conditionalMerge(options.commonjsPlugin, {});
   options.typescriptPlugin = conditionalMerge(options.typescriptPlugin, getTypescriptDefaultOptions(options));
@@ -185,7 +192,10 @@ function conditionalMerge<T extends NoDefaults<{}>>(value: T | undefined, def: T
   return { ...def, ...rest };
 };
 
-function getDefaultOutput(options: DefaultConfigsOutput, singleOutput: string, mjsOutput: string, cjsOutput: string): string {
+function getDefaultOutput(options: DefaultConfigsOutput, isTest: boolean, singleOutput: string, mjsOutput: string, cjsOutput: string, testOutput: string): string {
+  if (isTest) {
+    return testOutput;
+  }
   if (options.isSingleFormat) {
     return singleOutput;
   }
@@ -197,17 +207,18 @@ function getDefaultOutput(options: DefaultConfigsOutput, singleOutput: string, m
   return singleOutput;
 }
 
-async function generateOutput(options: DefaultConfigsOutput, isSingleFormat: boolean, sourceMap?: boolean, sourceMapType?: SourceMapType): Promise<OutputOptions> {
+async function generateOutput(options: DefaultConfigsOutput, isSingleFormat: boolean, isTest: boolean, sourceMap?: boolean, sourceMapType?: SourceMapType): Promise<OutputOptions> {
   options = await runHookOutputOptions(options);
   options.cjsOutputDir = getDefault(options.cjsOutputDir, "./dist/cjs/");
   options.mjsOutputDir = getDefault(options.mjsOutputDir, "./dist/esm/");
   options.singleOutputDir = getDefault(options.singleOutputDir, "./dist/");
+  options.testOutputDir = getDefault(options.testOutputDir, "./tests/");
   options.cjsOutputExt = getDefault(options.cjsOutputExt, ".js");
   options.mjsOutputExt = getDefault(options.mjsOutputExt, ".js");
   options.singleOutputExt = getDefault(options.singleOutputExt, ".js");
   options.isSingleFormat = getDefault(options.isSingleFormat, isSingleFormat);
-  options.outputFileDir = getDefault(options.outputFileDir, getDefaultOutput(options, options.singleOutputDir, options.mjsOutputDir, options.cjsOutputDir));
-  options.outputFileExt = getDefault(options.outputFileExt, getDefaultOutput(options, options.singleOutputExt, options.mjsOutputExt, options.cjsOutputExt));
+  options.outputFileDir = getDefault(options.outputFileDir, getDefaultOutput(options, isTest, options.singleOutputDir, options.mjsOutputDir, options.cjsOutputDir, options.testOutputDir));
+  options.outputFileExt = getDefault(options.outputFileExt, getDefaultOutput(options, isTest, options.singleOutputExt, options.mjsOutputExt, options.cjsOutputExt, options.singleOutputExt));
   let sm: boolean | "inline" = sourceMap ? (sourceMapType === "inline" ? "inline" : true) : false;
   let file = path.resolve(options.outputFileDir, options.outputFileName + options.outputFileExt);
   return {
@@ -247,12 +258,15 @@ function countFormats(outputs: DefaultConfigsOutput[]): number {
   return formats.size;
 }
 
-async function generateExport(exportName: string, options: DefaultConfigsExports): Promise<RollupOptions> {
+async function generateExport(exportName: string, options: DefaultConfigsExports, basePath: string): Promise<RollupOptions | undefined> {
   [exportName, options] = await runHookOptions(exportName, options);
+  options.isTest = getDefault(options.isTest, false);
+  options.buildTest = getDefault(options.buildTest, false);
+  if (options.isTest && !options.buildTest) return undefined;
   options.environment = getDefault(options.environment, "node");
   options.type = getDefault(options.type, "lib");
   options.defaultExportName = getDefault(options.defaultExportName, "index");
-  options.inputFileDir = getDefault(options.inputFileDir, "./src/");
+  options.inputFileDir = getDefault(options.inputFileDir, basePath);
   options.inputFileExt = getDefault(options.inputFileExt, ".ts");
   options.inputFileName = getDefault(options.inputFileName, getDefaultFileName(exportName, options.defaultExportName));
   options.prod = getDefault(options.prod, isProd());
@@ -265,8 +279,9 @@ async function generateExport(exportName: string, options: DefaultConfigsExports
     options.plugins.push(terser(options.terserPlugin));
   }
   options.outputs = getDefault(options.outputs, await getDefaultOutputs(options.inputFileName));
-  let isSingleFormat = countFormats(options.outputs) == 1;
-  let output = await Promise.all(options.outputs.map((value) => generateOutput({ ...options, ...value }, isSingleFormat, options.sourceMap, options.sourceMapType)));
+  const isSingleFormat = countFormats(options.outputs) == 1;
+  const isTest = options.isTest;
+  const output = await Promise.all(options.outputs.map((value) => generateOutput({ ...options, ...value }, isSingleFormat, isTest, options.sourceMap, options.sourceMapType)));
   return {
     input: path.resolve(options.inputFileDir, options.inputFileName + options.inputFileExt),
     output,
@@ -323,17 +338,60 @@ export async function calculatePackageJsonTypes(config?: RollupOptions[]): Promi
   return [...map.entries()].map(([packageJsonPath, format]) => ({ packageJsonPath, format }));
 }
 
+async function findTestFiles(options: DefaultConfigs): Promise<{ [key: string]: DefaultConfigsExports; }> {
+  options.inputBasePath = getDefault(options.testsFolderInBasePath, "./src/");
+  options.testsFolderInBasePath = getDefault(options.testsFolderInBasePath, "tests");
+  const testFolder = path.resolve(options.inputBasePath, options.testsFolderInBasePath);
+  const files = await fs.readdir(testFolder);
+  const testFiles: { [key: string]: DefaultConfigsExports; } = {};
+  await Promise.all(files.map(async (file) => {
+    options.testFilePrefix = getDefault(options.testsFolderInBasePath, "test");
+    if (!file.startsWith(options.testFilePrefix)) return;
+    const ext = path.extname(file).toLocaleLowerCase();
+    if ((ext !== ".cts") && (ext !== ".mts")) throw new Error(`Testfile ${file} dose not end with .mjs or .cjs. Extension is needed so ava test-runner runs it in the correct context`);
+    const p = path.resolve(testFolder, file);
+    const stat = await fs.stat(p);
+    if (!stat.isFile()) return;
+    options.inputBasePath = getDefault(options.testsFolderInBasePath, "./src/");
+    options.testsFolderInBasePath = getDefault(options.testsFolderInBasePath, "tests");
+    const name = path.join(options.testsFolderInBasePath, path.parse(file).name);
+    testFiles[name] = {
+      isTest: true,
+      inputFileExt: ext,
+      singleOutputExt: ext === ".cts" ? ".cjs" : ".mjs",
+    };
+  }));
+  return testFiles;
+}
+
+function makeObjectFromArray(array: string[] | { [key: string]: {}; }): { [key: string]: {}; } {
+  if (!Array.isArray(array)) return array;
+  return Object.fromEntries(array.map((name) => [name, {}]));
+}
+
+async function getBuildTargets(options: DefaultConfigs): Promise<{ [key: string]: DefaultConfigsExports; }> {
+  let exports = makeObjectFromArray(await topLevelExports());
+  let tests = await findTestFiles(options);
+  for (let [key, value] of Object.entries(tests)) {
+    if (exports[key] === undefined) exports[key] = {};
+    exports[key] = mergeExports(exports[key], value);
+  };
+  return exports;
+}
+
 export async function defaultConfigs(options?: DefaultConfigs): Promise<RollupOptions[]> {
   if (options === undefined) options = {};
-  let exports = options.exports || await topLevelExports();
-  if (Array.isArray(exports)) exports = Object.fromEntries(exports.map((name) => [name, {}]));
-  let additionalExports = options.exports || {};
-  if (Array.isArray(additionalExports)) additionalExports = Object.fromEntries(additionalExports.map((name) => [name, {}]));
+  let exports = makeObjectFromArray(options.exports || await getBuildTargets(options));
+  let additionalExports = makeObjectFromArray(options.exports || {});
   for (let [key, value] of Object.entries(additionalExports)) {
     if (exports[key] === undefined) exports[key] = {};
     exports[key] = mergeExports(exports[key], value);
   };
-  return await Promise.all(Object.entries(exports).map(([key, value]) => generateExport(key, mergeExports(options, value))));
+  return (await Promise.all(Object.entries(exports).map(([key, value]) => {
+    if (options === undefined) options = {};
+    options.inputBasePath = getDefault(options.testsFolderInBasePath, "./src/");
+    return generateExport(key, mergeExports(options, value), options.inputBasePath);
+  }))).filter((data): data is RollupOptions => data !== undefined);
 }
 
 const PackageEsContent = `{"type":"module"}`;
