@@ -1,8 +1,8 @@
 
+import { $ } from "execa";
 import { fetchLatestRelease, fetchReleaseByTag } from "fetch-github-release";
 import * as fs from "fs/promises";
 import gulp, { TaskFunction } from "gulp";
-import { exec, } from "gulp-execa";
 import * as path from "path";
 import * as url from 'url';
 
@@ -45,7 +45,7 @@ export async function readJson(relPath: string): Promise<any> {
 }
 
 export async function cleanWithGit(): Promise<void> {
-  await exec("git -c core.longpaths=true clean -dfX");
+  await $`git -c core.longpaths=true clean -dfX`;
 }
 
 export function setDisplayName<T extends TaskFunction>(name: string, task: T): T {
@@ -66,9 +66,9 @@ export async function downloadGithubRelease(options: Parameters<typeof fetchRele
 }
 
 export async function runTests(testFolder: string) {
-  await exec(`ava "${testFolder}/**"`);
+  await $`ava ${testFolder}/**`;
 }
 
 export async function runTestFiles(testFiles: string[]) {
-  await exec(`ava "${testFiles.join("\" \"")}"`);
+  await $`ava ${testFiles}`;
 }

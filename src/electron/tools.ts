@@ -1,6 +1,6 @@
 import { MakeOptions, api } from "@electron-forge/core";
+import { $ } from "execa";
 import type { OctokitReleaseAssets } from "fetch-github-release/dist/types.js";
-import { exec } from "gulp-execa";
 import path from "path";
 import { addToPath, dlxPath, downloadGithubRelease, downloadLatestGithubRelease } from "../tools/misc.js";
 
@@ -10,7 +10,7 @@ export async function forgeMake(opts?: MakeOptions) {
 }
 
 export async function start() {
-  await exec("pnpx electron .");
+  await $`pnpx electron .`;
 }
 
 function getWixAsset(_version: string, assets: OctokitReleaseAssets): OctokitReleaseAssets[number] | undefined {

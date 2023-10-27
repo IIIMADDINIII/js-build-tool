@@ -29,7 +29,7 @@ const SymlinkPackages: SymlinkPackages = {
   "rollup": true,
   "tslib": true,
   "gulp": true,
-  "gulp-execa": true,
+  "execa": true,
   "rimraf": true,
   "@rollup": {
     "plugin-commonjs": true,

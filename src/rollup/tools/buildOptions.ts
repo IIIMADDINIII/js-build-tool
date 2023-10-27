@@ -134,7 +134,7 @@ async function getDefaultExportsOpts(defaultConfigOpts: DefaultConfigOpts, confi
 }
 
 async function getDefaultExportOpts(defaultConfigOpts: DefaultConfigOpts, configOpts: ConfigOpts, exportName: string, exportOpts: ExportOpts): Promise<[string, DefaultExportOpts]> {
-  exportOpts = { ...exportOpts, ...configOpts };
+  exportOpts = { ...configOpts, ...exportOpts };
   [exportName, exportOpts] = await runHookOptions(exportName, exportOpts);
   const environment = getDefault(exportOpts.environment, "node");
   const type = getDefault(exportOpts.type, "lib");
@@ -192,7 +192,7 @@ async function getDefaultOutputsOpts(defaultExportOpts: DefaultExportOpts, expor
 }
 
 async function getDefaultOutputOpts(defaultExportOpts: DefaultExportOpts, exportOpts: ExportOpts, outputOpts: OutputOpts): Promise<DefaultOutputOpts> {
-  outputOpts = { ...outputOpts, ...exportOpts };
+  outputOpts = { ...exportOpts, ...outputOpts };
   outputOpts = await runHookOutputOptions(outputOpts);
   let defaultOutputOpts: DefaultOutputOpts = {
     outputFileName: outputOpts.outputFileName,
@@ -250,6 +250,7 @@ async function getDefaultTests(defaultConfigOpts: DefaultConfigOpts): Promise<Ex
         inputFileExt,
         singleOutputExt: inputFileExt === ".cts" ? ".cjs" : ".mjs",
         allowedDevDependencies: ["ava"],
+        externalDependencies: ["ava"],
         outputFormat: inputFileExt === ".mts" ? "es" : "commonjs",
       };
     }));
@@ -337,7 +338,7 @@ async function getDefaultOutputs(name: string, ext: string): Promise<OutputOpts[
     }];
   }
   if (ext === ".cts") {
-    [{
+    return [{
       outputFileName: name,
       outputFormat: "commonjs",
     }];

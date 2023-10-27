@@ -47,7 +47,7 @@
     "rollup": "^3.25.1",
     "tslib": "^2.5.3",
     "gulp": "^4.0.2",
-    "gulp-execa": "^5.0.0",
+    "execa": "^8.0.1",
     "rimraf": "^5.0.1",
     "rollup-config-iiimaddiniii": "^0.2.4",
     "@rollup/plugin-commonjs": "^25.0.1",
