@@ -82,7 +82,6 @@ async function calculatePackageJsonTypes(defaultConfigOpts: DefaultConfigOpts): 
     (${dir}). Module is not compatible for automatic package.json creation`);
     }
   }
-  console.log("all path", dirFormatMap);
 
   // Duplicate formats to shorter path, when the shorter path does not exist
   for (let [dir, format] of dirFormatMap.entries()) {
@@ -96,7 +95,7 @@ async function calculatePackageJsonTypes(defaultConfigOpts: DefaultConfigOpts): 
       dirFormatMap.set(dir, format);
     }
   }
-  console.log("After Duplicate", dirFormatMap);
+
   // Deduplicate Path wich can be handled by shorter Paths
   const dirs = Array.from(dirFormatMap.entries()).sort((a, b) => b[0].length - a[0].length);
   for (let dirFormat of Array.from(dirs)) {
@@ -116,9 +115,8 @@ async function calculatePackageJsonTypes(defaultConfigOpts: DefaultConfigOpts): 
     const delIndex = dirs.indexOf(dirFormat);
     if (delIndex > -1) dirs.splice(delIndex, 1);
   }
-  console.log("After Dedupe", dirFormatMap);
+
   dirFormatMap.delete(mainDir);
-  console.log("return", dirFormatMap);
   return [...dirFormatMap.entries()].map(([packageJsonPath, format]) => ({
     packageJsonPath:
       path.resolve(packageJsonPath, "package.json"), format

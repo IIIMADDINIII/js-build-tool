@@ -25,6 +25,6 @@ export function buildWithTests(configOpts?: ConfigOpts, commandOptions?: Command
 
 export function buildAndRunTests(configOpts?: ConfigOpts, commandOptions?: CommandOptions) {
   return setDisplayName("buildAndRunTests", async function buildAndRunTests() {
-    await tools.buildWithTests(configOpts, commandOptions);
+    await tools.buildAndRunTests(configOpts, commandOptions);
   });
 }

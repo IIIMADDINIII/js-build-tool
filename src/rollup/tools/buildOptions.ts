@@ -250,6 +250,7 @@ async function getDefaultTests(defaultConfigOpts: DefaultConfigOpts): Promise<Ex
         inputFileExt,
         singleOutputExt: inputFileExt === ".cts" ? ".cjs" : ".mjs",
         allowedDevDependencies: ["ava"],
+        outputFormat: inputFileExt === ".mts" ? "es" : "commonjs",
       };
     }));
     return testFiles;
