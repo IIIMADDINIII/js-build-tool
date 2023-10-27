@@ -1,5 +1,4 @@
 import * as fs from "fs/promises";
-import { exec } from "gulp-execa";
 import { rimraf } from "rimraf";
 import { tools, tasks, rollup } from "@iiimaddiniii/js-build-tool";
 
@@ -13,7 +12,7 @@ async function packageModules() {
   await rimraf([tmpBuildDir, destParent]);
   await fs.mkdir(tmpBuildDir);
   await fs.copyFile(src, dest);
-  await exec("pnpm install --node-linker=hoisted", { cwd: tmpBuildDir });
+  await tools.exec({ cwd: tmpBuildDir })`pnpm install --node-linker=hoisted`;
   await fs.mkdir(destParent);
   await fs.rename(srcDir, destDir);
 }
