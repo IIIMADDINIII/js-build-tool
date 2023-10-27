@@ -361,6 +361,7 @@ async function findTestFiles(options: DefaultConfigs): Promise<{ [key: string]: 
       singleOutputExt: ext === ".cts" ? ".cjs" : ".mjs",
     };
   }));
+  console.log(testFiles);
   return testFiles;
 }
 
