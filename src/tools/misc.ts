@@ -2,7 +2,7 @@
 import { fetchLatestRelease, fetchReleaseByTag } from "fetch-github-release";
 import * as fs from "fs/promises";
 import gulp, { TaskFunction } from "gulp";
-import { exec } from "gulp-execa";
+import { exec, } from "gulp-execa";
 import * as path from "path";
 import * as url from 'url';
 
@@ -63,4 +63,12 @@ export async function downloadLatestGithubRelease(options: Parameters<typeof fet
 
 export async function downloadGithubRelease(options: Parameters<typeof fetchReleaseByTag>[0]) {
   await fetchReleaseByTag(options);
+}
+
+export async function runTests(testFolder: string) {
+  await exec(`ava "${testFolder}/**"`);
+}
+
+export async function runTestFiles(testFiles: string[]) {
+  await exec(`ava "${testFiles.join("\" \"")}"`);
 }
