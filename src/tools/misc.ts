@@ -6,6 +6,7 @@ import gulp, { TaskFunction } from "gulp";
 import * as path from "path";
 import * as url from 'url';
 
+export const exec = $({ verbose: true, stdio: 'inherit' });
 
 function findDlxPath(packagePath: string): string {
   return packagePath.slice(0, packagePath.indexOf("node_modules"));
@@ -45,7 +46,7 @@ export async function readJson(relPath: string): Promise<any> {
 }
 
 export async function cleanWithGit(): Promise<void> {
-  await $`git -c core.longpaths=true clean -dfX`;
+  await exec`git -c core.longpaths=true clean -dfX`;
 }
 
 export function setDisplayName<T extends TaskFunction>(name: string, task: T): T {
@@ -66,9 +67,9 @@ export async function downloadGithubRelease(options: Parameters<typeof fetchRele
 }
 
 export async function runTests(testFolder: string) {
-  await $`ava ${testFolder}/**`;
+  await exec`ava ${testFolder}/**`;
 }
 
 export async function runTestFiles(testFiles: string[]) {
-  await $`ava ${testFiles}`;
+  await exec`ava ${testFiles}`;
 }
