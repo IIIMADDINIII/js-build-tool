@@ -1,6 +1,7 @@
 
 import type { RollupOptions, SerializedTimings } from "rollup";
 import * as loadConfigFile_js from "rollup/dist/shared/loadConfigFile.js";
+import * as parseAst_js from "rollup/dist/shared/parseAst.js";
 import * as rollup from "rollup/dist/shared/rollup.js";
 
 const BYTE_UNITS = [
@@ -80,7 +81,7 @@ async function build(inputOptions: RollupOptions, warnings: Warnings, silent = f
   if (outputOptions === undefined) outputOptions = [];
   if (!Array.isArray(outputOptions)) outputOptions = [outputOptions];
   const start = Date.now();
-  const files = outputOptions.map(t => rollup.relativeId(t.file || t.dir));
+  const files = outputOptions.map(t => parseAst_js.relativeId(t.file || t.dir));
   if (!silent) {
     let inputFiles;
     if (typeof inputOptions.input === 'string') {
