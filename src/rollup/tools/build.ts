@@ -339,30 +339,37 @@ export async function calculatePackageJsonTypes(config?: RollupOptions[]): Promi
 }
 
 async function findTestFiles(options: DefaultConfigs): Promise<{ [key: string]: DefaultConfigsExports; }> {
-  options.inputBasePath = getDefault(options.testsFolderInBasePath, "./src/");
+  options.inputBasePath = getDefault(options.inputBasePath, "./src/");
   options.testsFolderInBasePath = getDefault(options.testsFolderInBasePath, "tests");
   const testFolder = path.resolve(options.inputBasePath, options.testsFolderInBasePath);
-  const files = await fs.readdir(testFolder);
-  const testFiles: { [key: string]: DefaultConfigsExports; } = {};
-  await Promise.all(files.map(async (file) => {
-    options.testFilePrefix = getDefault(options.testsFolderInBasePath, "test");
-    if (!file.startsWith(options.testFilePrefix)) return;
-    const ext = path.extname(file).toLocaleLowerCase();
-    if ((ext !== ".cts") && (ext !== ".mts")) throw new Error(`Testfile ${file} dose not end with .mjs or .cjs. Extension is needed so ava test-runner runs it in the correct context`);
-    const p = path.resolve(testFolder, file);
-    const stat = await fs.stat(p);
-    if (!stat.isFile()) return;
-    options.inputBasePath = getDefault(options.testsFolderInBasePath, "./src/");
-    options.testsFolderInBasePath = getDefault(options.testsFolderInBasePath, "tests");
-    const name = path.join(options.testsFolderInBasePath, path.parse(file).name);
-    testFiles[name] = {
-      isTest: true,
-      inputFileExt: ext,
-      singleOutputExt: ext === ".cts" ? ".cjs" : ".mjs",
-    };
-  }));
-  console.log(testFiles);
-  return testFiles;
+  try {
+    const files = await fs.readdir(testFolder);
+    const testFiles: { [key: string]: DefaultConfigsExports; } = {};
+    await Promise.all(files.map(async (file) => {
+      options.testFilePrefix = getDefault(options.testsFolderInBasePath, "test");
+      if (!file.startsWith(options.testFilePrefix)) return;
+      const ext = path.extname(file).toLocaleLowerCase();
+      if ((ext !== ".cts") && (ext !== ".mts")) throw new Error(`Testfile ${file} dose not end with .mjs or .cjs. Extension is needed so ava test-runner runs it in the correct context`);
+      const p = path.resolve(testFolder, file);
+      const stat = await fs.stat(p);
+      if (!stat.isFile()) return;
+      options.inputBasePath = getDefault(options.inputBasePath, "./src/");
+      options.testsFolderInBasePath = getDefault(options.testsFolderInBasePath, "tests");
+      const name = path.join(options.testsFolderInBasePath, path.parse(file).name);
+      testFiles[name] = {
+        isTest: true,
+        inputFileExt: ext,
+        singleOutputExt: ext === ".cts" ? ".cjs" : ".mjs",
+      };
+    }));
+    console.log(testFiles);
+    return testFiles;
+  } catch (error) {
+    if (typeof error === "object" && error !== null && "code" in error && error.code === "ENOENT") {
+      return {};
+    }
+    throw error;
+  }
 }
 
 function makeObjectFromArray(array: string[] | { [key: string]: {}; }): { [key: string]: {}; } {
@@ -390,7 +397,7 @@ export async function defaultConfigs(options?: DefaultConfigs): Promise<RollupOp
   };
   return (await Promise.all(Object.entries(exports).map(([key, value]) => {
     if (options === undefined) options = {};
-    options.inputBasePath = getDefault(options.testsFolderInBasePath, "./src/");
+    options.inputBasePath = getDefault(options.inputBasePath, "./src/");
     return generateExport(key, mergeExports(options, value), options.inputBasePath);
   }))).filter((data): data is RollupOptions => data !== undefined);
 }
