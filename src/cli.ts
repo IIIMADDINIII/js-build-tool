@@ -34,7 +34,7 @@ const SymlinkPackages: SymlinkPackages = {
     "plugin-terser": true,
     "plugin-typescript": true,
     "plugin-json": true,
-    "@rollup/pluginutils": true
+    "pluginutils": true
   },
   "rollup-plugin-consts": true,
   "rollup-plugin-include-sourcemaps": true,
@@ -44,6 +44,7 @@ const SymlinkPackages: SymlinkPackages = {
     "maker-zip": true,
   },
   "fetch-github-release": true,
+  "eva": true,
 };
 
 async function symlinkPackages(packagePath: string, dlxPath: string) {
@@ -82,7 +83,7 @@ export async function linkDirs(sourceDir: string, destinationDir: string, dirs: 
     const destinationEntryPath = path.join(destinationDir, folder);
     try {
       const destStats = await fs.stat(destinationEntryPath);
-      if (destStats.isDirectory() && typeof children === "object") {
+      if ((destStats.isDirectory() || destStats.isSymbolicLink()) && typeof children === "object") {
         await linkDirs(sourceEntryPath, destinationEntryPath, children);
       } else {
         return;

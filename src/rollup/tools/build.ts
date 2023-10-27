@@ -228,14 +228,28 @@ async function generateOutput(options: DefaultConfigsOutput, isSingleFormat: boo
   };
 }
 
-async function getDefaultOutputs(name: string): Promise<DefaultConfigsOutput[]> {
+async function getDefaultOutputs(name: string, ext: string): Promise<DefaultConfigsOutput[]> {
   let type = await getPackageType();
+  ext = ext.toLocaleLowerCase();
+  if (ext === ".mts") {
+    return [{
+      outputFileName: name,
+      outputFormat: "es",
+    }];
+  }
+  if (ext === ".cts") {
+    [{
+      outputFileName: name,
+      outputFormat: "commonjs",
+    }];
+  }
   if (type === "module") {
     return [{
       outputFileName: name,
       outputFormat: "es",
     }];
-  } else if (type === "commonjs") {
+  }
+  if (type === "commonjs") {
     return [{
       outputFileName: name,
       outputFormat: "commonjs",
@@ -278,7 +292,7 @@ async function generateExport(exportName: string, options: DefaultConfigsExports
   if (options.minify) {
     options.plugins.push(terser(options.terserPlugin));
   }
-  options.outputs = getDefault(options.outputs, await getDefaultOutputs(options.inputFileName));
+  options.outputs = getDefault(options.outputs, await getDefaultOutputs(options.inputFileName, options.inputFileExt));
   const isSingleFormat = countFormats(options.outputs) == 1;
   const isTest = options.isTest;
   const output = await Promise.all(options.outputs.map((value) => generateOutput({ ...options, ...value }, isSingleFormat, isTest, options.sourceMap, options.sourceMapType)));
@@ -324,6 +338,8 @@ export async function calculatePackageJsonTypes(config?: RollupOptions[]): Promi
     if (!Array.isArray(outputs)) outputs = [outputs];
     for (let output of outputs) {
       if (output.file === undefined) continue;
+      let ext = path.extname(output.file);
+      if (ext === ".cjs" || ext == ".mjs") continue;
       let dir = path.dirname(output.file);
       let packageJsonPath = path.resolve(dir, "package.json");
       let existing = map.get(packageJsonPath);
@@ -346,7 +362,7 @@ async function findTestFiles(options: DefaultConfigs): Promise<{ [key: string]: 
     const files = await fs.readdir(testFolder);
     const testFiles: { [key: string]: DefaultConfigsExports; } = {};
     await Promise.all(files.map(async (file) => {
-      options.testFilePrefix = getDefault(options.testsFolderInBasePath, "test");
+      options.testFilePrefix = getDefault(options.testFilePrefix, "test");
       if (!file.startsWith(options.testFilePrefix)) return;
       const ext = path.extname(file).toLocaleLowerCase();
       if ((ext !== ".cts") && (ext !== ".mts")) throw new Error(`Testfile ${file} dose not end with .mjs or .cjs. Extension is needed so ava test-runner runs it in the correct context`);
@@ -360,9 +376,9 @@ async function findTestFiles(options: DefaultConfigs): Promise<{ [key: string]: 
         isTest: true,
         inputFileExt: ext,
         singleOutputExt: ext === ".cts" ? ".cjs" : ".mjs",
+        blacklistDevDependencies: false,
       };
     }));
-    console.log(testFiles);
     return testFiles;
   } catch (error) {
     if (typeof error === "object" && error !== null && "code" in error && error.code === "ENOENT") {
