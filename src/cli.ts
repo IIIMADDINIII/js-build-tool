@@ -1,8 +1,9 @@
 
-import * as cp from "child_process";
-import * as fs from "fs/promises";
-import * as path from "path";
-import * as url from 'url';
+import cp from "child_process";
+import fs from "fs/promises";
+import path from "path";
+import timer from "timers/promises";
+import url from 'url';
 
 async function run() {
   const gulpFile = "gulpfile.mjs";
@@ -31,6 +32,15 @@ async function symlinkPackages(projectPath: string, packagePath: string, dlxPath
   const packageModules = path.resolve(packagePath, "modules/node_modules");
   const dlxNodeModules = path.resolve(dlxPath, "node_modules");
   const projectSymlink = await getSymlinkDirs(projectModules);
+  console.log("projectPath", projectPath);
+  console.log("packagePath", packagePath);
+  console.log("dlxPath", dlxPath);
+  console.log("projectModules", projectModules);
+  console.log("packageModules", packageModules);
+  console.log("dlxNodeModules", dlxNodeModules);
+  console.log("projectSymlink", projectSymlink);
+  console.log("packageSymlink", packageSymlink);
+  await timer.setTimeout(10000);
   await linkDirs(projectModules, dlxNodeModules, projectSymlink);
   await linkDirs(packageModules, dlxNodeModules, packageSymlink);
 }

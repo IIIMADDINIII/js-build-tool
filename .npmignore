@@ -9,3 +9,6 @@
 /.tmpBuild/
 /gulpfile.mjs
 /packageDependencies.json
+/src
+/dist/**/*.map
+/dist/**/*.ts
