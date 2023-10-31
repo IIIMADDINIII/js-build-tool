@@ -25,11 +25,6 @@ const SymlinkPackages: SymlinkPackages = {
   "typescript": true,
   "gulp": true,
   "rollup": true,
-  "@rollup": {
-    "plugin-terser": true,
-    "plugin-json": true,
-    "pluginutils": true
-  },
 };
 
 async function symlinkPackages(packagePath: string, dlxPath: string) {
