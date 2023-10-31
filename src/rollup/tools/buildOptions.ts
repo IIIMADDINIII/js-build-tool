@@ -249,8 +249,6 @@ async function getDefaultTests(defaultConfigOpts: DefaultConfigOpts): Promise<Ex
         isTest: true,
         inputFileExt,
         singleOutputExt: inputFileExt === ".cts" ? ".cjs" : ".mjs",
-        allowedDevDependencies: ["ava"],
-        externalDependencies: ["ava"],
         outputFormat: inputFileExt === ".mts" ? "es" : "commonjs",
       };
     }));
