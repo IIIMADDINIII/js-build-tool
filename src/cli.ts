@@ -28,7 +28,7 @@ const packageSymlink: SymlinkPackages = {
 };
 
 async function symlinkPackages(projectPath: string, packagePath: string, dlxPath: string) {
-  const projectModules = path.resolve(projectPath, "modules/node_modules");
+  const projectModules = path.resolve(projectPath, "node_modules");
   const packageModules = path.resolve(packagePath, "modules/node_modules");
   const dlxNodeModules = path.resolve(dlxPath, "node_modules");
   const projectSymlink = await getSymlinkDirs(projectModules);
