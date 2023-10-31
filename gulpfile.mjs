@@ -18,7 +18,7 @@ async function packageModules() {
 }
 
 let deps = Object.keys((await tools.readJson("packageDependencies.json")).dependencies);
-const bundle = rollup.tasks.build({ blacklistDevDependencies: false, externalDependencies: deps }, { failAfterWarnings: false });
+const bundle = rollup.tasks.build({ blacklistDevDependencies: false, externalDependencies: deps, commonjsPlugin: { ignore: ["electron"] } }, { failAfterWarnings: false });
 
 export const clean = tools.exitAfter(tasks.cleanWithGit());
 export const build = tools.exitAfter(tasks.selectPnpmAndInstall(), tools.parallel(bundle, packageModules));

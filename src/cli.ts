@@ -41,8 +41,6 @@ const SymlinkPackages: SymlinkPackages = {
     "maker-wix": true,
     "maker-zip": true,
   },
-  "fetch-github-release": true,
-  "ava": true,
 };
 
 async function symlinkPackages(packagePath: string, dlxPath: string) {

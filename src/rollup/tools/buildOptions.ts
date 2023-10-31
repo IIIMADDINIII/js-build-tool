@@ -320,7 +320,7 @@ function getTypescriptDefaultOptions(defaultExportOpts: DefaultExportOpts): Roll
 
 function getNodeResolveDefaultOptions(environment: ExecutionEnvironment): RollupNodeResolveOptions {
   if (environment === "node") {
-    return { browser: false, exportConditions: ["node"] };
+    return { browser: false, exportConditions: ["node"], preferBuiltins: true };
   } else if (environment === "browser") {
     return { browser: true };
   }
