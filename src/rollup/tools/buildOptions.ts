@@ -154,7 +154,7 @@ async function getDefaultExportOpts(defaultConfigOpts: DefaultConfigOpts, config
     inputFileDir: getDefault(exportOpts.inputFileDir, defaultConfigOpts.inputBasePath),
     inputFileName,
     inputFileExt,
-    sourceMap: getDefault(exportOpts.sourceMap, prod && !isTest),
+    sourceMap: getDefault(exportOpts.sourceMap, !prod || isTest),
     sourceMapType: getDefault(exportOpts.sourceMapType, "external"),
     buildTest: getDefault(exportOpts.buildTest, false),
     terserPlugin: getDefault(exportOpts.terserPlugin, {}),
@@ -249,6 +249,7 @@ async function getDefaultTests(defaultConfigOpts: DefaultConfigOpts): Promise<Ex
       const name = path.join(defaultConfigOpts.testsFolderInBasePath, path.parse(file).name);
       testFiles[name] = {
         isTest: true,
+        inputFileExt,
       };
     }));
     return testFiles;
