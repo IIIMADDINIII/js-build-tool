@@ -62,6 +62,7 @@ export interface DefaultExportOpts {
   externalDependencies: string[];
   blacklistDependencies: string[];
   allowedDevDependencies: string[];
+  testDependencies: string[];
   blacklistDevDependencies: boolean;
   defaultExportName: string;
   inputFileDir: string;
@@ -161,11 +162,12 @@ async function getDefaultExportOpts(defaultConfigOpts: DefaultConfigOpts, config
     externalDependencies: getDefault(exportOpts.externalDependencies, []),
     blacklistDependencies: getDefault(exportOpts.blacklistDependencies, []),
     allowedDevDependencies: getDefault(exportOpts.allowedDevDependencies, []),
+    testDependencies: getDefault(exportOpts.allowedDevDependencies, ["@jest/globals"]),
     blacklistDevDependencies: getDefault(exportOpts.blacklistDevDependencies, true),
     constsPlugin: getDefault(exportOpts.constsPlugin, { production: prod, development: !prod, testing: isTest }),
     jsonPlugin: getDefault(exportOpts.jsonPlugin, {}),
     commonjsPlugin: getDefault(exportOpts.commonjsPlugin, {}),
-    generateDeclaration: getDefault(exportOpts.generateDeclaration, !prod || type === "lib"),
+    generateDeclaration: getDefault(exportOpts.generateDeclaration, (!prod || type === "lib") && !isTest),
     defaultLib: getDefault(exportOpts.defaultLib, ["ESNext"]),
     browserLib: getDefault(exportOpts.browserLib, ["DOM"]),
     nodeLib: getDefault(exportOpts.nodeLib, []),
@@ -285,14 +287,17 @@ async function getManageDependenciesDefaultOptions(defaultExportOpts: DefaultExp
     for (let allowed of defaultExportOpts.allowedDevDependencies) {
       devDeps.delete(allowed);
     }
+    if (defaultExportOpts.isTest) {
+      for (let allowed of defaultExportOpts.testDependencies) {
+        devDeps.delete(allowed);
+      }
+    }
     blacklist.push(...devDeps.values());
   }
-  if (defaultExportOpts.type === "lib") {
-    return { external: [...defaultExportOpts.externalDependencies, ...deps.values()], blacklist: blacklist };
-  } else if (defaultExportOpts.type === "app") {
-    return { external: defaultExportOpts.externalDependencies, blacklist: blacklist };
-  }
-  return {};
+  let external = defaultExportOpts.externalDependencies;
+  if (defaultExportOpts.type === "lib") external.push(...deps.values());
+  if (defaultExportOpts.isTest) external.push(...defaultExportOpts.testDependencies);
+  return { external, blacklist };
 }
 
 function getTypescriptDefaultOptions(defaultExportOpts: DefaultExportOpts): RollupTypescriptOptions {

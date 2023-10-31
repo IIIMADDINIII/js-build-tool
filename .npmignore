@@ -9,3 +9,6 @@
 /.tmpBuild/
 /gulpfile.mjs
 /packageDependencies.json
+/modules/node_modules/**/*.md
+/modules/node_modules/**/licence
+/modules/node_modules/@types/**/*
