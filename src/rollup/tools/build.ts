@@ -47,6 +47,7 @@ export async function bundleDeclarations(defaultConfigOpts: DefaultConfigOpts): 
     if (!defaultExportOpts.generateDeclaration) continue;
     for (let defaultOutputOpts of defaultExportOpts.outputs) {
       const source = defaultOutputOpts.declarationSource;
+      console.log("source", source);
       try {
         await fs.stat(source);
       } catch (e) {
@@ -55,8 +56,10 @@ export async function bundleDeclarations(defaultConfigOpts: DefaultConfigOpts): 
         }
         throw e;
       }
-      pathsToRemove.add(path.resolve(defaultOutputOpts.outputFileDir, defaultExportOpts.declarationDir));
-      runApiExtrator(path.resolve("package.json"), {
+      const declDir = path.resolve(defaultOutputOpts.outputFileDir, defaultExportOpts.declarationDir);
+      console.log("pathsToRemove", declDir);
+      pathsToRemove.add(declDir);
+      const apiExtractorConfig = {
         mainEntryPointFilePath: source,
         bundledPackages: defaultOutputOpts.bundleDeclarationPackages,
         compiler: {
@@ -69,7 +72,9 @@ export async function bundleDeclarations(defaultConfigOpts: DefaultConfigOpts): 
           untrimmedFilePath: defaultOutputOpts.declarationTarget,
         },
         tsdocMetadata: { enabled: false },
-      });
+      };
+      console.log("apiExtractorConfig", apiExtractorConfig);
+      runApiExtrator(path.resolve("package.json"), apiExtractorConfig);
     }
   }
   await Promise.all([...pathsToRemove.values()].map(async (path) => fs.rm(path, { recursive: true })));
