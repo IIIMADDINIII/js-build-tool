@@ -6,7 +6,7 @@ import { join, parse, resolve } from "path";
 const allowedBinNames = ["gulp"];
 const filterBasePrefix = ["license", "completion.sh", ".", "authors", "changelog", "changes", "makefile"];
 const filterBaseSuffix = [".md", ".yaml", ".map", ".ts", ".mts", ".cts", ".yml", ".txt", ".html", ".coffee", ".markdown", ".tsbuildinfo"];
-const filterDirIncludes = [join("node_modules", "@types")];
+const filterDirIncludes = [join("node_modules", "@types"), "__tests__"];
 
 /***
  * @param {import("path").ParsedPath} parsedPath 

@@ -24,7 +24,7 @@ const packageSymlink: SymlinkPackages = {
   },
   "gulp": true,
   "rollup": true,
-  "@@microsoft": {
+  "@microsoft": {
     "api-extractor": true,
   },
 };
