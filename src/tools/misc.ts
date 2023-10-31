@@ -3,7 +3,6 @@ import { $ } from "execa";
 import { fetchLatestRelease, fetchReleaseByTag } from "fetch-github-release";
 import * as fs from "fs/promises";
 import gulp, { TaskFunction } from "gulp";
-import { createRequire } from "module";
 import * as path from "path";
 import * as url from 'url';
 
@@ -22,14 +21,6 @@ export type { TaskFunction } from "gulp";
 let prod = false;
 export const cwd = process.cwd();
 export const packageDir = cwd;
-
-export function requireFromProject(module: string): unknown {
-  return createRequire(path.resolve("./package.json"))(module);
-}
-
-export function resolveFromProject(module: string): string {
-  return createRequire(path.resolve("./package.json")).resolve(module);
-}
 
 export function isProd(): boolean {
   let prodEnv = process.env["prod"];

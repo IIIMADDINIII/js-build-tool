@@ -52,6 +52,7 @@ async function packageModules() {
 }
 
 let deps = Object.keys((await tools.readJson("packageDependencies.json")).dependencies);
+deps.push("typescript");
 const bundle = rollup.tasks.build({ blacklistDevDependencies: false, externalDependencies: deps, commonjsPlugin: { ignore: ["electron"] } }, { failAfterWarnings: false });
 
 export const clean = tools.exitAfter(tasks.cleanWithGit());
