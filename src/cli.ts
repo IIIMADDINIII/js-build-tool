@@ -24,6 +24,9 @@ const packageSymlink: SymlinkPackages = {
   },
   "gulp": true,
   "rollup": true,
+  "@@microsoft": {
+    "api-extractor": true,
+  },
 };
 
 async function symlinkPackages(projectPath: string, packagePath: string, dlxPath: string) {
@@ -31,7 +34,6 @@ async function symlinkPackages(projectPath: string, packagePath: string, dlxPath
   const packageModules = path.resolve(packagePath, "modules/node_modules");
   const dlxNodeModules = path.resolve(dlxPath, "node_modules");
   const projectSymlink = await getSymlinkDirs(projectModules);
-  console.log("projectSymlink", projectSymlink);
   await linkDirs(projectModules, dlxNodeModules, projectSymlink);
   await linkDirs(packageModules, dlxNodeModules, packageSymlink);
 }
