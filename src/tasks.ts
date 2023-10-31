@@ -1,27 +1,30 @@
 
-import * as misc from "./tools/misc.js";
-import { TaskFunction, series, setDisplayName } from "./tools/misc.js";
-import * as pnpm from "./tools/pnpm.js";
+import * as tools from "./tools.js";
+import { series, type TaskFunction } from "./tools/gulp.js";
+import { setDisplayName } from "./tools/misc.js";
 
-export * as electron from "./electron/tasks.js";
-export * as rollup from "./rollup/tasks.js";
+
+import type { IConfigFile } from "@microsoft/api-extractor";
+import * as electron from "./electron/tasks.js";
+import * as rollup from "./rollup/tasks.js";
+export { electron, rollup };
 
 
 export function setProd(): () => Promise<void> {
   return setDisplayName("setProd", async function setProd() {
-    misc.setProd();
+    tools.setProd();
   });
 }
 
 export function selectPnpm(version: string = "latest"): () => Promise<void> {
   return setDisplayName("selectPnpm", async function selectPnpm() {
-    await pnpm.selectPnpm(version);
+    await tools.selectPnpm(version);
   });
 }
 
 export function installDependencies(): () => Promise<void> {
   return setDisplayName("installDependencies", async function installDependencies() {
-    await pnpm.installDependencies();
+    await tools.installDependencies();
   });
 }
 
@@ -35,25 +38,25 @@ export function prodSelectPnpmAndInstall(version: string = "latest"): TaskFuncti
 
 export function cleanWithGit(): () => Promise<void> {
   return setDisplayName("cleanWithGit", async function selectPnpm() {
-    await misc.cleanWithGit();
+    await tools.cleanWithGit();
   });
 }
 
 export function runScript(script: string, args: string[] = []): () => Promise<void> {
   return setDisplayName("runScript", async function runScript() {
-    pnpm.runScript(script, args);
+    tools.runScript(script, args);
   });
 }
 
 export function runWorkspaceScript(script: string, filter: string = "*", args: string[] = []): () => Promise<void> {
   return setDisplayName("runWorkspaceScript", async function runWorkspaceScript() {
-    await pnpm.runWorkspaceScript(script, filter, args);
+    await tools.runWorkspaceScript(script, filter, args);
   });
 }
 
 export function runWorkspaceScriptParallel(script: string, filter: string = "*", args: string[] = []): () => Promise<void> {
   return setDisplayName("runWorkspaceScriptParallel", async function runWorkspaceScriptParallel() {
-    await pnpm.runWorkspaceScriptParallel(script, filter, args);
+    await tools.runWorkspaceScriptParallel(script, filter, args);
   });
 }
 
@@ -67,12 +70,18 @@ export function exit(): () => Promise<void> {
 
 export function runTestFiles(testFiles: string[]): () => Promise<void> {
   return setDisplayName("runTestFiles", async function runTestFiles() {
-    await misc.runTestFiles(testFiles);
+    await tools.runTestFiles(testFiles);
   });
 }
 
 export function runTests(): () => Promise<void> {
   return setDisplayName("runTests", async function runTests() {
-    await misc.runTests();
+    await tools.runTests();
+  });
+}
+
+export function runApiExtrator(projectPackageJsonPath: string, configObject: IConfigFile): () => Promise<void> {
+  return setDisplayName("runApiExtrator", async function runApiExtrator() {
+    await tools.runApiExtrator(projectPackageJsonPath, configObject);
   });
 }

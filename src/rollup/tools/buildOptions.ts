@@ -1,20 +1,15 @@
 
-import type { RollupCommonJSOptions } from '@rollup/plugin-commonjs';
-import commonjs from "@rollup/plugin-commonjs";
-import type { RollupJsonOptions } from "@rollup/plugin-json";
-import json from "@rollup/plugin-json";
-import { nodeResolve, type RollupNodeResolveOptions } from '@rollup/plugin-node-resolve';
-import type { Options as TerserOptions } from "@rollup/plugin-terser";
-import terser from "@rollup/plugin-terser";
-import type { RollupTypescriptOptions } from "@rollup/plugin-typescript";
-import typescript from "@rollup/plugin-typescript";
+import commonjs, { RollupCommonJSOptions } from "@rollup/plugin-commonjs";
+import json, { RollupJsonOptions } from "@rollup/plugin-json";
+import { RollupNodeResolveOptions, nodeResolve } from '@rollup/plugin-node-resolve';
+import terser, { type Options as TerserOptions } from "@rollup/plugin-terser";
+import typescript, { RollupTypescriptOptions } from "@rollup/plugin-typescript";
 import fastGlob from "fast-glob";
 import fs from "fs/promises";
 import path from "path";
 import type { Plugin } from "rollup";
 import consts from "rollup-plugin-consts";
-import type { SourcemapsPluginOptions } from 'rollup-plugin-include-sourcemaps';
-import sourceMaps from 'rollup-plugin-include-sourcemaps';
+import sourceMaps, { SourcemapsPluginOptions } from 'rollup-plugin-include-sourcemaps';
 import { isProd } from "../../tools/misc.js";
 import { getPackageDependencies, getPackageDevDependencies, getPackageType, topLevelExports } from "../../tools/package.js";
 import { manageDependencies, type ManageDependenciesConfig } from "../plugins.js";
@@ -38,8 +33,11 @@ export interface DefaultOutputOpts {
   singleOutputExt: string;
   testOutputDir: string;
   file: string;
+  declarationTarget: string;
+  declarationSource: string;
+  bundleDeclarationPackages: string[];
 }
-export interface OutputOpts extends Partial<Omit<DefaultOutputOpts, "outputFileName" | "outputFormat" | "file">> {
+export interface OutputOpts extends Partial<Omit<DefaultOutputOpts, "outputFileName" | "outputFormat" | "file" | "declarationTarget" | "declarationSource">> {
   hookOutputOptions?(options: OutputOpts): Promise<OutputOpts | undefined> | OutputOpts | undefined;
   outputFileName: string,
   outputFormat: OutputFormat,
@@ -54,6 +52,7 @@ export interface DefaultExportOpts {
   prod: boolean;
   minify: boolean;
   generateDeclaration: boolean;
+  declarationDir: string;
   defaultLib: string[];
   browserLib: string[];
   nodeLib: string[];
@@ -171,6 +170,7 @@ async function getDefaultExportOpts(defaultConfigOpts: DefaultConfigOpts, config
     jsonPlugin: getDefault(exportOpts.jsonPlugin, {}),
     commonjsPlugin: getDefault(exportOpts.commonjsPlugin, {}),
     generateDeclaration: getDefault(exportOpts.generateDeclaration, (!prod || type === "lib") && !isTest),
+    declarationDir: getDefault(exportOpts.declarationDir, "decl"),
     defaultLib: getDefault(exportOpts.defaultLib, ["ESNext"]),
     browserLib: getDefault(exportOpts.browserLib, ["DOM"]),
     nodeLib: getDefault(exportOpts.nodeLib, []),
@@ -211,9 +211,12 @@ async function getDefaultOutputOpts(defaultExportOpts: DefaultExportOpts, export
     mjsOutputExt: getDefault(outputOpts.mjsOutputExt, ".js"),
     singleOutputExt: getDefault(outputOpts.singleOutputExt, ".js"),
     testOutputDir: getDefault(outputOpts.testOutputDir, "./tests/"),
+    bundleDeclarationPackages: getDefault(outputOpts.bundleDeclarationPackages, []),
     outputFileDir: "",
     outputFileExt: "",
     file: "",
+    declarationSource: "",
+    declarationTarget: "",
   };
   if (defaultExportOpts.isTest) {
     defaultOutputOpts.outputFileDir = defaultOutputOpts.testOutputDir;
@@ -232,6 +235,8 @@ async function getDefaultOutputOpts(defaultExportOpts: DefaultExportOpts, export
     defaultOutputOpts.outputFileExt = defaultOutputOpts.singleOutputExt;
   }
   defaultOutputOpts.file = path.resolve(defaultOutputOpts.outputFileDir, defaultOutputOpts.outputFileName + defaultOutputOpts.outputFileExt);
+  defaultOutputOpts.declarationSource = path.resolve(defaultOutputOpts.outputFileDir, defaultExportOpts.declarationDir, defaultOutputOpts.outputFileName + "d.ts");
+  defaultOutputOpts.declarationTarget = path.resolve(defaultOutputOpts.outputFileDir, defaultOutputOpts.outputFileName + "d.ts");
   return defaultOutputOpts;
 }
 

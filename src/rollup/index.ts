@@ -1,4 +1,5 @@
-export * as plugins from "./plugins.js";
-export * as tasks from "./tasks.js";
+import * as plugins from "./plugins.js";
+import * as tasks from "./tasks.js";
 export * from "./tools.js";
+export { plugins, tasks };
 

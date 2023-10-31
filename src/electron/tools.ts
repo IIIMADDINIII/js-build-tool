@@ -1,7 +1,8 @@
 // import { MakeOptions, api } from "@electron-forge/core";
-import type { OctokitReleaseAssets } from "fetch-github-release/dist/types.js";
 import path from "path";
-import { addToPath, dlxPath, downloadGithubRelease, downloadLatestGithubRelease, exec } from "../tools/misc.js";
+import { exec } from "../tools/exec.js";
+import { downloadGithubRelease, downloadLatestGithubRelease, ReleaseAsset } from "../tools/github.js";
+import { addToPath, dlxPath } from "../tools/misc.js";
 
 
 //export async function forgeMake(opts?: MakeOptions) {
@@ -12,7 +13,7 @@ export async function start() {
   await exec`pnpx electron .`;
 }
 
-function getWixAsset(_version: string, assets: OctokitReleaseAssets): OctokitReleaseAssets[number] | undefined {
+function getWixAsset(_version: string, assets: ReleaseAsset[]): ReleaseAsset | undefined {
   return assets.find((asset) => asset.name.endsWith("-binaries.zip"));
 }
 

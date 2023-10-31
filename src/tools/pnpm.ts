@@ -1,5 +1,6 @@
 
-import { exec, isProd } from "./misc.js";
+import { exec } from "./exec.js";
+import { isProd } from "./misc.js";
 
 export async function selectPnpm(version: string = "latest"): Promise<void> {
   await exec`corepack prepare pnpm@${version} --activate`;

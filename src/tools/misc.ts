@@ -1,21 +1,17 @@
 
-import { $ } from "execa";
-import { fetchLatestRelease, fetchReleaseByTag } from "fetch-github-release";
+
 import * as fs from "fs/promises";
-import gulp, { TaskFunction } from "gulp";
 import * as path from "path";
 import * as url from 'url';
+import { exec } from "./exec.js";
+import type { TaskFunction } from "./gulp.js";
 
-export const exec = $({ verbose: true, stdio: 'inherit' });
 
 function findDlxPath(packagePath: string): string {
   return packagePath.slice(0, packagePath.indexOf("node_modules"));
 }
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 export const dlxPath = findDlxPath(__dirname);
-export const series: typeof gulp.series = gulp.series;
-export const parallel: typeof gulp.parallel = gulp.parallel;
-export type { TaskFunction } from "gulp";
 
 
 let prod = false;
@@ -56,14 +52,6 @@ export function setDisplayName<T extends TaskFunction>(name: string, task: T): T
 
 export function addToPath(folder: string): void {
   process.env["path"] = folder + ";" + process.env["path"];
-}
-
-export async function downloadLatestGithubRelease(options: Parameters<typeof fetchLatestRelease>[0]) {
-  await fetchLatestRelease(options);
-}
-
-export async function downloadGithubRelease(options: Parameters<typeof fetchReleaseByTag>[0]) {
-  await fetchReleaseByTag(options);
 }
 
 export async function runTestFiles(testFiles: string[]) {

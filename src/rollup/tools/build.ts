@@ -1,6 +1,7 @@
 import * as fs from "fs/promises";
 import * as path from "path";
 import type { OutputOptions, RollupOptions } from "rollup";
+import { runApiExtrator } from "../../tools/apiExtractor.js";
 import { runTestFiles } from "../../tools/misc.js";
 import { ConfigOpts, DefaultConfigOpts, DefaultExportOpts, DefaultOutputOpts, OutputFormat, getDefaultConfigOpts } from "./buildOptions.js";
 import { run, type CommandOptions } from "./run.js";
@@ -36,7 +37,42 @@ export async function build(configOpts?: ConfigOpts, commandOptions?: CommandOpt
   const rollupOptions = getRollupOptions(defaultConfigOpts);
   await run(rollupOptions, commandOptions);
   await generatePackageJsonFiles(defaultConfigOpts);
+  await bundleDeclarations(defaultConfigOpts);
   return defaultConfigOpts;
+}
+
+export async function bundleDeclarations(defaultConfigOpts: DefaultConfigOpts): Promise<void> {
+  let pathsToRemove: Set<string> = new Set();
+  for (let defaultExportOpts of Object.values(defaultConfigOpts.entryPoints)) {
+    if (!defaultExportOpts.generateDeclaration) continue;
+    for (let defaultOutputOpts of defaultExportOpts.outputs) {
+      const source = defaultOutputOpts.declarationSource;
+      try {
+        await fs.stat(source);
+      } catch (e) {
+        if (typeof e === "object" && e !== null && "code" in e && e.code === "ENOENT") {
+          continue;
+        }
+        throw e;
+      }
+      pathsToRemove.add(path.resolve(defaultOutputOpts.outputFileDir, defaultExportOpts.declarationDir));
+      runApiExtrator(path.resolve("package.json"), {
+        mainEntryPointFilePath: source,
+        bundledPackages: defaultOutputOpts.bundleDeclarationPackages,
+        compiler: {
+          tsconfigFilePath: path.resolve(defaultExportOpts.tsconfig),
+        },
+        apiReport: { enabled: false },
+        docModel: { enabled: false },
+        dtsRollup: {
+          enabled: true,
+          untrimmedFilePath: defaultOutputOpts.declarationTarget,
+        },
+        tsdocMetadata: { enabled: false },
+      });
+    }
+  }
+  await Promise.all([...pathsToRemove.values()].map(async (path) => fs.rm(path, { recursive: true })));
 }
 
 export async function buildWithTests(configOpts?: ConfigOpts, commandOptions?: CommandOptions): Promise<DefaultConfigOpts> {
@@ -78,8 +114,7 @@ async function calculatePackageJsonTypes(defaultConfigOpts: DefaultConfigOpts): 
         dirFormatMap.set(dir, output.outputFormat);
         continue;
       }
-      if (existing !== output.outputFormat) throw new Error(`Output contains a folder with commonjs and esm files
-    (${dir}). Module is not compatible for automatic package.json creation`);
+      if (existing !== output.outputFormat) throw new Error(`Output contains a folder with commonjs and esm files (${dir}). Module is not compatible for automatic package.json creation`);
     }
   }
 

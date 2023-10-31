@@ -44,7 +44,7 @@ async function getSymlinkDirs(projectModules: string): Promise<SymlinkPackages> 
       const stat = await fs.stat(dir);
       if ((mod === ".bin" || mod.startsWith("@")) && stat.isDirectory()) {
         const bins = await fs.readdir(dir);
-        return [mod, Object.fromEntries(bins.map((name) => [name, false]))];
+        return [mod, Object.fromEntries(await Promise.all(bins.map(async (name) => [name, (await fs.stat(path.resolve(dir, name))).isDirectory()])))];
       }
       return [mod, stat.isDirectory()];
     })));
@@ -76,7 +76,7 @@ function findDlxPath(packagePath: string): string {
   return packagePath.slice(0, packagePath.indexOf("node_modules"));
 }
 
-export async function linkDirs(sourceDir: string, destinationDir: string, dirs: SymlinkPackages): Promise<void> {
+async function linkDirs(sourceDir: string, destinationDir: string, dirs: SymlinkPackages): Promise<void> {
   const sourceEntryNames = Object.entries(dirs);
   await Promise.all(sourceEntryNames.map(async ([folder, children]) => {
     const sourceEntryPath = path.join(sourceDir, folder);
