@@ -9,7 +9,6 @@
     "@rollup/plugin-typescript": "^11.1.5",
     "@rollup/plugin-json": "^6.0.1",
     "@rollup/pluginutils": "^5.0.5",
-    "rollup-plugin-consts": "^1.2.0",
     "rollup-plugin-include-sourcemaps": "^0.7.0",
     "@electron-forge/core": "^6.4.2",
     "@electron-forge/maker-wix": "^6.4.2",

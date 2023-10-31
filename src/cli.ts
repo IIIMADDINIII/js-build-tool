@@ -33,7 +33,6 @@ const SymlinkPackages: SymlinkPackages = {
     "plugin-json": true,
     "pluginutils": true
   },
-  "rollup-plugin-consts": true,
   "rollup-plugin-include-sourcemaps": true,
   "@electron-forge": {
     "core": true,
