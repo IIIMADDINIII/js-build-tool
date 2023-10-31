@@ -26,8 +26,6 @@ const SymlinkPackages: SymlinkPackages = {
   "gulp": true,
   "rollup": true,
   "@rollup": {
-    "plugin-commonjs": true,
-    "plugin-node-resolve": true,
     "plugin-terser": true,
     "plugin-json": true,
     "pluginutils": true
