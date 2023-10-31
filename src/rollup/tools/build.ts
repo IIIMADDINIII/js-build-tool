@@ -2,7 +2,7 @@ import * as fs from "fs/promises";
 import * as path from "path";
 import type { OutputOptions, RollupOptions } from "rollup";
 import { runApiExtrator } from "../../tools/apiExtractor.js";
-import { runTestFiles } from "../../tools/misc.js";
+import { cwd, runTestFiles } from "../../tools/misc.js";
 import { ConfigOpts, DefaultConfigOpts, DefaultExportOpts, DefaultOutputOpts, OutputFormat, getDefaultConfigOpts } from "./buildOptions.js";
 import { run, type CommandOptions } from "./run.js";
 
@@ -62,16 +62,14 @@ export async function bundleDeclarations(defaultConfigOpts: DefaultConfigOpts): 
       const apiExtractorConfig = {
         mainEntryPointFilePath: source,
         bundledPackages: defaultOutputOpts.bundleDeclarationPackages,
+        projectFolder: cwd,
         compiler: {
           tsconfigFilePath: path.resolve(defaultExportOpts.tsconfig),
         },
-        apiReport: { enabled: false },
-        docModel: { enabled: false },
         dtsRollup: {
           enabled: true,
           untrimmedFilePath: defaultOutputOpts.declarationTarget,
         },
-        tsdocMetadata: { enabled: false },
       };
       console.log("apiExtractorConfig", apiExtractorConfig);
       runApiExtrator(path.resolve("package.json"), apiExtractorConfig);
