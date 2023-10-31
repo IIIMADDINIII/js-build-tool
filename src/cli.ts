@@ -25,6 +25,7 @@ const SymlinkPackages: SymlinkPackages = {
   "typescript": true,
   "tslib": true,
   "gulp": true,
+  "rollup": true,
   "@rollup": {
     "plugin-commonjs": true,
     "plugin-node-resolve": true,
