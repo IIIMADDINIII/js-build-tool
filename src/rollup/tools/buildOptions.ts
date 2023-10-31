@@ -316,6 +316,9 @@ function getTypescriptDefaultOptions(defaultExportOpts: DefaultExportOpts): Roll
     lib,
     tsconfig: defaultExportOpts.tsconfig,
   };
+  if (defaultExportOpts.generateDeclaration) {
+    rollupTypescriptOptions.declarationDir = defaultExportOpts.declarationDir;
+  }
   if (!defaultExportOpts.sourceMap) {
     rollupTypescriptOptions.sourceMap = false;
     rollupTypescriptOptions.inlineSources = undefined;
