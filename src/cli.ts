@@ -32,12 +32,6 @@ const SymlinkPackages: SymlinkPackages = {
     "plugin-json": true,
     "pluginutils": true
   },
-  "rollup-plugin-include-sourcemaps": true,
-  "@electron-forge": {
-    "core": true,
-    "maker-wix": true,
-    "maker-zip": true,
-  },
 };
 
 async function symlinkPackages(packagePath: string, dlxPath: string) {

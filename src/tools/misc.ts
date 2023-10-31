@@ -3,6 +3,7 @@ import { $ } from "execa";
 import { fetchLatestRelease, fetchReleaseByTag } from "fetch-github-release";
 import * as fs from "fs/promises";
 import gulp, { TaskFunction } from "gulp";
+import { createRequire } from "module";
 import * as path from "path";
 import * as url from 'url';
 
@@ -21,6 +22,10 @@ export type { TaskFunction } from "gulp";
 let prod = false;
 export const cwd = process.cwd();
 export const packageDir = cwd;
+
+export function requireFromProject(module: string): unknown {
+  return createRequire(path.resolve("./package.json"))(module);
+}
 
 export function isProd(): boolean {
   let prodEnv = process.env["prod"];
@@ -67,7 +72,7 @@ export async function downloadGithubRelease(options: Parameters<typeof fetchRele
 }
 
 export async function runTestFiles(testFiles: string[]) {
-  await exec({ env: { NODE_OPTIONS: "--experimental-vm-modules" } })`jest ${testFiles}`;
+  await exec({ env: { NODE_OPTIONS: "--experimental-vm-modules" } })`jest ${testFiles.map((testFile) => testFile.replaceAll("\\", "/"))}`;
 }
 
 export async function runTests() {

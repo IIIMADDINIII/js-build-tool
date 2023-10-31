@@ -7,10 +7,6 @@
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-json": "^6.0.1",
-    "@rollup/pluginutils": "^5.0.5",
-    "rollup-plugin-include-sourcemaps": "^0.7.0",
-    "@electron-forge/core": "^6.4.2",
-    "@electron-forge/maker-wix": "^6.4.2",
-    "@electron-forge/maker-zip": "^6.4.2"
+    "@rollup/pluginutils": "^5.0.5"
   }
 }

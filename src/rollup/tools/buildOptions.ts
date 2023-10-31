@@ -15,7 +15,7 @@ import type { Plugin } from "rollup";
 import consts from "rollup-plugin-consts";
 import type { SourcemapsPluginOptions } from 'rollup-plugin-include-sourcemaps';
 import sourceMaps from 'rollup-plugin-include-sourcemaps';
-import { isProd } from "../../tools/misc.js";
+import { isProd, requireFromProject } from "../../tools/misc.js";
 import { getPackageDependencies, getPackageDevDependencies, getPackageType, topLevelExports } from "../../tools/package.js";
 import { manageDependencies, type ManageDependenciesConfig } from "../plugins.js";
 
@@ -264,7 +264,7 @@ async function getDefaultPlugins(defaultExportOpts: DefaultExportOpts): Promise<
     consts(defaultExportOpts.constsPlugin),
     json(defaultExportOpts.jsonPlugin),
     commonjs(defaultExportOpts.commonjsPlugin),
-    typescript(defaultExportOpts.typescriptPlugin),
+    typescript({ ...defaultExportOpts.typescriptPlugin, typescript: <typeof import("typescript")>requireFromProject("typescript") }),
     sourceMaps(defaultExportOpts.sourceMapsPlugin),
     nodeResolve(defaultExportOpts.nodeResolvePlugin),
   ];

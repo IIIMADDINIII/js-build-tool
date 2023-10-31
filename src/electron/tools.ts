@@ -1,12 +1,12 @@
-import { MakeOptions, api } from "@electron-forge/core";
+// import { MakeOptions, api } from "@electron-forge/core";
 import type { OctokitReleaseAssets } from "fetch-github-release/dist/types.js";
 import path from "path";
 import { addToPath, dlxPath, downloadGithubRelease, downloadLatestGithubRelease, exec } from "../tools/misc.js";
 
 
-export async function forgeMake(opts?: MakeOptions) {
-  await api.make(opts ? opts : {});
-}
+//export async function forgeMake(opts?: MakeOptions) {
+// await api.make(opts ? opts : {});
+//}
 
 export async function start() {
   await exec`pnpx electron .`;
