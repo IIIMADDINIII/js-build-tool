@@ -27,6 +27,10 @@ export function requireFromProject(module: string): unknown {
   return createRequire(path.resolve("./package.json"))(module);
 }
 
+export function resolveFromProject(module: string): string {
+  return createRequire(path.resolve("./package.json")).resolve(module);
+}
+
 export function isProd(): boolean {
   let prodEnv = process.env["prod"];
   if (prodEnv === undefined) return prod;
