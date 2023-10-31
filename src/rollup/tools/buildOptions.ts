@@ -8,6 +8,7 @@ import type { Options as TerserOptions } from "@rollup/plugin-terser";
 import terser from "@rollup/plugin-terser";
 import type { RollupTypescriptOptions } from "@rollup/plugin-typescript";
 import typescript from "@rollup/plugin-typescript";
+import fastGlob from "fast-glob";
 import fs from "fs/promises";
 import path from "path";
 import type { Plugin } from "rollup";
@@ -91,8 +92,7 @@ export type DefaultExportsOpts = { [key: string]: DefaultExportOpts; };
 export type ExportsOpts = string[] | { [key: string]: ExportOpts; };
 
 export interface DefaultConfigOpts {
-  testsFolderInBasePath: string;
-  testFilePrefix: string;
+  testFileGlobPatterns: string[];
   inputBasePath: string;
   exports: DefaultExportsOpts;
   tests: DefaultExportsOpts;
@@ -100,20 +100,23 @@ export interface DefaultConfigOpts {
   entryPoints: DefaultExportsOpts;
 }
 export interface ConfigOpts extends ExportOpts {
-  testsFolderInBasePath?: string;
-  testFilePrefix?: string;
+  testFileGlobPatterns?: string | string[];
   inputBasePath?: string;
   exports?: ExportsOpts;
   tests?: ExportsOpts;
   additionalExports?: ExportsOpts;
 }
 
+function makeArray<T>(input: T | T[]): T[] {
+  if (Array.isArray(input)) return input;
+  return [input];
+}
+
 export async function getDefaultConfigOpts(configOpts?: ConfigOpts): Promise<DefaultConfigOpts> {
   if (configOpts === undefined) configOpts = {};
   let defaultConfigOpts: DefaultConfigOpts = {
+    testFileGlobPatterns: makeArray(getDefault(configOpts.testFileGlobPatterns, "**/*.test.?ts")),
     inputBasePath: getDefault(configOpts.inputBasePath, "./src/"),
-    testsFolderInBasePath: getDefault(configOpts.testsFolderInBasePath, "tests"),
-    testFilePrefix: getDefault(configOpts.testFilePrefix, "test"),
     exports: {},
     tests: {},
     additionalExports: {},
@@ -237,30 +240,22 @@ async function getDefaultExports(): Promise<ExportsOpts> {
 }
 
 async function getDefaultTests(defaultConfigOpts: DefaultConfigOpts): Promise<ExportsOpts> {
-  const testFolder = path.resolve(defaultConfigOpts.inputBasePath, defaultConfigOpts.testsFolderInBasePath);
-  try {
-    const files = await fs.readdir(testFolder);
-    const testFiles: ExportsOpts = {};
-    await Promise.all(files.map(async (file) => {
-      if (!file.startsWith(defaultConfigOpts.testFilePrefix)) return;
-      const inputFileExt = path.extname(file).toLocaleLowerCase();
-      if ((inputFileExt !== ".cts") && (inputFileExt !== ".mts")) throw new Error(`Testfile ${file} dose not end with .mjs or .cjs. Extension is needed so ava test-runner runs it in the correct context`);
-      const p = path.resolve(testFolder, file);
-      const stat = await fs.stat(p);
-      if (!stat.isFile()) return;
-      const name = path.join(defaultConfigOpts.testsFolderInBasePath, path.parse(file).name);
-      testFiles[name] = {
-        isTest: true,
-        inputFileExt,
-      };
-    }));
-    return testFiles;
-  } catch (error) {
-    if (typeof error === "object" && error !== null && "code" in error && error.code === "ENOENT") {
-      return {};
-    }
-    throw error;
-  }
+  const searchPath = path.resolve(defaultConfigOpts.inputBasePath);
+  const files = await fastGlob(defaultConfigOpts.testFileGlobPatterns, { cwd: searchPath });
+  const testFiles: ExportsOpts = {};
+  await Promise.all(files.map(async (file) => {
+    const inputFileExt = path.extname(file).toLocaleLowerCase();
+    if ((inputFileExt !== ".cts") && (inputFileExt !== ".mts")) throw new Error(`Testfile ${file} dose not end with .mjs or .cjs. Extension is needed so ava test-runner runs it in the correct context`);
+    const p = path.resolve(searchPath, file);
+    const stat = await fs.stat(p);
+    if (!stat.isFile()) return;
+    const name = path.join(path.dirname(file), path.parse(file).name);
+    testFiles[name] = {
+      isTest: true,
+      inputFileExt,
+    };
+  }));
+  return testFiles;
 }
 
 async function getDefaultPlugins(defaultExportOpts: DefaultExportOpts): Promise<Plugin[]> {

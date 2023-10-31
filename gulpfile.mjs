@@ -17,7 +17,7 @@ async function packageModules() {
   await fs.rename(srcDir, destDir);
 }
 
-let deps = Object.keys((await tools.readJson("packageDependencies.json")).dependencies);
+let deps = [...Object.keys((await tools.readJson("packageDependencies.json")).dependencies), "typescript"];
 const bundle = rollup.tasks.build({ blacklistDevDependencies: false, externalDependencies: deps, commonjsPlugin: { ignore: ["electron"] } }, { failAfterWarnings: false });
 
 export const clean = tools.exitAfter(tasks.cleanWithGit());

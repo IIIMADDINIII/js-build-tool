@@ -22,7 +22,6 @@ const SymlinkPackages: SymlinkPackages = {
     "gulp.CMD": false,
     "gulp.ps1": false,
   },
-  "typescript": true,
   "tslib": true,
   "gulp": true,
   "rollup": true,
