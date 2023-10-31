@@ -10,5 +10,11 @@
 /gulpfile.mjs
 /packageDependencies.json
 /modules/node_modules/**/*.md
+/modules/node_modules/**/*.d.ts
 /modules/node_modules/**/licence
+/modules/node_modules/**/licence.txt
+/modules/node_modules/**/README.md
 /modules/node_modules/@types/**/*
+/modules/node_modules/typescript/**/*
+!/modules/node_modules/typescript/package.json
+!/modules/node_modules/typescript/lib/typescript.js
