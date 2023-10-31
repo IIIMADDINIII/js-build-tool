@@ -48,7 +48,6 @@
     "tslib": "^2.6.2",
     "gulp": "^4.0.2",
     "execa": "^8.0.1",
-    "rimraf": "^5.0.5",
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-terser": "^0.4.4",

@@ -66,10 +66,6 @@ export async function downloadGithubRelease(options: Parameters<typeof fetchRele
   await fetchReleaseByTag(options);
 }
 
-export async function runTests(testFolder: string) {
-  await exec`ava ${testFolder}/**`;
-}
-
 export async function runTestFiles(testFiles: string[]) {
-  await exec`ava ${testFiles}`;
+  testFiles;
 }

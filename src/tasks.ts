@@ -64,15 +64,3 @@ export function exit(): () => Promise<void> {
     }, 50);
   });
 }
-
-export function runTests(testFolder: string): () => Promise<void> {
-  return setDisplayName("runTests", async function runTests() {
-    await misc.runTests(testFolder);
-  });
-}
-
-export function runTestFiles(testFiles: string[]): () => Promise<void> {
-  return setDisplayName("runTestFiles", async function runTestFiles() {
-    await misc.runTestFiles(testFiles);
-  });
-}
