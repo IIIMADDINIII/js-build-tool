@@ -56,6 +56,7 @@ export interface DefaultExportOpts {
   defaultLib: string[];
   browserLib: string[];
   nodeLib: string[];
+  tsconfig: string;
   sourceMap: boolean;
   sourceMapType: SourceMapType;
   externalDependencies: string[];
@@ -136,24 +137,24 @@ async function getDefaultExportsOpts(defaultConfigOpts: DefaultConfigOpts, confi
 async function getDefaultExportOpts(defaultConfigOpts: DefaultConfigOpts, configOpts: ConfigOpts, exportName: string, exportOpts: ExportOpts): Promise<[string, DefaultExportOpts]> {
   exportOpts = { ...configOpts, ...exportOpts };
   [exportName, exportOpts] = await runHookOptions(exportName, exportOpts);
+  const isTest = getDefault(exportOpts.isTest, false);
   const environment = getDefault(exportOpts.environment, "node");
   const type = getDefault(exportOpts.type, "lib");
   const prod = isProd();
   const defaultExportName = getDefault(exportOpts.defaultExportName, "index");
   const inputFileName = getDefault(exportOpts.inputFileName, getDefaultFileName(exportName, defaultExportName));
   const inputFileExt = getDefault(exportOpts.inputFileExt, ".ts");
-  const isTest = getDefault(exportOpts.isTest, false);
   let defaultExportOpts: DefaultExportOpts = {
+    isTest,
     environment,
     type,
     prod,
-    minify: getDefault(exportOpts.minify, prod),
+    minify: getDefault(exportOpts.minify, prod && !isTest),
     defaultExportName,
     inputFileDir: getDefault(exportOpts.inputFileDir, defaultConfigOpts.inputBasePath),
     inputFileName,
     inputFileExt,
-    isTest,
-    sourceMap: getDefault(exportOpts.sourceMap, prod),
+    sourceMap: getDefault(exportOpts.sourceMap, prod && !isTest),
     sourceMapType: getDefault(exportOpts.sourceMapType, "external"),
     buildTest: getDefault(exportOpts.buildTest, false),
     terserPlugin: getDefault(exportOpts.terserPlugin, {}),
@@ -168,6 +169,7 @@ async function getDefaultExportOpts(defaultConfigOpts: DefaultConfigOpts, config
     defaultLib: getDefault(exportOpts.defaultLib, ["ESNext"]),
     browserLib: getDefault(exportOpts.browserLib, ["DOM"]),
     nodeLib: getDefault(exportOpts.nodeLib, []),
+    tsconfig: getDefault(exportOpts.tsconfig, isTest ? "./tsconfig.test.json" : "./tsconfig.json"),
     sourceMapsPlugin: getDefault(exportOpts.sourceMapsPlugin, {}),
     nodeResolvePlugin: getDefault(exportOpts.nodeResolvePlugin, getNodeResolveDefaultOptions(environment)),
     manageDependenciesPlugin: {},
@@ -210,7 +212,7 @@ async function getDefaultOutputOpts(defaultExportOpts: DefaultExportOpts, export
   };
   if (defaultExportOpts.isTest) {
     defaultOutputOpts.outputFileDir = defaultOutputOpts.testOutputDir;
-    defaultOutputOpts.outputFileExt = defaultOutputOpts.singleOutputExt;
+    defaultOutputOpts.outputFileExt = exportOpts.inputFileExt === ".cts" ? ".cjs" : ".mjs";
   } else if (defaultExportOpts.isSingleFormat) {
     defaultOutputOpts.outputFileDir = defaultOutputOpts.singleOutputDir;
     defaultOutputOpts.outputFileExt = defaultOutputOpts.singleOutputExt;
@@ -247,9 +249,6 @@ async function getDefaultTests(defaultConfigOpts: DefaultConfigOpts): Promise<Ex
       const name = path.join(defaultConfigOpts.testsFolderInBasePath, path.parse(file).name);
       testFiles[name] = {
         isTest: true,
-        inputFileExt,
-        singleOutputExt: inputFileExt === ".cts" ? ".cjs" : ".mjs",
-        outputFormat: inputFileExt === ".mts" ? "es" : "commonjs",
       };
     }));
     return testFiles;
@@ -309,6 +308,7 @@ function getTypescriptDefaultOptions(defaultExportOpts: DefaultExportOpts): Roll
     declaration: defaultExportOpts.generateDeclaration,
     declarationMap: defaultExportOpts.generateDeclaration,
     lib,
+    tsconfig: defaultExportOpts.tsconfig,
   };
   if (!defaultExportOpts.sourceMap) {
     rollupTypescriptOptions.sourceMap = false;
