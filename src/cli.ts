@@ -29,7 +29,6 @@ const SymlinkPackages: SymlinkPackages = {
     "plugin-commonjs": true,
     "plugin-node-resolve": true,
     "plugin-terser": true,
-    "plugin-typescript": true,
     "plugin-json": true,
     "pluginutils": true
   },
