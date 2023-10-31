@@ -2,7 +2,6 @@
 import cp from "child_process";
 import fs from "fs/promises";
 import path from "path";
-import timer from "timers/promises";
 import url from 'url';
 
 async function run() {
@@ -32,15 +31,7 @@ async function symlinkPackages(projectPath: string, packagePath: string, dlxPath
   const packageModules = path.resolve(packagePath, "modules/node_modules");
   const dlxNodeModules = path.resolve(dlxPath, "node_modules");
   const projectSymlink = await getSymlinkDirs(projectModules);
-  console.log("projectPath", projectPath);
-  console.log("packagePath", packagePath);
-  console.log("dlxPath", dlxPath);
-  console.log("projectModules", projectModules);
-  console.log("packageModules", packageModules);
-  console.log("dlxNodeModules", dlxNodeModules);
   console.log("projectSymlink", projectSymlink);
-  console.log("packageSymlink", packageSymlink);
-  await timer.setTimeout(10000);
   await linkDirs(projectModules, dlxNodeModules, projectSymlink);
   await linkDirs(packageModules, dlxNodeModules, packageSymlink);
 }
@@ -51,9 +42,9 @@ async function getSymlinkDirs(projectModules: string): Promise<SymlinkPackages> 
     return Object.fromEntries(await Promise.all(modules.map(async (mod): Promise<[string, boolean | SymlinkPackages]> => {
       const dir = path.resolve(projectModules, mod);
       const stat = await fs.stat(dir);
-      if (mod === ".bin" && stat.isDirectory()) {
+      if ((mod === ".bin" || mod.startsWith("@")) && stat.isDirectory()) {
         const bins = await fs.readdir(dir);
-        return [".bin", Object.fromEntries(bins.map((name) => [name, false]))];
+        return [mod, Object.fromEntries(bins.map((name) => [name, false]))];
       }
       return [mod, stat.isDirectory()];
     })));
