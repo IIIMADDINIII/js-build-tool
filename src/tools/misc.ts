@@ -67,6 +67,9 @@ export async function downloadGithubRelease(options: Parameters<typeof fetchRele
 }
 
 export async function runTestFiles(testFiles: string[]) {
-  // Todo: Implement jest Support
-  testFiles;
+  await exec({ env: { NODE_OPTIONS: "--experimental-vm-modules" } })`jest ${testFiles}`;
+}
+
+export async function runTests() {
+  await exec({ env: { NODE_OPTIONS: "--experimental-vm-modules" } })`jest`;
 }
