@@ -235,8 +235,8 @@ async function getDefaultOutputOpts(defaultExportOpts: DefaultExportOpts, export
     defaultOutputOpts.outputFileExt = defaultOutputOpts.singleOutputExt;
   }
   defaultOutputOpts.file = path.resolve(defaultOutputOpts.outputFileDir, defaultOutputOpts.outputFileName + defaultOutputOpts.outputFileExt);
-  defaultOutputOpts.declarationSource = path.resolve(defaultOutputOpts.outputFileDir, defaultExportOpts.declarationDir, defaultOutputOpts.outputFileName + "d.ts");
-  defaultOutputOpts.declarationTarget = path.resolve(defaultOutputOpts.outputFileDir, defaultOutputOpts.outputFileName + "d.ts");
+  defaultOutputOpts.declarationSource = path.resolve(defaultOutputOpts.outputFileDir, defaultExportOpts.declarationDir, defaultOutputOpts.outputFileName + ".d.ts");
+  defaultOutputOpts.declarationTarget = path.resolve(defaultOutputOpts.outputFileDir, defaultOutputOpts.outputFileName + ".d.ts");
   return defaultOutputOpts;
 }
 
