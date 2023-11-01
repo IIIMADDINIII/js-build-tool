@@ -8,7 +8,12 @@ export function runApiExtrator(projectPackageJsonPath: string, configObject: ICo
     typescriptCompilerFolder: resolve(resolveModule("typescript"), "../.."),
   });
   if (!extractorResult.succeeded) {
+
     throw new Error(`API Extractor completed with ${extractorResult.errorCount} errors and ${extractorResult.warningCount} warnings`);
   }
-  console.log(`API Extractor completed successfully`);
+  if (extractorResult.succeeded) return console.log('API Extractor completed successfully');
+  if (extractorResult.errorCount == 0) return console.warn('API Extractor completed with warnings');
+  console.error('API Extractor completed with errors');
+  throw new Error('API Extractor completed with errors');
 }
+
