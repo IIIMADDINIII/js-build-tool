@@ -47,7 +47,6 @@ export async function bundleDeclarations(defaultConfigOpts: DefaultConfigOpts): 
     if (!defaultExportOpts.generateDeclaration) continue;
     for (let defaultOutputOpts of defaultExportOpts.outputs) {
       const source = defaultOutputOpts.declarationSource;
-      console.log("source", source);
       try {
         await fs.stat(source);
       } catch (e) {
@@ -57,7 +56,6 @@ export async function bundleDeclarations(defaultConfigOpts: DefaultConfigOpts): 
         throw e;
       }
       const declDir = path.resolve(defaultOutputOpts.outputFileDir, defaultExportOpts.declarationDir);
-      console.log("pathsToRemove", declDir);
       pathsToRemove.add(declDir);
       const apiExtractorConfig = {
         mainEntryPointFilePath: source,
@@ -71,7 +69,6 @@ export async function bundleDeclarations(defaultConfigOpts: DefaultConfigOpts): 
           untrimmedFilePath: defaultOutputOpts.declarationTarget,
         },
       };
-      console.log("apiExtractorConfig", apiExtractorConfig);
       runApiExtrator(path.resolve("package.json"), apiExtractorConfig);
     }
   }

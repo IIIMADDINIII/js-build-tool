@@ -1,6 +1,7 @@
 
 
 import * as fs from "fs/promises";
+import { createRequire } from "module";
 import * as path from "path";
 import * as url from 'url';
 import { exec } from "./exec.js";
@@ -60,4 +61,8 @@ export async function runTestFiles(testFiles: string[]) {
 
 export async function runTests() {
   await exec({ env: { NODE_OPTIONS: "--experimental-vm-modules" } })`jest`;
+}
+
+export function resolveModule(module: string): string {
+  return createRequire(path.resolve(dlxPath, "package.json")).resolve(module);
 }
