@@ -1,6 +1,6 @@
 
 import { normalizePath } from "@rollup/pluginutils";
-import { access } from "fs/promises";
+import { fs } from "../../tools/file.js";
 import { resolve } from "path";
 import type { Plugin } from "rollup";
 
@@ -35,7 +35,7 @@ export function manageDependencies(config: ManageDependenciesConfig): Plugin {
     while (importerPath.length >= 1) {
       file = path + "/package.json";
       try {
-        await access(file);
+        await fs.access(file);
         return file;
       } catch { }
       importerPath = importerPath.slice(0, -1);

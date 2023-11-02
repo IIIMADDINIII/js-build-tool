@@ -5,14 +5,14 @@ import { RollupNodeResolveOptions, nodeResolve } from '@rollup/plugin-node-resol
 import terser, { type Options as TerserOptions } from "@rollup/plugin-terser";
 import typescript, { RollupTypescriptOptions } from "@rollup/plugin-typescript";
 import fastGlob from "fast-glob";
-import fs from "fs/promises";
 import path from "path";
 import type { Plugin } from "rollup";
 import consts from "rollup-plugin-consts";
 import sourceMaps, { SourcemapsPluginOptions } from 'rollup-plugin-include-sourcemaps';
 import { isProd } from "../../tools/misc.js";
-import { getPackageDependencies, getPackageDevDependencies, getPackageType, topLevelExports } from "../../tools/package.js";
+import { getProjectDependencies, getProjectDevDependencies, getProjectPackageType, getProjectTopLevelExports } from "../../tools/package.js";
 import { manageDependencies, type ManageDependenciesConfig } from "../plugins.js";
+import { fs } from "../../tools/file.js";
 
 export type OutputFormat = "es" | "commonjs";
 export type ExecutionEnvironment = "node" | "browser";
@@ -68,6 +68,7 @@ export interface DefaultExportOpts {
   inputFileDir: string;
   inputFileName: string;
   inputFileExt: string;
+  inputFile: string;
   isTest: boolean;
   isSingleFormat: boolean;
   buildTest: boolean;
@@ -82,7 +83,7 @@ export interface DefaultExportOpts {
   sourceMapsPlugin: SourcemapsPluginOptions;
   nodeResolvePlugin: RollupNodeResolveOptions;
 }
-export interface ExportOpts extends Partial<Omit<DefaultExportOpts, "outputs">>, Partial<OutputOpts> {
+export interface ExportOpts extends Partial<Omit<DefaultExportOpts, "outputs" | "inputFile">>, Partial<OutputOpts> {
   hookOptions?(exportName: string, options: ExportOpts): Promise<[string, ExportOpts] | undefined> | [string, ExportOpts] | undefined;
   outputs?: OutputsOpts;
 }
@@ -146,7 +147,8 @@ async function getDefaultExportOpts(defaultConfigOpts: DefaultConfigOpts, config
   const prod = isProd();
   const defaultExportName = getDefault(exportOpts.defaultExportName, "index");
   const inputFileName = getDefault(exportOpts.inputFileName, getDefaultFileName(exportName, defaultExportName));
-  const inputFileExt = getDefault(exportOpts.inputFileExt, ".ts");
+  const inputFileDir = getDefault(exportOpts.inputFileDir, defaultConfigOpts.inputBasePath);
+  const inputFileExt = getDefault(exportOpts.inputFileExt, await getDefaultInputFileExt(inputFileDir, inputFileName));
   let defaultExportOpts: DefaultExportOpts = {
     isTest,
     environment,
@@ -154,9 +156,10 @@ async function getDefaultExportOpts(defaultConfigOpts: DefaultConfigOpts, config
     prod,
     minify: getDefault(exportOpts.minify, prod && !isTest),
     defaultExportName,
-    inputFileDir: getDefault(exportOpts.inputFileDir, defaultConfigOpts.inputBasePath),
+    inputFileDir,
     inputFileName,
     inputFileExt,
+    inputFile: path.resolve(inputFileDir, inputFileName + inputFileExt),
     sourceMap: getDefault(exportOpts.sourceMap, !prod || isTest),
     sourceMapType: getDefault(exportOpts.sourceMapType, "external"),
     buildTest: getDefault(exportOpts.buildTest, false),
@@ -234,6 +237,8 @@ async function getDefaultOutputOpts(defaultExportOpts: DefaultExportOpts, export
     defaultOutputOpts.outputFileDir = defaultOutputOpts.singleOutputDir;
     defaultOutputOpts.outputFileExt = defaultOutputOpts.singleOutputExt;
   }
+  if (defaultExportOpts.inputFileExt === ".cts") defaultOutputOpts.outputFileExt = ".cjs";
+  if (defaultExportOpts.inputFileExt === ".mts") defaultOutputOpts.outputFileExt = ".mjs";
   defaultOutputOpts.file = path.resolve(defaultOutputOpts.outputFileDir, defaultOutputOpts.outputFileName + defaultOutputOpts.outputFileExt);
   defaultOutputOpts.declarationSource = path.resolve(defaultOutputOpts.outputFileDir, defaultExportOpts.declarationDir, defaultOutputOpts.outputFileName + ".d.ts");
   defaultOutputOpts.declarationTarget = path.resolve(defaultOutputOpts.outputFileDir, defaultOutputOpts.outputFileName + ".d.ts");
@@ -241,7 +246,7 @@ async function getDefaultOutputOpts(defaultExportOpts: DefaultExportOpts, export
 }
 
 async function getDefaultExports(): Promise<ExportsOpts> {
-  return await topLevelExports();
+  return await getProjectTopLevelExports();
 }
 
 async function getDefaultTests(defaultConfigOpts: DefaultConfigOpts): Promise<ExportsOpts> {
@@ -280,10 +285,10 @@ async function getDefaultPlugins(defaultExportOpts: DefaultExportOpts): Promise<
 }
 
 async function getManageDependenciesDefaultOptions(defaultExportOpts: DefaultExportOpts): Promise<ManageDependenciesConfig> {
-  let deps = Object.keys(await getPackageDependencies());
+  let deps = Object.keys(await getProjectDependencies());
   let blacklist = [...defaultExportOpts.blacklistDependencies];
   if (defaultExportOpts.blacklistDevDependencies) {
-    let devDeps = new Set(Object.keys(await getPackageDevDependencies()));
+    let devDeps = new Set(Object.keys(await getProjectDevDependencies()));
     for (let allowed of defaultExportOpts.allowedDevDependencies) {
       devDeps.delete(allowed);
     }
@@ -335,8 +340,20 @@ function getNodeResolveDefaultOptions(environment: ExecutionEnvironment): Rollup
   return {};
 }
 
+async function getDefaultInputFileExt(inputFileDir: string, inputFileName: string): Promise<string> {
+  try {
+    await fs.stat(path.resolve(inputFileDir, inputFileName + ".cts"));
+    return ".cts";
+  } catch {}
+  try {
+    await fs.stat(path.resolve(inputFileDir, inputFileName + ".mts"));
+    return ".mts";
+  } catch {}
+  return ".ts";
+}
+
 async function getDefaultOutputs(name: string, ext: string): Promise<OutputOpts[]> {
-  let type = await getPackageType();
+  let type = await getProjectPackageType();
   ext = ext.toLocaleLowerCase();
   if (ext === ".mts") {
     return [{

@@ -1,7 +1,7 @@
-import * as fs from "fs/promises";
-import { rimraf } from "rimraf";
+import fs from "fs/promises";
 import { tools, tasks, rollup } from "@iiimaddiniii/js-build-tool";
 import { join, parse, resolve } from "path";
+import { createPackageWithOptions } from "@electron/asar";
 
 const allowedBinNames = ["gulp"];
 const filterBasePrefix = ["license", "completion.sh", ".", "authors", "changelog", "changes", "makefile"];
@@ -35,26 +35,42 @@ async function filterModulesFiles(folder) {
   if ((await fs.readdir(folder)).length === 0) await fs.rmdir(folder);
 }
 
-async function packageModules() {
+export async function packageModules() {
   let tmpBuildDir = tools.file(".tmpBuild");
   let src = tools.file("packageDependencies.json");
   let dest = tools.file(".tmpBuild/package.json");
   let srcDir = tools.file(".tmpBuild/node_modules");
-  let destDir = tools.file("modules/node_modules");
-  let destParent = tools.file("modules");
-  await rimraf([tmpBuildDir, destParent]);
-  await fs.mkdir(tmpBuildDir);
+  let destFile = tools.file("node_modules.asar");
+  try { await fs.rm(destFile); } catch { }
+  try { await fs.mkdir(tmpBuildDir); } catch { }
   await fs.copyFile(src, dest);
   await tools.exec({ cwd: tmpBuildDir })`pnpm install --node-linker=hoisted`;
   await filterModulesFiles(srcDir);
-  await fs.mkdir(destParent);
-  await fs.rename(srcDir, destDir);
+  await createPackageWithOptions(tmpBuildDir, destFile, { unpack: "*.node" });
+}
+
+async function copyAsarNodeAutorunJs() {
+  let autostart = await tools.read("./node_modules/asar-node/dist/autorun.js");
+  let appendix = await tools.read("./autostart_appendix.js");
+  await fs.writeFile(tools.file("./dist/asar-node-autostart.cjs"), autostart + appendix);
 }
 
 let deps = Object.keys((await tools.readJson("packageDependencies.json")).dependencies);
 deps.push("typescript");
-const bundle = rollup.tasks.build({ blacklistDevDependencies: false, externalDependencies: deps, commonjsPlugin: { ignore: ["electron"] } }, { failAfterWarnings: false });
+const bundle = rollup.tasks.build({
+  blacklistDevDependencies: false,
+  externalDependencies: deps,
+  commonjsPlugin: { ignore: ["electron"] },
+  additionalExports: {
+    "./bin/cli": {
+      outputs: [{
+        outputFileName: "./bin/cli",
+        outputFormat: "commonjs",
+      }],
+    }
+  }
+}, { failAfterWarnings: false });
 
 export const clean = tools.exitAfter(tasks.cleanWithGit());
-export const build = tools.exitAfter(tasks.selectPnpmAndInstall(), tools.parallel(bundle, packageModules));
-export const buildCi = tools.exitAfter(tasks.cleanWithGit(), tasks.prodSelectPnpmAndInstall(), tools.parallel(bundle, packageModules));
+export const build = tools.exitAfter(tasks.selectPnpmAndInstall(), tools.parallel(bundle, packageModules), copyAsarNodeAutorunJs);
+export const buildCi = tools.exitAfter(tasks.cleanWithGit(), tasks.prodSelectPnpmAndInstall(), tools.parallel(bundle, packageModules), copyAsarNodeAutorunJs);

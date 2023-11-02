@@ -14,6 +14,9 @@ devDependencies:
   '@electron-forge/maker-zip':
     specifier: ^6.4.2
     version: 6.4.2
+  '@electron/asar':
+    specifier: ^3.2.7
+    version: 3.2.7
   '@iiimaddiniii/js-build-tool':
     specifier: ^0.4.1
     version: 0.4.1
@@ -47,6 +50,9 @@ devDependencies:
   '@types/node':
     specifier: ^20.8.9
     version: 20.8.9
+  asar-node:
+    specifier: ^3.1.1
+    version: 3.1.1
   execa:
     specifier: ^8.0.1
     version: 8.0.1
@@ -281,12 +287,11 @@ packages:
       - supports-color
     dev: true
 
-  /@electron/asar@3.2.4:
-    resolution: {integrity: sha512-lykfY3TJRRWFeTxccEKdf1I6BLl2Plw81H0bbp4Fc5iEc67foDCa5pjJQULVgo0wF+Dli75f3xVcdb/67FFZ/g==}
+  /@electron/asar@3.2.7:
+    resolution: {integrity: sha512-8FaSCAIiZGYFWyjeevPQt+0e9xCK9YmJ2Rjg5SXgdsXon6cRnU0Yxnbe6CvJbQn26baifur2Y2G5EBayRIsjyg==}
     engines: {node: '>=10.12.0'}
     hasBin: true
     dependencies:
-      chromium-pickle-js: 0.2.0
       commander: 5.1.0
       glob: 7.2.3
       minimatch: 3.1.2
@@ -360,7 +365,7 @@ packages:
     resolution: {integrity: sha512-BdhBgm2ZBnYyYRLRgOjM5VHkyFItsbggJ0MHycOjKWdFGYwK97ZFXH54dTvUWEfha81vfvwr5On6XBjt99uDcg==}
     engines: {node: '>=8.6'}
     dependencies:
-      '@electron/asar': 3.2.4
+      '@electron/asar': 3.2.7
       '@malept/cross-spawn-promise': 1.1.1
       debug: 4.3.4
       dir-compare: 3.3.0
@@ -1213,6 +1218,11 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
+  /asar-node@3.1.1:
+    resolution: {integrity: sha512-QqvK7LhJZjlgXAeVbPddqbkA6Nw/uvt48yM6iyvEly3PSAIK/VzzRLK40w4mQGEx2bKkun7ipGw3JBwVVDY1rA==}
+    hasBin: true
+    dev: true
+
   /assign-symbols@1.0.0:
     resolution: {integrity: sha512-Q+JC7Whu8HhmTdBph/Tq59IoRtoy6KAm5zzPv00WdujX82lbAL8K7WVjne7vdCsAmbF4AYaDOPyO3k0kl8qIrw==}
     engines: {node: '>=0.10.0'}
@@ -1543,10 +1553,6 @@ packages:
   /chownr@2.0.0:
     resolution: {integrity: sha512-bIomtDF5KGpdogkLd9VspvFzk9KfpyyGlS8YFVZl7TGPBHL5snIOnxeshwVgPteQ9b4Eydl+pVbIyE1DcvCWgQ==}
     engines: {node: '>=10'}
-    dev: true
-
-  /chromium-pickle-js@0.2.0:
-    resolution: {integrity: sha512-1R5Fho+jBq0DDydt+/vHWj5KJNJCKdARKOCwZUen84I5BreWoLqRLANH1U87eJy1tiASPtMnGqJJq0ZsLoRPOw==}
     dev: true
 
   /class-utils@0.3.6:
@@ -2042,7 +2048,7 @@ packages:
     engines: {node: '>= 14.17.5'}
     hasBin: true
     dependencies:
-      '@electron/asar': 3.2.4
+      '@electron/asar': 3.2.7
       '@electron/get': 2.0.2
       '@electron/notarize': 1.2.4
       '@electron/osx-sign': 1.0.5

@@ -1,17 +1,23 @@
 
 import type { Dependency, JSONSchemaForNPMPackageJsonFiles } from "@schemastore/package";
-import { readJson } from "./misc.js";
+import { readJson } from "./file.js";
+
+export type PackageJsonSchema = JSONSchemaForNPMPackageJsonFiles;
+
+export async function readPackageJson(path: string): Promise<JSONSchemaForNPMPackageJsonFiles> {
+  return await readJson(path);
+}
 
 let packageCache: JSONSchemaForNPMPackageJsonFiles | null = null;
-export async function getPackageJson(cache: boolean = true): Promise<JSONSchemaForNPMPackageJsonFiles> {
+export async function getProjectPackageJson(cache: boolean = true): Promise<JSONSchemaForNPMPackageJsonFiles> {
   if (packageCache !== null && cache) return packageCache;
   let json = await readJson("package.json");
   packageCache = json;
   return json;
 }
 
-export async function topLevelExports(): Promise<string[]> {
-  let packageJson = await getPackageJson();
+export async function getProjectTopLevelExports(): Promise<string[]> {
+  let packageJson = await getProjectPackageJson();
   if (!("exports" in packageJson) || (typeof packageJson.exports !== "object") || (packageJson.exports === null)) throw new Error("Package Exports must be an object");
   // only return entries wich have more than only an type definition
   return Object.entries(packageJson.exports)
@@ -23,21 +29,21 @@ export async function topLevelExports(): Promise<string[]> {
     .map(([key, _value]) => key);
 }
 
-export async function getPackageDependencies(): Promise<Dependency> {
-  let packageJson = await getPackageJson();
+export async function getProjectDependencies(): Promise<Dependency> {
+  let packageJson = await getProjectPackageJson();
   let dependencies = packageJson.dependencies;
   if (dependencies == undefined) dependencies = {};
   return dependencies;
 }
 
-export async function getPackageDevDependencies(): Promise<Dependency> {
-  let packageJson = await getPackageJson();
+export async function getProjectDevDependencies(): Promise<Dependency> {
+  let packageJson = await getProjectPackageJson();
   let dependencies = packageJson.devDependencies;
   if (dependencies == undefined) dependencies = {};
   return dependencies;
 }
 
-export async function getPackageType(): Promise<JSONSchemaForNPMPackageJsonFiles["type"]> {
-  let packageJson = await getPackageJson();
+export async function getProjectPackageType(): Promise<JSONSchemaForNPMPackageJsonFiles["type"]> {
+  let packageJson = await getProjectPackageJson();
   return packageJson.type;
 }

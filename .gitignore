@@ -4,3 +4,5 @@
 /tsconfig.tsbuildinfo
 /.tmpBuild/
 /modules/
+/node_modules.asar
+/node_modules.asar.unpacked/

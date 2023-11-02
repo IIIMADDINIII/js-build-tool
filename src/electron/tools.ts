@@ -2,7 +2,8 @@
 import path from "path";
 import { exec } from "../tools/exec.js";
 import { downloadGithubRelease, downloadLatestGithubRelease, ReleaseAsset } from "../tools/github.js";
-import { addToPath, dlxPath } from "../tools/misc.js";
+import { addToPath } from "../tools/misc.js";
+import { dlxPath } from "../tools/paths.js";
 
 
 //export async function forgeMake(opts?: MakeOptions) {

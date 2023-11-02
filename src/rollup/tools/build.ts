@@ -2,7 +2,8 @@ import * as fs from "fs/promises";
 import * as path from "path";
 import type { OutputOptions, RollupOptions } from "rollup";
 import { runApiExtrator } from "../../tools/apiExtractor.js";
-import { cwd, runTestFiles } from "../../tools/misc.js";
+import { runTestFiles } from "../../tools/misc.js";
+import { cwd } from "../../tools/paths.js";
 import { ConfigOpts, DefaultConfigOpts, DefaultExportOpts, DefaultOutputOpts, OutputFormat, getDefaultConfigOpts } from "./buildOptions.js";
 import { run, type CommandOptions } from "./run.js";
 
@@ -22,7 +23,7 @@ function getRollupOutput(defaultExportOpts: DefaultExportOpts, defaultOutputOpts
 function getRollupOption(defaultExportOpts: DefaultExportOpts): RollupOptions | undefined {
   if (defaultExportOpts.isTest && !defaultExportOpts.buildTest) return undefined;
   return {
-    input: path.resolve(defaultExportOpts.inputFileDir, defaultExportOpts.inputFileName + defaultExportOpts.inputFileExt),
+    input: defaultExportOpts.inputFile,
     output: defaultExportOpts.outputs.map((defaultOutputOpts) => getRollupOutput(defaultExportOpts, defaultOutputOpts)),
     plugins: defaultExportOpts.plugins,
   };
