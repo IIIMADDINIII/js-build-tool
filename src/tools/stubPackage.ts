@@ -3,14 +3,26 @@ import { createRequire } from "module";
 import path from "path";
 import { fs } from "./file.js";
 import { readPackageJson, type PackageJsonSchema } from "./package.js";
-import { binPath, nodeModulesPath } from "./paths.js";
+import { binPath, nodeModulesPath, projectNodeModulesPath } from "./paths.js";
 
-export type StubPackageOptions = {
+export type StubProjectPackageOptions = {
   name: string;
-  location: string;
   resolveFromLocation?: boolean;
   subpaths?: string[];
 };
+
+export type StubPackageOptions = {
+  location: string;
+} & StubProjectPackageOptions;
+
+
+export async function stubProjectPackage(options: StubProjectPackageOptions) {
+  const opt = {
+    location: path.resolve(projectNodeModulesPath, options.name),
+    ...options,
+  };
+  await stubProjectPackage(opt);
+}
 
 export async function stubPackages(options: StubPackageOptions[]): Promise<void> {
   await Promise.all(options.map(stubPackage));

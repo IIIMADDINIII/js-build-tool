@@ -19,6 +19,7 @@ export const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 export const dlxPath = findDlxPath(__dirname);
 export const cwd = process.cwd();
 export const projectPath = cwd;
+export const projectNodeModulesPath = path.resolve(projectPath, "node_modules");
 export const gulpFileName = "gulpfile.mjs";
 export const gulpFilePath = path.resolve(dlxPath, gulpFileName);
 export const jsBuildToolPath = findJsBuildToolPath(__dirname);

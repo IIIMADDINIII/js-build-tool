@@ -9,15 +9,16 @@ import cp from "child_process";
 import path from "path";
 import { fs, reloadFs } from "../tools/file.js";
 import { binPath, cwd, gulpFileName, gulpFilePath, jsBuildToolPath } from "../tools/paths.js";
-import { stubPackages, type StubPackageOptions } from "../tools/stubPackage.js";
+import { StubPackageOptions, stubPackages, type StubProjectPackageOptions } from "../tools/stubPackage.js";
 
 const nodeModulesAsar = path.resolve(jsBuildToolPath, "node_modules.asar/node_modules");
 
-const asarStubOptions: Omit<StubPackageOptions, "location">[] = [
+const asarStubOptions: StubProjectPackageOptions[] = [
   { name: "gulp" },
   { name: "rollup", subpaths: ["dist/shared/loadConfigFile.js", "dist/shared/parseAst.js", "dist/shared/rollup.js"] },
   { name: "@microsoft/api-extractor" },
-  { name: "typescript" }];
+  { name: "typescript" },
+  { name: "tslib" }];
 
 async function stubAsarPackages() {
   let options: StubPackageOptions[] = asarStubOptions.map((options) => {
