@@ -1,10 +1,9 @@
 
+import type { IConfigFile } from "@microsoft/api-extractor";
 import * as tools from "./tools.js";
 import { series, type TaskFunction } from "./tools/gulp.js";
 import { setDisplayName } from "./tools/misc.js";
 
-
-import type { IConfigFile } from "@microsoft/api-extractor";
 import * as electron from "./electron/tasks.js";
 import * as rollup from "./rollup/tasks.js";
 export { electron, rollup };

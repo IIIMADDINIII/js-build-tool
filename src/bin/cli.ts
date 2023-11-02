@@ -17,7 +17,8 @@ const asarStubOptions: StubProjectPackageOptions[] = [
   { name: "gulp" },
   { name: "rollup", subpaths: ["dist/shared/loadConfigFile.js", "dist/shared/parseAst.js", "dist/shared/rollup.js"] },
   { name: "@microsoft/api-extractor" },
-  { name: "typescript" }];
+  { name: "typescript" },
+  { name: "tslib", subpaths: ["tslib.es6.js"] }];
 
 async function stubAsarPackages() {
   let options: StubPackageOptions[] = asarStubOptions.map((options) => {

@@ -15,11 +15,12 @@ const filterDirIncludes = [join("node_modules", "@types"), "__tests__"];
 function shouldDelete(parsedPath, path) {
   const base = parsedPath.base.toLocaleLowerCase();
   const dir = parsedPath.dir.toLocaleLowerCase();
+  if (dir.includes(join("node_modules", "typescript")) && base.endsWith(".d.ts")) return false;
+  if (dir.includes(join("node_modules", "typescript")) && base !== "package.json" && base !== "typescript.js") return true;
   if (filterBasePrefix.some((prefix) => base.startsWith(prefix))) return true;
   if (filterBaseSuffix.some((suffix) => base.endsWith(suffix))) return true;
   if (filterDirIncludes.some((infix) => dir.includes(infix))) return true;
   if (dir.endsWith(".bin") && !allowedBinNames.includes(parsedPath.name)) return true;
-  if (dir.includes(join("node_modules", "typescript")) && base !== "package.json" && base !== "typescript.js") return true;
   return false;
 }
 
