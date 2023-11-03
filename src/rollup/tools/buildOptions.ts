@@ -9,10 +9,10 @@ import path from "path";
 import type { Plugin } from "rollup";
 import consts from "rollup-plugin-consts";
 import sourceMaps, { SourcemapsPluginOptions } from 'rollup-plugin-include-sourcemaps';
+import { fs } from "../../tools/file.js";
 import { isProd } from "../../tools/misc.js";
 import { getProjectDependencies, getProjectDevDependencies, getProjectPackageType, getProjectTopLevelExports } from "../../tools/package.js";
 import { manageDependencies, type ManageDependenciesConfig } from "../plugins.js";
-import { fs } from "../../tools/file.js";
 
 export type OutputFormat = "es" | "commonjs";
 export type ExecutionEnvironment = "node" | "browser";
@@ -57,6 +57,7 @@ export interface DefaultExportOpts {
   browserLib: string[];
   nodeLib: string[];
   tsconfig: string;
+  tsBuildInfoFileName: string;
   sourceMap: boolean;
   sourceMapType: SourceMapType;
   externalDependencies: string[];
@@ -178,6 +179,7 @@ async function getDefaultExportOpts(defaultConfigOpts: DefaultConfigOpts, config
     browserLib: getDefault(exportOpts.browserLib, ["DOM"]),
     nodeLib: getDefault(exportOpts.nodeLib, []),
     tsconfig: getDefault(exportOpts.tsconfig, isTest ? "./tsconfig.test.json" : "./tsconfig.json"),
+    tsBuildInfoFileName: getDefault(exportOpts.tsBuildInfoFileName, inputFileName.replaceAll(/[\/\\]/, "+") + ".tsbuildinfo"),
     sourceMapsPlugin: getDefault(exportOpts.sourceMapsPlugin, {}),
     nodeResolvePlugin: getDefault(exportOpts.nodeResolvePlugin, getNodeResolveDefaultOptions(environment)),
     manageDependenciesPlugin: {},
@@ -240,7 +242,7 @@ async function getDefaultOutputOpts(defaultExportOpts: DefaultExportOpts, export
   if (defaultExportOpts.inputFileExt === ".cts") defaultOutputOpts.outputFileExt = ".cjs";
   if (defaultExportOpts.inputFileExt === ".mts") defaultOutputOpts.outputFileExt = ".mjs";
   defaultOutputOpts.file = path.resolve(defaultOutputOpts.outputFileDir, defaultOutputOpts.outputFileName + defaultOutputOpts.outputFileExt);
-  defaultOutputOpts.declarationSource = path.resolve(defaultOutputOpts.outputFileDir, defaultExportOpts.declarationDir, defaultOutputOpts.outputFileName + ".d.ts");
+  defaultOutputOpts.declarationSource = path.resolve(path.dirname(path.resolve(defaultOutputOpts.outputFileDir, defaultOutputOpts.outputFileName)), defaultExportOpts.declarationDir, defaultOutputOpts.outputFileName + ".d.ts");
   defaultOutputOpts.declarationTarget = path.resolve(defaultOutputOpts.outputFileDir, defaultOutputOpts.outputFileName + ".d.ts");
   return defaultOutputOpts;
 }
@@ -320,6 +322,7 @@ function getTypescriptDefaultOptions(defaultExportOpts: DefaultExportOpts): Roll
     declarationMap: defaultExportOpts.generateDeclaration,
     lib,
     tsconfig: defaultExportOpts.tsconfig,
+    tsBuildInfoFile: defaultExportOpts.tsBuildInfoFileName,
   };
   if (defaultExportOpts.generateDeclaration) {
     rollupTypescriptOptions.declarationDir = defaultExportOpts.declarationDir;
@@ -344,11 +347,11 @@ async function getDefaultInputFileExt(inputFileDir: string, inputFileName: strin
   try {
     await fs.stat(path.resolve(inputFileDir, inputFileName + ".cts"));
     return ".cts";
-  } catch {}
+  } catch { }
   try {
     await fs.stat(path.resolve(inputFileDir, inputFileName + ".mts"));
     return ".mts";
-  } catch {}
+  } catch { }
   return ".ts";
 }
 

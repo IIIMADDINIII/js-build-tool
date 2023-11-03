@@ -62,12 +62,11 @@ const bundle = rollup.tasks.build({
   blacklistDevDependencies: false,
   externalDependencies: deps,
   commonjsPlugin: { ignore: ["electron"] },
-  declarationDir: "dist/decl",
 }, { failAfterWarnings: false });
 
 export const clean = tools.exitAfter(tasks.cleanWithGit());
 export const build = tools.exitAfter(
-  //tasks.selectPnpmAndInstall(), 
+  tasks.selectPnpmAndInstall(),
   tools.parallel(bundle, packageModules),
   copyAsarNodeAutorunJs);
 export const buildCi = tools.exitAfter(tasks.cleanWithGit(), tasks.prodSelectPnpmAndInstall(), tools.parallel(bundle, packageModules), copyAsarNodeAutorunJs);
