@@ -17,9 +17,6 @@ devDependencies:
   '@electron/asar':
     specifier: ^3.2.7
     version: 3.2.7
-  '@iiimaddiniii/js-build-tool':
-    specifier: ^0.4.1
-    version: 0.4.1
   '@microsoft/api-extractor':
     specifier: ^7.38.1
     version: 7.38.1(@types/node@20.8.9)
@@ -47,6 +44,9 @@ devDependencies:
   '@types/gulp':
     specifier: ^4.0.16
     version: 4.0.16
+  '@types/js-build-tool-types':
+    specifier: npm:@iiimaddiniii/js-build-tool-types@^0.4.1
+    version: /@iiimaddiniii/js-build-tool-types@0.4.1(@types/node@20.8.9)(typescript@5.2.2)
   '@types/node':
     specifier: ^20.8.9
     version: 20.8.9
@@ -376,9 +376,14 @@ packages:
       - supports-color
     dev: true
 
-  /@iiimaddiniii/js-build-tool@0.4.1:
-    resolution: {integrity: sha512-t5MgJIe4iawQdYs7g7NTZbtU5834qVMoubFD/M+G5uljRBH0VoR5IJ5o2XqKnA+9hwAWjZIF9Q35N9GbU3jzcw==}
-    hasBin: true
+  /@iiimaddiniii/js-build-tool-types@0.4.1(@types/node@20.8.9)(typescript@5.2.2):
+    resolution: {integrity: sha512-WweWO+w4hlm2zljDrwKhxGBk14ZyZ7LrjNuA+dHu7ibUWf6UWQslOnjHJFlXRdwHynG6dxVpXB15/fB/V3ud9g==}
+    peerDependencies:
+      '@types/node': '>=20.8.10'
+      typescript: '>=5.2.2'
+    dependencies:
+      '@types/node': 20.8.9
+      typescript: 5.2.2
     dev: true
 
   /@isaacs/cliui@8.0.2:

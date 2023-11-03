@@ -17,9 +17,6 @@
         "types": "./dist/index.d.ts",
         "default": "./dist/index.js"
       }
-    },
-    "./switches": {
-      "types": "./dist/switches.d.ts"
     }
   },
   "types": "./dist/index.d.ts",
@@ -28,7 +25,7 @@
     "clean": "pnpm run gulp clean",
     "build": "pnpm run gulp build",
     "buildCi": "pnpm run gulp buildCi",
-    "gulp": "pnpm --package=@electron/asar --package=@iiimaddiniii/js-build-tool@0.4.1 dlx js-build-tool"
+    "gulp": "pnpm --package=@electron/asar --package=@iiimaddiniii/js-build-tool@0.5.1-5 dlx js-build-tool"
   },
   "repository": {
     "type": "git",
@@ -43,6 +40,7 @@
   "devDependencies": {
     "@types/node": "^20.8.9",
     "@types/gulp": "^4.0.16",
+    "@types/js-build-tool-types": "npm:@iiimaddiniii/js-build-tool-types@^0.4.1",
     "typescript": "^5.2.2",
     "rollup": "^4.1.4",
     "tslib": "^2.6.2",
@@ -57,7 +55,6 @@
     "rollup-plugin-consts": "^1.2.0",
     "rollup-plugin-include-sourcemaps": "^0.7.0",
     "@schemastore/package": "^0.0.10",
-    "@iiimaddiniii/js-build-tool": "^0.4.1",
     "@electron-forge/core": "^6.4.2",
     "@electron-forge/maker-wix": "^6.4.2",
     "@electron-forge/maker-zip": "^6.4.2",
