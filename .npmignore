@@ -5,10 +5,12 @@
 /rollup.config.mjs
 /switches.d.ts
 /tsconfig.json
-/tsconfig.tsbuildinfo
+/*.tsbuildinfo
 /.tmpBuild/
 /gulpfile.mjs
 /packageDependencies.json
 /src
 /dist/**/*.map
 /dist/**/*.ts
+/dist/**/*.cts
+/autostart_appendix.js

@@ -7,9 +7,9 @@ syncBuiltinESMExports();
 
 import cp from "child_process";
 import path from "path";
-import { fs, reloadFs } from "../tools/file.js";
-import { binPath, cwd, gulpFileName, gulpFilePath, jsBuildToolPath } from "../tools/paths.js";
-import { StubPackageOptions, stubPackages, type StubProjectPackageOptions } from "../tools/stubPackage.js";
+import { fs, reloadFs } from "./tools/file.js";
+import { binPath, cwd, gulpFileName, gulpFilePath, jsBuildToolPath } from "./tools/paths.js";
+import { StubPackageOptions, stubPackages, type StubProjectPackageOptions } from "./tools/stubPackage.js";
 
 const nodeModulesAsar = path.resolve(jsBuildToolPath, "node_modules.asar/node_modules");
 
