@@ -3,12 +3,12 @@
   "version": "0.5.1-6",
   "description": "Tool for building my javascript projects",
   "bin": {
-    "js-build-tool": "./dist/bin/cli.js"
+    "js-build-tool": "./dist/bin/cli.cjs"
   },
   "exports": {
     "./bin/cli": {
       "require": {
-        "types": "./dist/bin/cli.d.ts",
+        "types": "./dist/bin/cli.d.cts",
         "default": "./dist/bin/cli.cjs"
       }
     },
