@@ -66,5 +66,8 @@ const bundle = rollup.tasks.build({
 }, { failAfterWarnings: false });
 
 export const clean = tools.exitAfter(tasks.cleanWithGit());
-export const build = tools.exitAfter(tasks.selectPnpmAndInstall(), tools.parallel(bundle, packageModules), copyAsarNodeAutorunJs);
+export const build = tools.exitAfter(
+  //tasks.selectPnpmAndInstall(), 
+  tools.parallel(bundle, packageModules),
+  copyAsarNodeAutorunJs);
 export const buildCi = tools.exitAfter(tasks.cleanWithGit(), tasks.prodSelectPnpmAndInstall(), tools.parallel(bundle, packageModules), copyAsarNodeAutorunJs);

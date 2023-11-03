@@ -14,7 +14,7 @@ interface PackageJsonType {
 
 function getRollupOutput(defaultExportOpts: DefaultExportOpts, defaultOutputOpts: DefaultOutputOpts): OutputOptions {
   return {
-    dir: path.dirname(defaultOutputOpts.file),
+    file: defaultOutputOpts.file,
     format: defaultOutputOpts.outputFormat,
     sourcemap: defaultExportOpts.sourceMap ? (defaultExportOpts.sourceMapType === "inline" ? "inline" : true) : false,
   };
@@ -22,9 +22,8 @@ function getRollupOutput(defaultExportOpts: DefaultExportOpts, defaultOutputOpts
 
 function getRollupOption(defaultExportOpts: DefaultExportOpts): RollupOptions | undefined {
   if (defaultExportOpts.isTest && !defaultExportOpts.buildTest) return undefined;
-  const inputPath = path.parse(defaultExportOpts.inputFile);
   return {
-    input: { [inputPath.name]: defaultExportOpts.inputFile },
+    input: defaultExportOpts.inputFile,
     output: defaultExportOpts.outputs.map((defaultOutputOpts) => getRollupOutput(defaultExportOpts, defaultOutputOpts)),
     plugins: defaultExportOpts.plugins,
   };
