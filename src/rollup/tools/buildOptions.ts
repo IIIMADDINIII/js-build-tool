@@ -244,8 +244,8 @@ async function getDefaultOutputOpts(defaultExportOpts: DefaultExportOpts, export
   if (defaultExportOpts.inputFileExt === ".cts") defaultOutputOpts.outputFileExt = ".cjs";
   if (defaultExportOpts.inputFileExt === ".mts") defaultOutputOpts.outputFileExt = ".mjs";
   defaultOutputOpts.file = path.resolve(defaultOutputOpts.outputFileDir, defaultOutputOpts.outputFileName + defaultOutputOpts.outputFileExt);
-  defaultOutputOpts.declarationSource = path.resolve(path.dirname(path.resolve(defaultOutputOpts.outputFileDir, defaultOutputOpts.outputFileName)), defaultExportOpts.declarationDir, defaultOutputOpts.outputFileName + ".d.ts");
-  defaultOutputOpts.declarationTarget = path.resolve(defaultOutputOpts.outputFileDir, defaultOutputOpts.outputFileName + ".d.ts");
+  defaultOutputOpts.declarationSource = path.resolve(path.dirname(path.resolve(defaultOutputOpts.outputFileDir, defaultOutputOpts.outputFileName)), defaultExportOpts.declarationDir, defaultOutputOpts.outputFileName + ".d" + defaultExportOpts.inputFileExt);
+  defaultOutputOpts.declarationTarget = path.resolve(defaultOutputOpts.outputFileDir, defaultOutputOpts.outputFileName + ".d" + defaultExportOpts.inputFileExt);
   return defaultOutputOpts;
 }
 

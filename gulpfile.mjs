@@ -62,7 +62,6 @@ const bundle = rollup.tasks.build({
   blacklistDevDependencies: false,
   externalDependencies: deps,
   commonjsPlugin: { ignore: ["electron"] },
-  bundleDeclarations: false,
 }, { failAfterWarnings: false });
 
 export const clean = tools.exitAfter(tasks.cleanWithGit());
