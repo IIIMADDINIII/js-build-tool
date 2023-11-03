@@ -1,7 +1,7 @@
 /.rollup.cache/
 /node_modules/
 /dist/
-/tsconfig.tsbuildinfo
+/*.tsbuildinfo
 /.tmpBuild/
 /modules/
 /node_modules.asar

@@ -45,6 +45,7 @@ export async function build(configOpts?: ConfigOpts, commandOptions?: CommandOpt
 export async function bundleDeclarations(defaultConfigOpts: DefaultConfigOpts): Promise<void> {
   let pathsToRemove: Set<string> = new Set();
   for (let defaultExportOpts of Object.values(defaultConfigOpts.entryPoints)) {
+    if (!defaultExportOpts.bundleDeclarations) continue;
     if (!defaultExportOpts.generateDeclaration) continue;
     for (let defaultOutputOpts of defaultExportOpts.outputs) {
       const source = defaultOutputOpts.declarationSource;
