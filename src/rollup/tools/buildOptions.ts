@@ -175,7 +175,7 @@ async function getDefaultExportOpts(defaultConfigOpts: DefaultConfigOpts, config
     jsonPlugin: getDefault(exportOpts.jsonPlugin, {}),
     commonjsPlugin: getDefault(exportOpts.commonjsPlugin, {}),
     generateDeclaration: getDefault(exportOpts.generateDeclaration, (!prod || type === "lib") && !isTest),
-    bundleDeclarations: getDefault(exportOpts.generateDeclaration, true),
+    bundleDeclarations: getDefault(exportOpts.bundleDeclarations, true),
     declarationDir: getDefault(exportOpts.declarationDir, "decl"),
     defaultLib: getDefault(exportOpts.defaultLib, ["ESNext"]),
     browserLib: getDefault(exportOpts.browserLib, ["DOM"]),
