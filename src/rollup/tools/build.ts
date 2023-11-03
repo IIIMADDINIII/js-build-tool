@@ -57,7 +57,7 @@ export async function bundleDeclarations(defaultConfigOpts: DefaultConfigOpts): 
         }
         throw e;
       }
-      const declDir = path.resolve(defaultOutputOpts.outputFileDir, defaultExportOpts.declarationDir);
+      const declDir = path.resolve(path.dirname(defaultOutputOpts.file), defaultExportOpts.declarationDir);
       pathsToRemove.add(declDir);
       const apiExtractorConfig = {
         mainEntryPointFilePath: source,
