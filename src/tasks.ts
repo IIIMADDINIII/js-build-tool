@@ -8,58 +8,132 @@ import * as electron from "./electron/tasks.js";
 import * as rollup from "./rollup/tasks.js";
 export { electron, rollup };
 
-
-export function setProd(): () => Promise<void> {
+/**
+ * Sets the environment to be Production.
+ * All Tasks from now run in Production mode.
+ * Can directly be used as an Rollup Task.
+ * @returns A Gulp Task.
+ * @public
+ */
+export function setProd(): TaskFunction {
   return setDisplayName("setProd", async function setProd() {
     tools.setProd();
   });
 }
 
-export function selectPnpm(version: string = "latest"): () => Promise<void> {
+/**
+ * Install and activate pnpm.
+ * Can directly be used as an Rollup Task.
+ * @param version - the version of pnpm to install (default = latest).
+ * @returns A Gulp Task.
+ * @public
+ */
+export function selectPnpm(version: string = "latest"): TaskFunction {
   return setDisplayName("selectPnpm", async function selectPnpm() {
     await tools.selectPnpm(version);
   });
 }
 
-export function installDependencies(): () => Promise<void> {
+/**
+ * Installs all dependencies of the package using pnpm.
+ * Will use the frozen lockfile in Production mode.
+ * Can directly be used as an Rollup Task.
+ * @returns A Gulp Task.
+ * @public
+ */
+export function installDependencies(): TaskFunction {
   return setDisplayName("installDependencies", async function installDependencies() {
     await tools.installDependencies();
   });
 }
 
+/**
+ * A combination of {@link selectPnpm} and {@link installDependencies}.
+ * Installs all dependencies after installing pnpm.
+ * Can directly be used as an Rollup Task.
+ * @param version - the version of pnpm to install (default = latest).
+ * @returns A Gulp Task.
+ * @public
+ */
 export function selectPnpmAndInstall(version: string = "latest"): TaskFunction {
   return setDisplayName("selectPnpmAndInstall", series(selectPnpm(version), installDependencies()));
 }
 
+/**
+ * A combination of {@link setProd}, {@link selectPnpm} and {@link installDependencies}.
+ * Set Production mode and after installing pnpm installing all dependencies.
+ * Can directly be used as an Rollup Task.
+ * @param version - the version of pnpm to install (default = latest).
+ * @returns A Gulp Task.
+ * @public
+ */
 export function prodSelectPnpmAndInstall(version: string = "latest"): TaskFunction {
   return setDisplayName("selectPnpmAndInstall", series(setProd(), selectPnpm(version), installDependencies()));
 }
 
-export function cleanWithGit(): () => Promise<void> {
+/**
+ * Clean the Project folder with git (git -c core.longpaths=true clean -dfX).
+ * Can directly be used as an Rollup Task.
+ * @returns A Gulp Task.
+ * @public
+ */
+export function cleanWithGit(): TaskFunction {
   return setDisplayName("cleanWithGit", async function selectPnpm() {
     await tools.cleanWithGit();
   });
 }
 
-export function runScript(script: string, args: string[] = []): () => Promise<void> {
+/**
+ * Runs a pnpm script defined in the package.json file.
+ * Can directly be used as an Rollup Task.
+ * @param script - the name of the script to run.
+ * @param args - an Array of arguments for the script (default = []).
+ * @returns A Gulp Task.
+ * @public
+ */
+export function runScript(script: string, args: string[] = []): TaskFunction {
   return setDisplayName("runScript", async function runScript() {
     tools.runScript(script, args);
   });
 }
 
-export function runWorkspaceScript(script: string, filter: string = "*", args: string[] = []): () => Promise<void> {
+/**
+ * Runs a script in one specific or all workspaces.
+ * Can directly be used as an Rollup Task.
+ * @param script - the name of the script to run.
+ * @param filter - a pnpm filter to specify in which workspaces to run the script (default = "*").
+ * @param args - an Array of arguments for the script (default = []).
+ * @returns A Gulp Task.
+ * @public
+ */
+export function runWorkspaceScript(script: string, filter: string = "*", args: string[] = []): TaskFunction {
   return setDisplayName("runWorkspaceScript", async function runWorkspaceScript() {
     await tools.runWorkspaceScript(script, filter, args);
   });
 }
 
-export function runWorkspaceScriptParallel(script: string, filter: string = "*", args: string[] = []): () => Promise<void> {
+/**
+ * Runs a script in one specific or all workspaces in parallel.
+ * Can directly be used as an Rollup Task.
+ * @param script - the name of the script to run.
+ * @param filter - a pnpm filter to specify in which workspaces to run the script (default = "*").
+ * @param args - an Array of arguments for the script (default = []).
+ * @returns A Gulp Task.
+ * @public
+ */
+export function runWorkspaceScriptParallel(script: string, filter: string = "*", args: string[] = []): TaskFunction {
   return setDisplayName("runWorkspaceScriptParallel", async function runWorkspaceScriptParallel() {
     await tools.runWorkspaceScriptParallel(script, filter, args);
   });
 }
 
-export function exit(): () => Promise<void> {
+/**
+ * Exit the current process.
+ * Can directly be used as an Rollup Task.
+ * @returns A Gulp Task.
+ * @public
+ */
+export function exit(): TaskFunction {
   return setDisplayName("exit", async function exit() {
     setTimeout(() => {
       process.exit();
@@ -67,19 +141,40 @@ export function exit(): () => Promise<void> {
   });
 }
 
-export function runTestFiles(testFiles: string[]): () => Promise<void> {
+/**
+ * Run the testfiles with jest.
+ * Can directly be used as an Rollup Task.
+ * @param testFiles - files wich should be executed as tests.
+ * @returns A Gulp Task.
+ * @public
+ */
+export function runTestFiles(testFiles: string[]): TaskFunction {
   return setDisplayName("runTestFiles", async function runTestFiles() {
     await tools.runTestFiles(testFiles);
   });
 }
 
-export function runTests(): () => Promise<void> {
+/**
+ * Runs all testfiles from the jest config.
+ * Can directly be used as an Rollup Task.
+ * @returns A Gulp Task.
+ * @public
+ */
+export function runTests(): TaskFunction {
   return setDisplayName("runTests", async function runTests() {
     await tools.runTests();
   });
 }
 
-export function runApiExtrator(projectPackageJsonPath: string, configObject: IConfigFile): () => Promise<void> {
+/**
+ * Runs the {@link https://api-extractor.com/ | ApiExtractor}.
+ * Can directly be used as an Rollup Task.
+ * @param projectPackageJsonPath - path to the package.json file
+ * @param configObject - the {@link https://api.rushstack.io/pages/api-extractor.iextractorconfigprepareoptions/ | IExtractorConfigPrepareOptions} of the APIExtractor.
+ * @returns A Gulp Task.
+ * @public
+ */
+export function runApiExtrator(projectPackageJsonPath: string, configObject: IConfigFile): TaskFunction {
   return setDisplayName("runApiExtrator", async function runApiExtrator() {
     await tools.runApiExtrator(projectPackageJsonPath, configObject);
   });

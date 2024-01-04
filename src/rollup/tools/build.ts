@@ -1,3 +1,4 @@
+import { ExtractorLogLevel, type IConfigFile } from "@microsoft/api-extractor";
 import * as fs from "fs/promises";
 import * as path from "path";
 import type { OutputOptions, RollupOptions } from "rollup";
@@ -33,6 +34,14 @@ function getRollupOptions(defaultConfigOpts: DefaultConfigOpts): RollupOptions[]
   return Object.values(defaultConfigOpts.entryPoints).map(getRollupOption).filter((data): data is RollupOptions => data !== undefined);
 }
 
+/**
+ * Build the Project with an automatically generated rollup config.
+ * Also bundles the declaration files with ApiExtractor and generate necessary package.json with module types.
+ * @param configOpts - options on how the rollup config should be generated.
+ * @param commandOptions - optional cli flags for rollup.
+ * @returns Normalized version of the configOpts.
+ * @public
+ */
 export async function build(configOpts?: ConfigOpts, commandOptions?: CommandOptions): Promise<DefaultConfigOpts> {
   const defaultConfigOpts = await getDefaultConfigOpts(configOpts);
   const rollupOptions = getRollupOptions(defaultConfigOpts);
@@ -42,6 +51,11 @@ export async function build(configOpts?: ConfigOpts, commandOptions?: CommandOpt
   return defaultConfigOpts;
 }
 
+/**
+ * Bundles the Declarations of an build and deletes them.
+ * @param defaultConfigOpts - Normalized ConfigOptions returned from build.
+ * @public
+ */
 export async function bundleDeclarations(defaultConfigOpts: DefaultConfigOpts): Promise<void> {
   let pathsToRemove: Set<string> = new Set();
   for (let defaultExportOpts of Object.values(defaultConfigOpts.entryPoints)) {
@@ -59,7 +73,18 @@ export async function bundleDeclarations(defaultConfigOpts: DefaultConfigOpts): 
       }
       const declDir = path.resolve(path.dirname(defaultOutputOpts.file), defaultExportOpts.declarationDir);
       pathsToRemove.add(declDir);
-      const apiExtractorConfig = {
+      const apiExtractorConfig: IConfigFile = {
+        messages: {
+          compilerMessageReporting: { default: { logLevel: ExtractorLogLevel.Warning } },
+          extractorMessageReporting: { default: { logLevel: ExtractorLogLevel.Warning } },
+          tsdocMessageReporting: {
+            default: { logLevel: ExtractorLogLevel.Warning },
+            "tsdoc-undefined-tag": { logLevel: ExtractorLogLevel.None },
+            "ae-unresolved-link": { logLevel: ExtractorLogLevel.None },
+            "tsdoc-escape-right-brace": { logLevel: ExtractorLogLevel.None },
+            "tsdoc-malformed-inline-tag": { logLevel: ExtractorLogLevel.None },
+          },
+        },
         mainEntryPointFilePath: source,
         bundledPackages: defaultOutputOpts.bundleDeclarationPackages,
         projectFolder: cwd,
@@ -77,10 +102,29 @@ export async function bundleDeclarations(defaultConfigOpts: DefaultConfigOpts): 
   await Promise.all([...pathsToRemove.values()].map(async (path) => fs.rm(path, { recursive: true })));
 }
 
+/**
+ * Build the Project with an automatically generated rollup config.
+ * Also bundles the declaration files with ApiExtractor and generate necessary package.json with module types.
+ * Automatically sets the configOpts.buildTest option to true to build the test files.
+ * @param configOpts - options on how the rollup config should be generated.
+ * @param commandOptions - optional cli flags for rollup.
+ * @returns Normalized version of the configOpts.
+ * @public
+ */
 export async function buildWithTests(configOpts?: ConfigOpts, commandOptions?: CommandOptions): Promise<DefaultConfigOpts> {
   return build({ buildTest: true, ...configOpts }, commandOptions);
 }
 
+/**
+ * Build the Project with an automatically generated rollup config.
+ * Also bundles the declaration files with ApiExtractor and generate necessary package.json with module types.
+ * Automatically sets the configOpts.buildTest option to true to build the test files.
+ * Runs Jest with the generated test files after the build finished.
+ * @param configOpts - options on how the rollup config should be generated.
+ * @param commandOptions - optional cli flags for rollup.
+ * @returns Normalized version of the configOpts.
+ * @public
+ */
 export async function buildAndRunTests(configOpts?: ConfigOpts, commandOptions?: CommandOptions): Promise<DefaultConfigOpts> {
   const defaultConfigOpts = await buildWithTests(configOpts, commandOptions);
   const testFiles = getTestFiles(defaultConfigOpts);
@@ -160,6 +204,12 @@ async function calculatePackageJsonTypes(defaultConfigOpts: DefaultConfigOpts): 
   }));
 }
 
+/**
+ * Calculates the paths to the generated test files.
+ * @param defaultConfigOpts - Normalized ConfigOptions returned from build.
+ * @returns An Array of files wich includes the tests.
+ * @public
+ */
 export function getTestFiles(defaultConfigOpts: DefaultConfigOpts): string[] {
   const testFiles: string[] = [];
   for (let defaultExportOpts of Object.values(defaultConfigOpts.entryPoints)) {

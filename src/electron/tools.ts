@@ -10,6 +10,10 @@ import { dlxPath } from "../tools/paths.js";
 // await api.make(opts ? opts : {});
 //}
 
+/**
+ * Starts the electron app in the current folder (executes "pnpx electron .").
+ * @public
+ */
 export async function start() {
   await exec`pnpx electron .`;
 }
@@ -18,6 +22,11 @@ function getWixAsset(_version: string, assets: ReleaseAsset[]): ReleaseAsset | u
   return assets.find((asset) => asset.name.endsWith("-binaries.zip"));
 }
 
+/**
+ * Downloads the wixtoolset automatically and adds it to the path, so Electron Forge can use it.
+ * @param releaseTag - wich release of the wixtoolset should be downloaded (undefined = latest).
+ * @public
+ */
 export async function prepareWixTools(releaseTag?: string) {
   const dlDir = path.resolve(dlxPath, "download");
   const wixDir = path.resolve(dlDir, "wix3");

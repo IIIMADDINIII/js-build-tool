@@ -14,98 +14,474 @@ import { isProd } from "../../tools/misc.js";
 import { getProjectDependencies, getProjectDevDependencies, getProjectPackageType, getProjectTopLevelExports } from "../../tools/package.js";
 import { manageDependencies, type ManageDependenciesConfig } from "../plugins.js";
 
+/**
+ * Output format for a bundle:
+ * "es" = ECMAScript Module syntax (mjs).
+ * "commonjs" = CommonJs Module Syntax (cjs).
+ * @public
+ */
 export type OutputFormat = "es" | "commonjs";
+/**
+ * Where dose this code execute:
+ * "node" = Code is Executed by Node or similar environment.
+ * "browser" = Code is Executed by a Browser.
+ * @public
+ */
 export type ExecutionEnvironment = "node" | "browser";
+/**
+ * What type of package is compiled:
+ * "app" = A standalone Application. It will be distributed as a whole (dependencies are bundled).
+ * "lib" = A library wich will be eventually be used by an Application (dependencies are not bundled).
+ * @public
+ */
 export type ExportType = "app" | "lib";
+/**
+ * How should the sourcemap be generated:
+ * "external" = A separate file with the Sourcemap is emitted.
+ * "inline" = The sourcemap is inlined in to the bundle.
+ * @public
+ */
 export type SourceMapType = "external" | "inline";
+/**
+ * Options for the Consts Rollup Plugin.
+ * @see {@link https://www.npmjs.com/package/rollup-plugin-consts | rollup-plugin-consts}
+ * @public
+ */
 export type ConstsPluginOptions = { [name: string]: any; };
 
+/**
+ * Options on how a Bundle was emitted.
+ * @public
+ */
 export interface DefaultOutputOpts {
+  /**
+   * The base path directory where this output should be generated.
+   * By default it will use one of the cjsOutputDir, mjsOutputDir, singleOutputDir, testOutputDir values.
+   */
   outputFileDir: string;
+  /**
+   * Path of the file relative to the base path.
+   */
   outputFileName: string;
+  /**
+   * The File extension to use when emitting the bundle.
+   * By default it will use one of the cjsOutputExt, mjsOutputExt, singleOutputExt values.
+   * Testfiles will use .cjs ode .mjs based on the input file extension.
+   * Is the input file used .mts or .mjs it will take precedence over all other rules.
+   */
   outputFileExt: string;
+  /**
+   * Output format of this Bundle.
+   * If the Output Options are generated automatically, it will analyse the package.json type field and use that format.
+   * If the type field is undefined, it will generate both es and commonjs.
+   * .cts or .mts extensions take precedence over the package.json type field.
+   */
   outputFormat: OutputFormat;
+  /**
+   * The base path directory if multiple outputFormats are present and the format is commonjs.
+   * @default "./dist/cjs/"
+   */
   cjsOutputDir: string;
+  /**
+   * The base path directory if multiple outputFormats are present and the format is es.
+   * @default "./dist/esm/"
+   */
   mjsOutputDir: string;
+  /**
+   * The base path directory if only one outputFormat is present.
+   * @default "./dist/"
+   */
   singleOutputDir: string;
+  /**
+   * Extension of the output file if multiple outputFormats a present and the format is commonjs.
+   * @default ".js"
+   */
   cjsOutputExt: string;
+  /**
+   * Extension of the output file if multiple outputFormats a present and the format is es.
+   * @default ".js"
+   */
   mjsOutputExt: string;
+  /**
+   * Extension of the output file to be used, when only a single outputFormat is used.
+   * @default ".js"
+   */
   singleOutputExt: string;
+  /**
+   * The base path directory for tests to be emitted.
+   * @default "./tests/"
+   */
   testOutputDir: string;
+  /**
+   * Filepath to the generated output.
+   */
   file: string;
+  /**
+   * File path where the bundled declarations should be emitted.
+   */
   declarationTarget: string;
+  /**
+   * Current location of the unbundled declaration file associated with this output.
+   */
   declarationSource: string;
+  /**
+   * A list of packages wich should also be bundled in the declarations.
+   * @default []
+   */
   bundleDeclarationPackages: string[];
 }
+
+/**
+ * Options for how to generate 
+ * @public
+ */
 export interface OutputOpts extends Partial<Omit<DefaultOutputOpts, "outputFileName" | "outputFormat" | "file" | "declarationTarget" | "declarationSource">> {
+  /**
+   * An callback function wich is called for each Output.
+   * Used to modify the Output Options before the config is normalized.
+   * If it returns undefined the output options are not changed.
+   * @param options - the options for the current output
+   * @returns the New Output Options wich should be used or undefined. Can return a Promise.
+   */
   hookOutputOptions?(options: OutputOpts): Promise<OutputOpts | undefined> | OutputOpts | undefined;
+  /**
+   * The file name of the generated bundle.
+   */
   outputFileName: string,
+  /**
+   * What format the output should be (es or commenjs).
+   */
   outputFormat: OutputFormat,
 }
 
+/**
+ * An Array of OutputOpts each defining an bundle wich was emitted.
+ * @public
+ */
 export type DefaultOutputsOpts = DefaultOutputOpts[];
+
+/**
+ * An Array of OutputOpts each defining an bundle wich should be emitted.
+ * @public
+ */
 export type OutputsOpts = OutputOpts[];
 
+/**
+ * Normalized Information on how an entrypoint was generated.
+ * @public
+ */
 export interface DefaultExportOpts {
+  /**
+   * Where dose this code execute:
+   * "node" = Code is Executed by Node or similar environment.
+   * "browser" = Code is Executed by a Browser.
+   * @default "node"
+   */
   environment: ExecutionEnvironment;
+  /**
+   * What type of package is compiled:
+   * "app" = A standalone Application. It will be distributed as a whole (dependencies are bundled).
+   * "lib" = A library wich will be eventually be used by an Application (dependencies are not bundled).
+   * @default "lib"
+   */
   type: ExportType;
+  /**
+   * Is it in Production?
+   */
   prod: boolean;
+  /**
+   * Should the bundle be minified with terser?
+   * By default only Production Builds except test files are minified.
+   */
   minify: boolean;
+  /**
+   * Should declarations be generated?
+   * For Testfiles declarations are not generated, by default.
+   * If it is a library (type==="lib") or not in Production, declaration will be generated by default.
+   */
   generateDeclaration: boolean;
+  /**
+   * The directory where declarations should be emitted.
+   * @default "decl"
+   */
   declarationDir: string;
+  /**
+   * Should the declarations of this entrypoint be bundled?
+   * @default true
+   */
   bundleDeclarations: boolean;
+  /**
+   * Typescript Libraries to be used in all Projects.
+   * @default ["ESNext"]
+   */
   defaultLib: string[];
+  /**
+   * Typescript Libraries to be used with Browser Projects.
+   * @default ["DOM"]
+   */
   browserLib: string[];
+  /**
+   * Typescript Libraries to be used with Node Projects.
+   * @default []
+   */
   nodeLib: string[];
+  /**
+   * TsConfig file to be used with this export.
+   * By default "./tsconfig.json" will be used.
+   * Testfiles use "./tsconfig.test.json"
+   */
   tsconfig: string;
+  /**
+   * Tsbuildinfo filename for this entrypoint.
+   * needs to be different for each entrypoint else incremental builds don't work.
+   * By default it is generated based on inputFileName.
+   */
   tsBuildInfoFileName: string;
+  /**
+   * Should sourcemaps be generated?
+   * By default sourcemaps are generated when not in Production (CI) or if it is a test.
+   */
   sourceMap: boolean;
+  /**
+   * How should the sourcemap be generated:
+   * "external" = A separate file with the Sourcemap is emitted.
+   * "inline" = The sourcemap is inlined in to the bundle.
+   * @default "external"
+   */
   sourceMapType: SourceMapType;
+  /**
+   * Additional dependencies wich should not be bundled (External dependencies).
+   * @default []
+   */
   externalDependencies: string[];
+  /**
+   * Additional packages wich should be blacklisted.
+   * @default []
+   */
   blacklistDependencies: string[];
+  /**
+   * Dev Dependencies wich are allowed even when blacklisting is on.
+   * @default []
+   */
   allowedDevDependencies: string[];
+  /**
+   * Dev Dependencies wich are allowed in test files.
+   * @default ["\@jest/globals"]
+   */
   testDependencies: string[];
+  /**
+   * Should the build fail, if dev dependencies are referenced in the bundle.
+   * @default true
+   */
   blacklistDevDependencies: boolean;
+  /**
+   * Filename to be used for the default export ".".
+   * @default "index"
+   */
   defaultExportName: string;
+  /**
+   * Base path of the source file.
+   * Will be the value of {@link ConfigOpts.inputBasePath} by default.
+   */
   inputFileDir: string;
+  /**
+   * Filepath of the sourcefile relative to the base path.
+   * By default it will use the path specified in the exports field in Package.json.
+   */
   inputFileName: string;
+  /**
+   * File extension of the source file.
+   * By default it will try to load .cts and .mts files first.
+   * If these files don't exist, it will use .ts
+   */
   inputFileExt: string;
+  /**
+   * Filepath to the entrypoint source.
+   */
   inputFile: string;
+  /**
+   * If true, this is an entrypoint to a test file.
+   * @default false
+   */
   isTest: boolean;
+  /**
+   * Overrides the automatic detection if this entrypoint has multiple outputFormats.
+   */
   isSingleFormat: boolean;
+  /**
+   * Defines if testfiles should be build.
+   * @default false
+   */
   buildTest: boolean;
+  /**
+   * An Array of DefaultOutputsOpts each defining an bundle wich was emitted.
+   */
   outputs: DefaultOutputsOpts;
+  /**
+   * Overrides the array of Rollup Plugins to be used.
+   */
   plugins: Plugin[];
+  /**
+   * Overrides the Options of the terser plugin.
+   * @see {@link https://www.npmjs.com/package/@rollup/plugin-terser | @rollup/plugin-terser}
+   * @default {}
+   */
   terserPlugin: TerserOptions;
+  /**
+   * Overrides the Options of the manage dependencies plugin.
+   * @see {@link manageDependencies}
+   */
   manageDependenciesPlugin: ManageDependenciesConfig;
+  /**
+   * Overrides the Options of the consts plugin.
+   * @see {@link https://www.npmjs.com/package/rollup-plugin-consts | rollup-plugin-consts}
+   */
   constsPlugin: ConstsPluginOptions;
+  /**
+   * Overrides the Options of the json plugin.
+   * @see {@link https://www.npmjs.com/package/@rollup/plugin-json | @rollup/plugin-json}
+   * @default {}
+   */
   jsonPlugin: RollupJsonOptions;
+  /**
+   * Overrides the Options of the commonjs plugin.
+   * @see {@link https://www.npmjs.com/package/@rollup/plugin-commonjs | @rollup/plugin-commonjs}
+   * @default {}
+   */
   commonjsPlugin: RollupCommonJSOptions;
+  /**
+   * Overrides the Options of the typescript plugin.
+   * @see {@link https://www.npmjs.com/package/@rollup/plugin-typescript | @rollup/plugin-typescript}
+   */
   typescriptPlugin: RollupTypescriptOptions;
+  /**
+   * Overrides the Options of the source Maps plugin.
+   * @see {@link https://www.npmjs.com/package/rollup-plugin-include-sourcemaps | rollup-plugin-include-sourcemaps}
+   * @default {}
+   */
   sourceMapsPlugin: SourcemapsPluginOptions;
+  /**
+   * Overrides the Options of the node resolve plugin.
+   * @see {@link https://www.npmjs.com/package/@rollup/plugin-node-resolve | @rollup/plugin-node-resolve}
+   */
   nodeResolvePlugin: RollupNodeResolveOptions;
 }
-export interface ExportOpts extends Partial<Omit<DefaultExportOpts, "outputs" | "inputFile">>, Partial<OutputOpts> {
+
+/**
+ * Options on how to generate an entrypoint.
+ * @public
+ */
+export interface ExportOpts extends Partial<Omit<DefaultExportOpts, "outputs" | "inputFile" | "prod">>, Partial<OutputOpts> {
+  /**
+   * An callback function wich is called for each Entrypoint.
+   * Used to modify the Entrypoint Options and name before the config is normalized.
+   * If it returns undefined the entrypoint options are not changed.
+   * @param exportName - the Name of the Entrypoint
+   * @param options - the options for the current entrypoint
+   * @returns the New Entrypoint Options wich should be used or undefined. Can return a Promise.
+   */
   hookOptions?(exportName: string, options: ExportOpts): Promise<[string, ExportOpts] | undefined> | [string, ExportOpts] | undefined;
+  /**
+   * An Array of OutputOpts each defining an bundle to emit.
+   * Overrides the default outputs wich are generated.
+   * by default it will analyse the package.json type field and use that format.
+   * If the type field is undefined, it will generate both es and commonjs.
+   * .cts or .mts extensions take precedence over the package.json type field.
+   */
   outputs?: OutputsOpts;
 }
 
+/**
+ * A normalized Map of entrypoints with its build options.
+ * @public
+ */
 export type DefaultExportsOpts = { [key: string]: DefaultExportOpts; };
+
+/**
+ * A string[] or Map with Options with entrypoints.
+ * @public
+ */
 export type ExportsOpts = string[] | { [key: string]: ExportOpts; };
 
+/**
+ * Normalized version of the ConfigOpts.
+ * Defines how the Rollup Config was generated.
+ * @public
+ */
 export interface DefaultConfigOpts {
+  /**
+   * A Glob Pattern defining wich files are Testfiles.
+   */
   testFileGlobPatterns: string[];
+  /**
+   * BasePath of all source files.
+   */
   inputBasePath: string;
+  /**
+   * A Map of all automatically generated entrypoints to the application with its build options.
+   */
   exports: DefaultExportsOpts;
+  /**
+   * A Map of all testfiles with its build options.
+   */
   tests: DefaultExportsOpts;
+  /**
+   * A Map of all entrypoints wich were added manually with its build options.
+   */
   additionalExports: DefaultExportsOpts;
+  /**
+   * A Merged map of exports, tests and tests.
+   */
   entryPoints: DefaultExportsOpts;
 }
+
+/**
+ * Configuration Options on how to generate an Rollup Config.
+ * @public
+ */
 export interface ConfigOpts extends ExportOpts {
+  /**
+   * A Glob Pattern defining wich files are Testfiles.
+   * @default "**\/*.test.?ts"
+   */
   testFileGlobPatterns?: string | string[];
+  /**
+   * BasePath of all source files (default = "./src/").
+   * @default "./src/"
+   */
   inputBasePath?: string;
+  /**
+   * A string[] or Map with Options overriding the automatically generated exports list.
+   * By default the exports of the package.json file are analyzed.
+   * @example 
+   * <caption>example content of an package.json exports field:</caption>
+   * ```
+   * "exports": {
+   *   "./cli": {
+   *     "require": {
+   *       "types": "./dist/cli.d.cts",
+   *       "default": "./dist/cli.cjs"
+   *     }
+   *   },
+   *   ".": {
+   *     "import": {
+   *       "types": "./dist/index.d.ts",
+   *       "default": "./dist/index.js"
+   *     }
+   *   }
+   * },
+   * ```
+   */
   exports?: ExportsOpts;
+  /**
+   * A string[] or Map with Options overriding the automatically testfile list.
+   * By default all files wich match testFileGlobPatterns are added as tests.
+   */
   tests?: ExportsOpts;
+  /**
+   * A string[] or Map with Options with additional exports added manually.
+   * By default this list is empty.
+   */
   additionalExports?: ExportsOpts;
 }
 
@@ -169,7 +545,7 @@ async function getDefaultExportOpts(defaultConfigOpts: DefaultConfigOpts, config
     externalDependencies: getDefault(exportOpts.externalDependencies, []),
     blacklistDependencies: getDefault(exportOpts.blacklistDependencies, []),
     allowedDevDependencies: getDefault(exportOpts.allowedDevDependencies, []),
-    testDependencies: getDefault(exportOpts.allowedDevDependencies, ["@jest/globals"]),
+    testDependencies: getDefault(exportOpts.testDependencies, ["@jest/globals"]),
     blacklistDevDependencies: getDefault(exportOpts.blacklistDevDependencies, true),
     constsPlugin: getDefault(exportOpts.constsPlugin, { production: prod, development: !prod, testing: isTest }),
     jsonPlugin: getDefault(exportOpts.jsonPlugin, {}),

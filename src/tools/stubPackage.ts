@@ -5,29 +5,65 @@ import { fs } from "./file.js";
 import { readPackageJson, type PackageJsonSchema } from "./package.js";
 import { binPath, nodeModulesPath, projectNodeModulesPath } from "./paths.js";
 
+/**
+ * Options to create a stubPackage for a project dependency.
+ * @public
+ */
 export type StubProjectPackageOptions = {
+  /**
+   * Name of the package which is the destination of the stubPackage.
+   */
   name: string;
+  /**
+   * Normally the package is resolved when the stubPackage is created.
+   * Set this to true do delay the resolving of the package to the time of requiring the stub.
+   */
   resolveFromLocation?: boolean;
+  /**
+   * Subpath to also stub in the stubPackage.
+   */
   subpaths?: string[];
 };
 
+/**
+ * Options to create a stubPackage.
+ * @public
+ */
 export type StubPackageOptions = {
+  /**
+   * Location of the package for wich a stubPackage should be created.
+   */
   location: string;
 } & StubProjectPackageOptions;
 
 
+/**
+ * Creates a stub Package in the temporary directory of the dlx operation, targeting a package prom the project.
+ * @param options - options on how the stubPackage should be created.
+ * @public
+ */
 export async function stubProjectPackage(options: StubProjectPackageOptions) {
   const opt = {
     location: path.resolve(projectNodeModulesPath, options.name),
     ...options,
   };
-  await stubProjectPackage(opt);
+  await stubPackage(opt);
 }
 
+/**
+ * Create multiple stubPackages in the temporary directory of the dlx operation.
+ * @param options - array of options for how to create the stubPackage.
+ * @public
+ */
 export async function stubPackages(options: StubPackageOptions[]): Promise<void> {
   await Promise.all(options.map(stubPackage));
 }
 
+/**
+ * Create a stubPackages in the temporary directory of the dlx operation.
+ * @param options - options for how to create the stubPackage.
+ * @public
+ */
 export async function stubPackage(options: StubPackageOptions): Promise<void> {
   const packageJson = await getPackageJson(options);
   const packagePath = path.resolve(nodeModulesPath, options.name);
@@ -82,7 +118,7 @@ async function stubPackageJson(packagePath: string, packageJson: PackageJsonSche
   await fs.writeFile(packageJsonPath, JSON.stringify(json), { flag: "wx" });
 }
 
-export async function writeReExportFile(filePath: string, options: StubPackageOptions, subPath: string = "") {
+async function writeReExportFile(filePath: string, options: StubPackageOptions, subPath: string = "") {
   await fs.mkdir(path.dirname(filePath), { recursive: true });
   if (options.resolveFromLocation) {
     const targetLocation = path.resolve(options.location).replaceAll("\\", "/");

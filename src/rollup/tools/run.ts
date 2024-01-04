@@ -122,8 +122,20 @@ function printTimings(timings: SerializedTimings) {
   }
 }
 
+/**
+ * Options wich are normally provided to rollup with cli flags.
+ * @public
+ */
 export interface CommandOptions {
+  /**
+   * The build should fail if warnings are emitted.
+   * @default true
+   */
   failAfterWarnings?: boolean;
+  /**
+   * The build should be silent.
+   * @default false
+   */
   silent?: boolean;
 }
 
@@ -155,6 +167,12 @@ async function loadConfigFile(rollupOptions: RollupOptions[] | RollupOptions, co
   }
 };
 
+/**
+ * Run Rollup with an custom configuration.
+ * @param rollupOptions - Rollup Options wich normally are defined by the rollup.config.js.
+ * @param commandOptions - Options wich are normally provided through cli flags.
+ * @public
+ */
 export async function run(rollupOptions?: RollupOptions[] | RollupOptions, commandOptions?: CommandOptions): Promise<void> {
   if (rollupOptions === undefined) throw new Error("Rollup config is Empty");
   const command: Required<CommandOptions> = { failAfterWarnings: true, silent: false, ...commandOptions };

@@ -1,17 +1,34 @@
 
 import { normalizePath } from "@rollup/pluginutils";
-import { fs } from "../../tools/file.js";
 import { resolve } from "path";
 import type { Plugin } from "rollup";
+import { fs } from "../../tools/file.js";
 
 // Plugin for checking devDependencies and mark dependencies as external
 class ManageDependenciesError extends Error { }
 
+/**
+ * Configuration Options for the ManageDependencies Rollup Plugin.
+ * @public
+ */
 export interface ManageDependenciesConfig {
+  /**
+   * Array of Packages/Paths wich should not be bundled.
+   */
   external?: string[];
+  /**
+   * Array of Packages/Paths wich result in an Error when part of the bundle.
+   */
   blacklist?: string[];
 }
 
+/**
+ * ManageDependencies Rollup Plugin for managing bundled dependencies.
+ * Either marks dependencies as External (are not bundled) or Blacklisted (Error when part of bundle).
+ * @param config - Object defining External/Blacklisted Packages/Paths.
+ * @returns Rollup Plugin Instance.
+ * @public
+ */
 export function manageDependencies(config: ManageDependenciesConfig): Plugin {
   // Calculate external packages
   let external = config.external || [];
