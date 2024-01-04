@@ -1,7 +1,6 @@
 import fs from "fs/promises";
 import { tools, tasks, rollup } from "@iiimaddiniii/js-build-tool";
 import { join, parse, resolve } from "path";
-import { createPackageWithOptions } from "@electron/asar";
 
 const allowedBinNames = ["gulp"];
 const filterBasePrefix = ["license", "completion.sh", ".", "authors", "changelog", "changes", "makefile"];
@@ -37,17 +36,27 @@ async function filterModulesFiles(folder) {
 }
 
 export async function packageModules() {
-  let tmpBuildDir = tools.file(".tmpBuild");
-  let src = tools.file("packageDependencies.json");
-  let dest = tools.file(".tmpBuild/package.json");
+  const tmpBuildDir = tools.file(".tmpBuild");
+  const srcPackage = tools.file("packageDependencies.json");
+  const srcLock = tools.file("pnpm-lockDependencies.yaml");
+  const destPackage = tools.file(".tmpBuild/package.json");
+  const destLock = tools.file(".tmpBuild/pnpm-lock.yaml");
   let srcDir = tools.file(".tmpBuild/node_modules");
   let destFile = tools.file("node_modules.asar");
   try { await fs.rm(destFile); } catch { }
   try { await fs.mkdir(tmpBuildDir); } catch { }
-  await fs.copyFile(src, dest);
-  await tools.exec({ cwd: tmpBuildDir })`pnpm install --node-linker=hoisted`;
+  await fs.copyFile(srcPackage, destPackage);
+  await fs.copyFile(srcLock, destLock);
+  if (tools.isProd()) {
+    await tools.exec({ cwd: tmpBuildDir })`pnpm install --frozen-lockfile --config.confirmModulesPurge=false --node-linker=hoisted`;
+  } else {
+    await tools.exec({ cwd: tmpBuildDir })`pnpm install --config.confirmModulesPurge=false --node-linker=hoisted`;
+    await fs.copyFile(destLock, srcLock);
+  }
   await filterModulesFiles(srcDir);
-  await createPackageWithOptions(tmpBuildDir, destFile, { unpack: "*.node" });
+  await tools.stubProjectPackage({ name: "@electron/asar" });
+  let asar = await import("@electron/asar");
+  await asar.createPackageWithOptions(tmpBuildDir, destFile, { unpack: "*.node" });
 }
 
 async function copyAsarNodeAutorunJs() {
