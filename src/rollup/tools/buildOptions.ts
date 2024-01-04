@@ -3,7 +3,7 @@ import commonjs, { RollupCommonJSOptions } from "@rollup/plugin-commonjs";
 import json, { RollupJsonOptions } from "@rollup/plugin-json";
 import { RollupNodeResolveOptions, nodeResolve } from '@rollup/plugin-node-resolve';
 import terser, { type Options as TerserOptions } from "@rollup/plugin-terser";
-import typescript, { RollupTypescriptOptions } from "@rollup/plugin-typescript";
+import typescript, { type RollupTypescriptOptions } from "@rollup/plugin-typescript";
 import fastGlob from "fast-glob";
 import path from "path";
 import type { Plugin } from "rollup";
@@ -707,7 +707,7 @@ function getTypescriptDefaultOptions(defaultExportOpts: DefaultExportOpts): Roll
   }
   if (!defaultExportOpts.sourceMap) {
     rollupTypescriptOptions.sourceMap = false;
-    rollupTypescriptOptions.inlineSources = undefined;
+    (<undefined>rollupTypescriptOptions.inlineSources) = undefined;
   }
   return rollupTypescriptOptions;
 }

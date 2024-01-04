@@ -76,11 +76,13 @@ export async function bundleDeclarations(defaultConfigOpts: DefaultConfigOpts): 
       const apiExtractorConfig: IConfigFile = {
         messages: {
           compilerMessageReporting: { default: { logLevel: ExtractorLogLevel.Warning } },
-          extractorMessageReporting: { default: { logLevel: ExtractorLogLevel.Warning } },
+          extractorMessageReporting: {
+            default: { logLevel: ExtractorLogLevel.Warning },
+            "ae-unresolved-link": { logLevel: ExtractorLogLevel.None },
+          },
           tsdocMessageReporting: {
             default: { logLevel: ExtractorLogLevel.Warning },
             "tsdoc-undefined-tag": { logLevel: ExtractorLogLevel.None },
-            "ae-unresolved-link": { logLevel: ExtractorLogLevel.None },
             "tsdoc-escape-right-brace": { logLevel: ExtractorLogLevel.None },
             "tsdoc-malformed-inline-tag": { logLevel: ExtractorLogLevel.None },
           },
