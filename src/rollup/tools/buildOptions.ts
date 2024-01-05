@@ -227,10 +227,15 @@ export interface DefaultExportOpts {
   nodeLib: string[];
   /**
    * TsConfig file to be used with this export.
-   * By default "./tsconfig.json" will be used.
-   * Testfiles use "./tsconfig.test.json"
+   * @default "./tsconfig.json"
    */
   tsconfig: string;
+  /**
+   * The outDir typescript option.
+   * By Default it will use the "./dist/" folder.
+   * If it is a test it will use the "./tests/" folder.
+   */
+  tsOutDir: string;
   /**
    * Tsbuildinfo filename for this entrypoint.
    * needs to be different for each entrypoint else incremental builds don't work.
@@ -556,7 +561,8 @@ async function getDefaultExportOpts(defaultConfigOpts: DefaultConfigOpts, config
     defaultLib: getDefault(exportOpts.defaultLib, ["ESNext"]),
     browserLib: getDefault(exportOpts.browserLib, ["DOM"]),
     nodeLib: getDefault(exportOpts.nodeLib, []),
-    tsconfig: getDefault(exportOpts.tsconfig, isTest ? "./tsconfig.test.json" : "./tsconfig.json"),
+    tsconfig: getDefault(exportOpts.tsconfig, "./tsconfig.json"),
+    tsOutDir: getDefault(exportOpts.tsOutDir, isTest ? "./tests/" : "./dist/"),
     tsBuildInfoFileName: getDefault(exportOpts.tsBuildInfoFileName, inputFileName.replaceAll(/[\/\\]/g, "+") + ".tsbuildinfo"),
     sourceMapsPlugin: getDefault(exportOpts.sourceMapsPlugin, {}),
     nodeResolvePlugin: getDefault(exportOpts.nodeResolvePlugin, getNodeResolveDefaultOptions(environment)),
@@ -701,6 +707,7 @@ function getTypescriptDefaultOptions(defaultExportOpts: DefaultExportOpts): Roll
     lib,
     tsconfig: defaultExportOpts.tsconfig,
     tsBuildInfoFile: defaultExportOpts.tsBuildInfoFileName,
+    outDir: defaultExportOpts.tsOutDir,
   };
   if (defaultExportOpts.generateDeclaration) {
     rollupTypescriptOptions.declarationDir = defaultExportOpts.declarationDir;

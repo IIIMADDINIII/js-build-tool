@@ -92,7 +92,8 @@ const bundle = rollup.tasks.build({
     "@jridgewell/source-map",
     "@octokit/types",
     "@jridgewell/trace-mapping",
-    "@octokit/openapi-types"],
+    "@octokit/openapi-types",
+    "estree"],
 }, { failAfterWarnings: false });
 
 export const clean = tools.exitAfter(tasks.cleanWithGit());
