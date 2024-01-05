@@ -1,4 +1,5 @@
 
+import type { promises } from "fs";
 import { createRequire } from "module";
 import path from "path";
 import { projectPath } from "./paths.js";
@@ -7,14 +8,14 @@ import { projectPath } from "./paths.js";
  * The NodeJs fs/promises module.
  * @public
  */
-export let fs: typeof import("fs/promises") = createRequire("/")("fs").promises;
+export let fs: typeof promises = createRequire("/")("fs").promises;
 
 /**
  * Reloads the fs module (maybe because it was monkey patched).
  * @returns the just loaded fs/promises module.
  * @public
  */
-export function reloadFs(): typeof import("fs/promises") {
+export function reloadFs(): typeof promises {
   fs = createRequire("/")("fs").promises;
   return fs;
 }

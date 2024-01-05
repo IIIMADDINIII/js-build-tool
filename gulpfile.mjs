@@ -71,6 +71,28 @@ const bundle = rollup.tasks.build({
   blacklistDevDependencies: false,
   externalDependencies: deps,
   commonjsPlugin: { ignore: ["electron"] },
+  bundleDeclarationPackages: [
+    "@schemastore/package",
+    "execa",
+    "fetch-github-release",
+    "@microsoft/api-extractor",
+    "@rollup/plugin-terser",
+    "gulp",
+    "rollup",
+    "@rollup/plugin-commonjs",
+    "@rollup/plugin-json",
+    "@rollup/plugin-node-resolve",
+    "@rollup/plugin-typescript",
+    "rollup-plugin-include-sourcemaps",
+    "@rollup/pluginutils",
+    "terser",
+    "@octokit/rest",
+    "@microsoft/api-extractor-model",
+    "@octokit/plugin-rest-endpoint-methods",
+    "@jridgewell/source-map",
+    "@octokit/types",
+    "@jridgewell/trace-mapping",
+    "@octokit/openapi-types"],
 }, { failAfterWarnings: false });
 
 export const clean = tools.exitAfter(tasks.cleanWithGit());
