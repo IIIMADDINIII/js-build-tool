@@ -249,9 +249,8 @@ export interface DefaultExportOpts {
   sourceMap: boolean;
   /**
    * How should the sourcemap be generated:
-   * "external" = A separate file with the Sourcemap is emitted.
-   * "inline" = The sourcemap is inlined in to the bundle.
-   * @default "external"
+   * "external" = A separate file with the Sourcemap is emitted (default).
+   * "inline" = The sourcemap is inlined in to the bundle (default for tests only).
    */
   sourceMapType: SourceMapType;
   /**
@@ -544,7 +543,7 @@ async function getDefaultExportOpts(defaultConfigOpts: DefaultConfigOpts, config
     inputFileExt,
     inputFile: path.resolve(inputFileDir, inputFileName + inputFileExt),
     sourceMap: getDefault(exportOpts.sourceMap, !prod || isTest),
-    sourceMapType: getDefault(exportOpts.sourceMapType, "external"),
+    sourceMapType: getDefault(exportOpts.sourceMapType, isTest ? "inline" : "external"),
     buildTest: getDefault(exportOpts.buildTest, false),
     terserPlugin: getDefault(exportOpts.terserPlugin, {}),
     externalDependencies: getDefault(exportOpts.externalDependencies, []),
