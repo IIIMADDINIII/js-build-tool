@@ -1,9 +1,9 @@
 {
   "dependencies": {
-    "rollup": "^4.1.4",
+    "rollup": "^4.9.3",
     "gulp": "^4.0.2",
     "tslib": "^2.6.2",
-    "typescript": "^5.2.2",
-    "@microsoft/api-extractor": "^7.38.2"
+    "typescript": "^5.3.3",
+    "@microsoft/api-extractor": "^7.39.1"
   }
 }

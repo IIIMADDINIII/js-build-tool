@@ -25,7 +25,7 @@
     "clean": "pnpm run gulp clean",
     "build": "pnpm run gulp build",
     "buildCi": "pnpm run gulp buildCi",
-    "gulp": "pnpm --package=@iiimaddiniii/js-build-tool@0.5.5 dlx js-build-tool"
+    "gulp": "pnpm --package=@iiimaddiniii/js-build-tool@0.5.6 dlx js-build-tool"
   },
   "repository": {
     "type": "git",
@@ -38,11 +38,11 @@
   },
   "homepage": "https://github.com/IIIMADDINIII/node-package-template#readme",
   "devDependencies": {
-    "@types/node": "^20.8.9",
-    "@types/gulp": "^4.0.16",
-    "@types/js-build-tool-types": "npm:@iiimaddiniii/js-build-tool-types@^0.4.1",
-    "typescript": "^5.2.2",
-    "rollup": "^4.1.4",
+    "@types/node": "^20.10.6",
+    "@types/gulp": "^4.0.17",
+    "@types/js-build-tool-types": "npm:@iiimaddiniii/js-build-tool-types@^0.5.6",
+    "typescript": "^5.3.3",
+    "rollup": "^4.9.3",
     "tslib": "^2.6.2",
     "gulp": "^4.0.2",
     "execa": "^8.0.1",
@@ -50,18 +50,18 @@
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.5",
-    "@rollup/plugin-json": "^6.0.1",
-    "@rollup/pluginutils": "^5.0.5",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/pluginutils": "^5.1.0",
     "rollup-plugin-consts": "^1.2.0",
     "rollup-plugin-include-sourcemaps": "^0.7.0",
     "@schemastore/package": "^0.0.10",
-    "@electron-forge/core": "^6.4.2",
-    "@electron-forge/maker-wix": "^6.4.2",
-    "@electron-forge/maker-zip": "^6.4.2",
+    "@electron-forge/core": "^7.2.0",
+    "@electron-forge/maker-wix": "^7.2.0",
+    "@electron-forge/maker-zip": "^7.2.0",
     "fetch-github-release": "^1.0.0",
-    "fast-glob": "^3.3.1",
-    "@microsoft/api-extractor": "^7.38.2",
-    "@electron/asar": "^3.2.7",
+    "fast-glob": "^3.3.2",
+    "@microsoft/api-extractor": "^7.39.1",
+    "@electron/asar": "^3.2.8",
     "asar-node": "^3.1.1"
   }
 }
