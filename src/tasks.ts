@@ -22,15 +22,14 @@ export function setProd(): TaskFunction {
 }
 
 /**
- * Install and activate pnpm.
+ * Install and activate pnpm using the version range specified by package.json engines.pnpm.
  * Can directly be used as an Rollup Task.
- * @param version - the version of pnpm to install (default = latest).
  * @returns A Gulp Task.
  * @public
  */
-export function selectPnpm(version: string = "latest"): TaskFunction {
+export function selectPnpm(): TaskFunction {
   return setDisplayName("selectPnpm", async function selectPnpm() {
-    await tools.selectPnpm(version);
+    await tools.selectPnpm();
   });
 }
 
@@ -50,25 +49,25 @@ export function installDependencies(): TaskFunction {
 /**
  * A combination of {@link selectPnpm} and {@link installDependencies}.
  * Installs all dependencies after installing pnpm.
+ * Pnpm version specified by range in package.json engines.pnpm.
  * Can directly be used as an Rollup Task.
- * @param version - the version of pnpm to install (default = latest).
  * @returns A Gulp Task.
  * @public
  */
-export function selectPnpmAndInstall(version: string = "latest"): TaskFunction {
-  return setDisplayName("selectPnpmAndInstall", series(selectPnpm(version), installDependencies()));
+export function selectPnpmAndInstall(): TaskFunction {
+  return setDisplayName("selectPnpmAndInstall", series(selectPnpm(), installDependencies()));
 }
 
 /**
  * A combination of {@link setProd}, {@link selectPnpm} and {@link installDependencies}.
  * Set Production mode and after installing pnpm installing all dependencies.
+ * Pnpm version specified by range in package.json engines.pnpm.
  * Can directly be used as an Rollup Task.
- * @param version - the version of pnpm to install (default = latest).
  * @returns A Gulp Task.
  * @public
  */
-export function prodSelectPnpmAndInstall(version: string = "latest"): TaskFunction {
-  return setDisplayName("selectPnpmAndInstall", series(setProd(), selectPnpm(version), installDependencies()));
+export function prodSelectPnpmAndInstall(): TaskFunction {
+  return setDisplayName("selectPnpmAndInstall", series(setProd(), selectPnpm(), installDependencies()));
 }
 
 /**

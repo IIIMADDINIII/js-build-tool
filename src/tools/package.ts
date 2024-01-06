@@ -83,3 +83,8 @@ export async function getProjectPackageType(): Promise<JSONSchemaForNPMPackageJs
   let packageJson = await getProjectPackageJson();
   return packageJson.type;
 }
+
+export async function getProjectPnpmVersion(): Promise<string | undefined> {
+  let packageJson = await getProjectPackageJson();
+  return packageJson.engines?.["pnpm"];
+}

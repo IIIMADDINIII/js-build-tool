@@ -103,6 +103,7 @@ export const build = tools.exitAfter(
   copyAsarNodeAutorunJs);
 export const buildCi = tools.exitAfter(
   tasks.cleanWithGit(),
-  tasks.prodSelectPnpmAndInstall(),
+  tasks.setProd(),
+  tasks.installDependencies(),
   tools.parallel(bundle, packageModules),
   copyAsarNodeAutorunJs);

@@ -13,4 +13,4 @@ import { $ } from "execa";
  * ```
  * @public
  */
-export const exec = $({ verbose: true, stdio: 'inherit', cleanup: true });
+export const exec: typeof $ = $({ verbose: true, stdio: 'inherit', cleanup: true });

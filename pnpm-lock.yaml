@@ -50,6 +50,9 @@ devDependencies:
   '@types/node':
     specifier: ^20.10.6
     version: 20.10.6
+  '@types/semver':
+    specifier: ^7.5.6
+    version: 7.5.6
   asar-node:
     specifier: ^3.1.1
     version: 3.1.1
@@ -74,6 +77,9 @@ devDependencies:
   rollup-plugin-include-sourcemaps:
     specifier: ^0.7.0
     version: 0.7.0(@types/node@20.10.6)(rollup@4.9.3)
+  semver:
+    specifier: ^7.5.4
+    version: 7.5.4
   tslib:
     specifier: ^2.6.2
     version: 2.6.2
@@ -1022,6 +1028,10 @@ packages:
     resolution: {integrity: sha512-85Y2BjiufFzaMIlvJDvTTB8Fxl2xfLo4HgmHzVBz08w4wDePCTjYw66PdrolO0kzli3yam/YCgRufyo1DdQVTA==}
     dependencies:
       '@types/node': 20.10.6
+    dev: true
+
+  /@types/semver@7.5.6:
+    resolution: {integrity: sha512-dn1l8LaMea/IjDoHNd9J52uBbInB796CDffS6VdIxvqYCPSG0V0DzHp76GpaWnlhg88uYyPbXCDIowa86ybd5A==}
     dev: true
 
   /@types/streamx@2.9.1:
@@ -2413,7 +2423,7 @@ packages:
       '@octokit/rest': 18.12.0
       decompress: 4.2.1
       download: 8.0.0
-      semver: 7.5.2
+      semver: 7.5.4
     transitivePeerDependencies:
       - encoding
     dev: true
@@ -5103,14 +5113,6 @@ packages:
   /semver@6.3.0:
     resolution: {integrity: sha512-b39TBaTSfV6yBrapU89p5fKekE2m/NwnDocOVruQFS1/veMgdzuPcnOM34M6CwxW8jH/lxEa5rBoDeUwu5HHTw==}
     hasBin: true
-    dev: true
-
-  /semver@7.5.2:
-    resolution: {integrity: sha512-SoftuTROv/cRjCze/scjGyiDtcUyxw1rgYQSZY7XTmtR5hX+dm76iDbTH8TkLPHCQmlbQVSSbNZCPM2hb0knnQ==}
-    engines: {node: '>=10'}
-    hasBin: true
-    dependencies:
-      lru-cache: 6.0.0
     dev: true
 
   /semver@7.5.4:
