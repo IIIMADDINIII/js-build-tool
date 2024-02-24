@@ -25,7 +25,8 @@
     "clean": "pnpm run gulp clean",
     "build": "pnpm run gulp build",
     "buildCi": "pnpm run gulp buildCi",
-    "gulp": "pnpm --package=@iiimaddiniii/js-build-tool@0.5.10 dlx js-build-tool"
+    "gulp": "pnpm --package=@iiimaddiniii/js-build-tool@0.5.10 dlx js-build-tool",
+    "test": "pnpm --package=@iiimaddiniii/js-build-tool@0.6.0 dlx js-build-tool build"
   },
   "repository": {
     "type": "git",
