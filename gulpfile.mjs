@@ -17,7 +17,7 @@ async function updatePnpmLockDependencies() {
     }
     return [key, value];
   });
-  if (writeFile) await fs.writeFile(srcPackage, JSON.stringify({dependencies: newPackageDeps}, undefined, 2));
+  if (writeFile) await fs.writeFile(srcPackage, JSON.stringify({ dependencies: newPackageDeps }, undefined, 2));
   try { await fs.mkdir(tmpBuildDir); } catch { }
   await fs.copyFile(srcPackage, destPackage);
   await fs.copyFile(srcLock, destLock);
@@ -28,39 +28,6 @@ async function updatePnpmLockDependencies() {
     await fs.copyFile(destLock, srcLock);
   }
 }
-
-
-// async function bundle() {
-//   let deps = Object.keys((await tools.readJson("packageDependencies.json")).dependencies);
-//   await rollup.build({
-//     blacklistDevDependencies: false,
-//     externalDependencies: deps,
-//     commonjsPlugin: { ignore: ["electron"] },
-//     bundleDeclarationPackages: [
-//       "@schemastore/package",
-//       "execa",
-//       "fetch-github-release",
-//       "@microsoft/api-extractor",
-//       "@rollup/plugin-terser",
-//       "gulp",
-//       "rollup",
-//       "@rollup/plugin-commonjs",
-//       "@rollup/plugin-json",
-//       "@rollup/plugin-node-resolve",
-//       "@rollup/plugin-typescript",
-//       "rollup-plugin-include-sourcemaps",
-//       "@rollup/pluginutils",
-//       "terser",
-//       "@octokit/rest",
-//       "@microsoft/api-extractor-model",
-//       "@octokit/plugin-rest-endpoint-methods",
-//       "@jridgewell/source-map",
-//       "@octokit/types",
-//       "@jridgewell/trace-mapping",
-//       "@octokit/openapi-types",
-//       "estree"],
-//   }, { failAfterWarnings: false });
-// }
 
 let deps = Object.keys((await tools.readJson("packageDependencies.json")).dependencies);
 deps.push("typescript");
