@@ -8,16 +8,16 @@ async function updatePnpmLockDependencies() {
   const destPackage = tools.file(".tmpBuild/package.json");
   const destLock = tools.file(".tmpBuild/pnpm-lock.yaml");
   const devDeps = await tools.getDevDependencies();
-  const packageDeps = await tools.getDevDependencies(srcPackage);
+  const packageDeps = await tools.getDependencies(srcPackage);
   let writeFile = false;
-  const newPackageDeps = Object.entries(packageDeps).map(([key, value]) => {
-    if (key in devDeps) {
+  const newPackageDeps = Object.fromEntries(Object.entries(packageDeps).map(([key, value]) => {
+    if ((key in devDeps) && (devDeps[key] !== value)) {
       writeFile = true;
       return [key, devDeps[key]];
     }
     return [key, value];
-  });
-  if (writeFile) await fs.writeFile(srcPackage, JSON.stringify({ dependencies: newPackageDeps }, undefined, 2));
+  }));
+  if (writeFile) await tools.writeJson(srcPackage, { dependencies: newPackageDeps });
   try { await fs.mkdir(tmpBuildDir); } catch { }
   await fs.copyFile(srcPackage, destPackage);
   await fs.copyFile(srcLock, destLock);
@@ -53,11 +53,8 @@ const bundle = rollup.tasks.build({
     "@octokit/rest",
     "@microsoft/api-extractor-model",
     "@octokit/plugin-rest-endpoint-methods",
-    "@jridgewell/source-map",
     "@octokit/types",
-    "@jridgewell/trace-mapping",
-    "@octokit/openapi-types",
-    "estree"],
+    "@octokit/openapi-types"],
 }, { failAfterWarnings: false });
 
 export const clean = tools.exitAfter(tasks.cleanWithGit());

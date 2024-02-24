@@ -47,14 +47,11 @@ devDependencies:
     specifier: ^4.0.17
     version: 4.0.17
   '@types/js-build-tool-types':
-    specifier: npm:@iiimaddiniii/js-build-tool-types@^0.5.6
-    version: /@iiimaddiniii/js-build-tool-types@0.5.6(@types/node@20.11.20)(typescript@5.3.3)
+    specifier: npm:@iiimaddiniii/js-build-tool-types@^0.6.6
+    version: /@iiimaddiniii/js-build-tool-types@0.6.6(@types/node@20.11.20)(typescript@5.3.3)
   '@types/node':
     specifier: ^20.11.20
     version: 20.11.20
-  '@types/semver':
-    specifier: ^7.5.8
-    version: 7.5.8
   execa:
     specifier: ^8.0.1
     version: 8.0.1
@@ -429,8 +426,8 @@ packages:
       - supports-color
     dev: true
 
-  /@iiimaddiniii/js-build-tool-types@0.5.6(@types/node@20.11.20)(typescript@5.3.3):
-    resolution: {integrity: sha512-AaRC6+SXqwCRCiNyxfRtvRAZq+CCYhQM9flAIrVi8Ll/2zI/U6OaooYjWL1GK7wMIbGC6OWH4cQ+BLzgUcjB2A==}
+  /@iiimaddiniii/js-build-tool-types@0.6.6(@types/node@20.11.20)(typescript@5.3.3):
+    resolution: {integrity: sha512-3GBgkMu8hbh8zGfkM5mZcb61vh8QrUWU1qChum1Lh5cADullbzp+jkxMveBbt+a1cHSnhubOivlfAkEM1ZzMiw==}
     peerDependencies:
       '@types/node': '>=20.8.10'
       typescript: '>=5.2.2'
@@ -1039,10 +1036,6 @@ packages:
     resolution: {integrity: sha512-85Y2BjiufFzaMIlvJDvTTB8Fxl2xfLo4HgmHzVBz08w4wDePCTjYw66PdrolO0kzli3yam/YCgRufyo1DdQVTA==}
     dependencies:
       '@types/node': 20.11.20
-    dev: true
-
-  /@types/semver@7.5.8:
-    resolution: {integrity: sha512-I8EUhyrgfLrcTkzV3TSsGyl1tSuPrEDzr0yd5m90UgNxQkyDXULk3b6MlQqTCpZpNtWe1K0hzclnZkTcLBe2UQ==}
     dev: true
 
   /@types/streamx@2.9.1:
