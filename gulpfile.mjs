@@ -15,12 +15,6 @@ export async function updatePnpmLockDependencies() {
   await fs.copyFile(destLock, srcLock);
 }
 
-async function copyAsarNodeAutorunJs() {
-  let autostart = await tools.read("./node_modules/asar-node/dist/autorun.js");
-  let appendix = await tools.read("./autostart_appendix.js");
-  await fs.writeFile(tools.file("./dist/asar-node-autostart.cjs"), autostart + appendix);
-}
-
 let deps = Object.keys((await tools.readJson("packageDependencies.json")).dependencies);
 deps.push("typescript");
 const bundle = rollup.tasks.build({
@@ -55,11 +49,9 @@ const bundle = rollup.tasks.build({
 export const clean = tools.exitAfter(tasks.cleanWithGit());
 export const build = tools.exitAfter(
   tasks.selectPnpmAndInstall(),
-  tools.parallel(bundle, updatePnpmLockDependencies),
-  copyAsarNodeAutorunJs);
+  tools.parallel(bundle, updatePnpmLockDependencies));
 export const buildCi = tools.exitAfter(
   tasks.cleanWithGit(),
   tasks.setProd(),
   tasks.installDependencies(),
-  bundle,
-  copyAsarNodeAutorunJs);
+  bundle);
