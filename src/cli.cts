@@ -16,7 +16,7 @@ const stubOptions: StubPackageOptions[] = [
 async function main(): Promise<never> {
   const version = await getPackageVersion() || "0.0.0";
   const dependenciesDir = path.resolve(os.tmpdir(), "js-build-tool@" + version);
-  await fs.mkdir(path.dirname(dependenciesDir), { recursive: true });
+  await fs.mkdir(dependenciesDir, { recursive: true });
   await fs.copyFile(path.resolve(jsBuildToolPath, "packageDependencies.json"), path.resolve(dependenciesDir, "package.json"));
   await fs.copyFile(path.resolve(jsBuildToolPath, "pnpm-lockDependencies.yaml"), path.resolve(dependenciesDir, "pnpm-lock.yaml"));
   console.log("Preparing Dependencies");
