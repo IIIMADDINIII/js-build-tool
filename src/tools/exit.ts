@@ -1,5 +1,5 @@
 import { exit } from "../tasks.js";
-import { TaskFunction, series } from "./gulp.js";
+import { series, type TaskFunction } from "./gulp.js";
 
 /**
  * Exists the gulp task after all tasks finished in series.

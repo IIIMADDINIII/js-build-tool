@@ -1,14 +1,14 @@
 
-import commonjs, { RollupCommonJSOptions } from "@rollup/plugin-commonjs";
-import json, { RollupJsonOptions } from "@rollup/plugin-json";
-import { RollupNodeResolveOptions, nodeResolve } from '@rollup/plugin-node-resolve';
+import commonjs, { type RollupCommonJSOptions } from "@rollup/plugin-commonjs";
+import json, { type RollupJsonOptions } from "@rollup/plugin-json";
+import { nodeResolve, type RollupNodeResolveOptions } from '@rollup/plugin-node-resolve';
 import terser, { type Options as TerserOptions } from "@rollup/plugin-terser";
 import typescript, { type RollupTypescriptOptions } from "@rollup/plugin-typescript";
 import fastGlob from "fast-glob";
 import path from "path";
 import type { Plugin } from "rollup";
 import consts from "rollup-plugin-consts";
-import sourceMaps, { SourcemapsPluginOptions } from 'rollup-plugin-include-sourcemaps';
+import sourceMaps, { type SourcemapsPluginOptions } from 'rollup-plugin-include-sourcemaps';
 import { fs } from "../../tools/file.js";
 import { isProd } from "../../tools/misc.js";
 import { getDependencies, getDevDependencies, getPackageType, getTopLevelExports } from "../../tools/package.js";

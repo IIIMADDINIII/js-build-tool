@@ -1,7 +1,7 @@
 // import { MakeOptions, api } from "@electron-forge/core";
 import path from "path";
 import { exec } from "../tools/exec.js";
-import { downloadGithubRelease, downloadLatestGithubRelease, ReleaseAsset } from "../tools/github.js";
+import { downloadGithubRelease, downloadLatestGithubRelease, type ReleaseAsset } from "../tools/github.js";
 import { addToPath } from "../tools/misc.js";
 import { dlxPath } from "../tools/paths.js";
 

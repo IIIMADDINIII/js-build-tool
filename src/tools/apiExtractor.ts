@@ -1,4 +1,4 @@
-import { Extractor, ExtractorConfig, ExtractorLogLevel, IConfigFile } from "@microsoft/api-extractor";
+import { Extractor, ExtractorConfig, ExtractorLogLevel, type IConfigFile } from "@microsoft/api-extractor";
 
 /**
  * Runs the {@link https://api-extractor.com/ | ApiExtractor}.

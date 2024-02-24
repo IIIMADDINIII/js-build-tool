@@ -2,7 +2,6 @@ import type { ConfigOpts, ConstsPluginOptions, DefaultConfigOpts, DefaultExportO
 
 
 
-
 export type { ConstsPluginOptions };
 
 export type { ExecutionEnvironment, ExportType, OutputFormat, SourceMapType };

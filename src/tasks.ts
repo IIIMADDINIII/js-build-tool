@@ -1,5 +1,5 @@
 
-import type { IConfigFile } from "@microsoft/api-extractor";
+import { type IConfigFile } from "@microsoft/api-extractor";
 import * as tools from "./tools.js";
 import { series, type TaskFunction } from "./tools/gulp.js";
 import { setDisplayName } from "./tools/misc.js";
@@ -44,7 +44,7 @@ export function installDependencies(): TaskFunction {
  * @public
  */
 export function prodInstallDependencies(): TaskFunction {
-  return setDisplayName("selectPnpmAndInstall", series(setProd(), installDependencies()));
+  return setDisplayName("prodInstallDependencies", series(setProd(), installDependencies()));
 }
 
 /**
