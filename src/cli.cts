@@ -20,7 +20,7 @@ async function main(): Promise<never> {
   await fs.copyFile(path.resolve(jsBuildToolPath, "packageDependencies.json"), path.resolve(dependenciesDir, "package.json"));
   await fs.copyFile(path.resolve(jsBuildToolPath, "pnpm-lockDependencies.yaml"), path.resolve(dependenciesDir, "pnpm-lock.yaml"));
   console.log("Preparing Dependencies");
-  await exec({ cwd: dependenciesDir })`pnpm install --frozen-lockfile --config.confirmModulesPurge=false --node-linker=hoisted`;
+  await exec({ cwd: dependenciesDir, verbose: false, stdio: "ignore" })`pnpm install --frozen-lockfile --config.confirmModulesPurge=false --node-linker=hoisted`;
   await stubPackages(stubOptions, path.resolve(dependenciesDir, "node_modules"));
   await runGulp();
   process.exit(-1);
