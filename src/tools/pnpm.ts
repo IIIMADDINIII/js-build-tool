@@ -1,36 +1,22 @@
 
-import { maxSatisfying } from "semver";
 import { exec } from "./exec.js";
 import { isProd } from "./misc.js";
-import { getProjectPnpmVersion } from "./package.js";
+import { getNodeVersionToUse } from "./package.js";
 
 /**
- * Install and activate pnpm using the version range specified by package.json engines.pnpm.
+ * Install and activate node using the version range specified by package.json engines.pnpm.
+ * If no version is pacified lts is used.
+ * @param version - version string to use (default = package.enginesToUse.node || "lts").
  * @public
  */
-export async function selectPnpm(): Promise<void> {
-  // Request all valid versions from pnpm
-  const packageInfo = await (await fetch("https://registry.npmjs.org/@pnpm/exe")).json();
-  if (typeof packageInfo !== "object" || packageInfo === null || !("versions" in packageInfo)) throw new Error("Could not read packageInfo.versions from https://registry.npmjs.org/@pnpm/exe");
-  const versionObject = packageInfo.versions;
-  if (typeof versionObject !== "object" || versionObject === null) throw new Error("Could not read packageInfo.versions from https://registry.npmjs.org/@pnpm/exe");
-  const versions = Object.keys(versionObject);
-  // get the version specified in package.json
-  let targetVersion = await getProjectPnpmVersion();
-  if (targetVersion === undefined) {
-    targetVersion = "*";
+export async function selectNode(version?: string): Promise<void> {
+  if (version === undefined) {
+    version = await getNodeVersionToUse();
   }
-  // find the latest version satisfying the package.json range
-  let version = maxSatisfying(versions, targetVersion);
-  if (version === null) {
-    version = "";
+  if (version === undefined) {
+    version = "lts";
   }
-  // install the selected version
-  if (process.platform === "win32") {
-    await exec({ env: { PNPM_VERSION: version }, shell: "powershell" })`iwr https://get.pnpm.io/install.ps1 -useb | iex`;
-  } else {
-    await exec({ env: { PNPM_VERSION: version }, shell: true })`wget -qO- https://get.pnpm.io/install.sh | sh -`;
-  }
+  await exec`pnpm env use -g ${version}`;
 }
 
 /**

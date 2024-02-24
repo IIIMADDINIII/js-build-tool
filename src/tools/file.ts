@@ -1,24 +1,10 @@
 
-import type { promises } from "fs";
-import { createRequire } from "module";
+import * as fs from "fs/promises";
 import path from "path";
 import { projectPath } from "./paths.js";
 
-/**
- * The NodeJs fs/promises module.
- * @public
- */
-export let fs: typeof promises = createRequire("/")("fs").promises;
 
-/**
- * Reloads the fs module (maybe because it was monkey patched).
- * @returns the just loaded fs/promises module.
- * @public
- */
-export function reloadFs(): typeof promises {
-  fs = createRequire("/")("fs").promises;
-  return fs;
-}
+export { fs };
 
 /**
  * returns the absolute path of a file in the project.

@@ -22,18 +22,6 @@ export function setProd(): TaskFunction {
 }
 
 /**
- * Install and activate pnpm using the version range specified by package.json engines.pnpm.
- * Can directly be used as an Rollup Task.
- * @returns A Gulp Task.
- * @public
- */
-export function selectPnpm(): TaskFunction {
-  return setDisplayName("selectPnpm", async function selectPnpm() {
-    await tools.selectPnpm();
-  });
-}
-
-/**
  * Installs all dependencies of the package using pnpm.
  * Will use the frozen lockfile in Production mode.
  * Can directly be used as an Rollup Task.
@@ -46,17 +34,6 @@ export function installDependencies(): TaskFunction {
   });
 }
 
-/**
- * A combination of {@link selectPnpm} and {@link installDependencies}.
- * Installs all dependencies after installing pnpm.
- * Pnpm version specified by range in package.json engines.pnpm.
- * Can directly be used as an Rollup Task.
- * @returns A Gulp Task.
- * @public
- */
-export function selectPnpmAndInstall(): TaskFunction {
-  return setDisplayName("selectPnpmAndInstall", series(selectPnpm(), installDependencies()));
-}
 
 /**
  * A combination of {@link setProd}, {@link selectPnpm} and {@link installDependencies}.
@@ -66,8 +43,8 @@ export function selectPnpmAndInstall(): TaskFunction {
  * @returns A Gulp Task.
  * @public
  */
-export function prodSelectPnpmAndInstall(): TaskFunction {
-  return setDisplayName("selectPnpmAndInstall", series(setProd(), selectPnpm(), installDependencies()));
+export function prodInstallDependencies(): TaskFunction {
+  return setDisplayName("selectPnpmAndInstall", series(setProd(), installDependencies()));
 }
 
 /**
@@ -77,7 +54,7 @@ export function prodSelectPnpmAndInstall(): TaskFunction {
  * @public
  */
 export function cleanWithGit(): TaskFunction {
-  return setDisplayName("cleanWithGit", async function selectPnpm() {
+  return setDisplayName("cleanWithGit", async function cleanWithGit() {
     await tools.cleanWithGit();
   });
 }

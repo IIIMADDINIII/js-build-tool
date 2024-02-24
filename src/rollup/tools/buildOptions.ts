@@ -11,7 +11,7 @@ import consts from "rollup-plugin-consts";
 import sourceMaps, { SourcemapsPluginOptions } from 'rollup-plugin-include-sourcemaps';
 import { fs } from "../../tools/file.js";
 import { isProd } from "../../tools/misc.js";
-import { getProjectDependencies, getProjectDevDependencies, getProjectPackageType, getProjectTopLevelExports } from "../../tools/package.js";
+import { getDependencies, getDevDependencies, getPackageType, getTopLevelExports } from "../../tools/package.js";
 import { manageDependencies, type ManageDependenciesConfig } from "../plugins.js";
 
 /**
@@ -631,7 +631,7 @@ async function getDefaultOutputOpts(defaultExportOpts: DefaultExportOpts, export
 }
 
 async function getDefaultExports(): Promise<ExportsOpts> {
-  return await getProjectTopLevelExports();
+  return await getTopLevelExports();
 }
 
 async function getDefaultTests(defaultConfigOpts: DefaultConfigOpts): Promise<ExportsOpts> {
@@ -670,10 +670,10 @@ async function getDefaultPlugins(defaultExportOpts: DefaultExportOpts): Promise<
 }
 
 async function getManageDependenciesDefaultOptions(defaultExportOpts: DefaultExportOpts): Promise<ManageDependenciesConfig> {
-  let deps = Object.keys(await getProjectDependencies());
+  let deps = Object.keys(await getDependencies());
   let blacklist = [...defaultExportOpts.blacklistDependencies];
   if (defaultExportOpts.blacklistDevDependencies) {
-    let devDeps = new Set(Object.keys(await getProjectDevDependencies()));
+    let devDeps = new Set(Object.keys(await getDevDependencies()));
     for (let allowed of defaultExportOpts.allowedDevDependencies) {
       devDeps.delete(allowed);
     }
@@ -740,7 +740,7 @@ async function getDefaultInputFileExt(inputFileDir: string, inputFileName: strin
 }
 
 async function getDefaultOutputs(name: string, ext: string): Promise<OutputOpts[]> {
-  let type = await getProjectPackageType();
+  let type = await getPackageType();
   ext = ext.toLocaleLowerCase();
   if (ext === ".mts") {
     return [{

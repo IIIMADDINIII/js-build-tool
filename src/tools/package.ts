@@ -1,6 +1,6 @@
 
 import type { Dependency, JSONSchemaForNPMPackageJsonFiles } from "@schemastore/package";
-import { readJson } from "./file.js";
+import { file, readJson } from "./file.js";
 
 /**
  * The type of a package.json file.
@@ -8,37 +8,35 @@ import { readJson } from "./file.js";
  */
 export type PackageJsonSchema = JSONSchemaForNPMPackageJsonFiles;
 
+
+let packageCache: Map<string, JSONSchemaForNPMPackageJsonFiles> = new Map();
 /**
  * Reads the contents of a package.json file.
- * @param path - path to the package.json file.
+ * @param path - path to the package.json file (default = projects package.json file).
+ * @param cache - wether to use a previously cached result (default = true).
  * @returns the Object representing the content of the package.json file.
  * @public
  */
-export async function readPackageJson(path: string): Promise<JSONSchemaForNPMPackageJsonFiles> {
-  return await readJson(path);
-}
-
-let packageCache: JSONSchemaForNPMPackageJsonFiles | null = null;
-/**
- * Reads the contents of a package.json of the project and caches it.
- * @param cache - wether it should read the cached version (default = true).
- * @returns the Object representing the content of the  project package.json file.
- * @public
- */
-export async function getProjectPackageJson(cache: boolean = true): Promise<JSONSchemaForNPMPackageJsonFiles> {
-  if (packageCache !== null && cache) return packageCache;
-  let json = await readJson("package.json");
-  packageCache = json;
-  return json;
+export async function readPackageJson(path: string = "package.json", cache: boolean = true): Promise<JSONSchemaForNPMPackageJsonFiles> {
+  path = file(path);
+  if (cache) {
+    const cached = packageCache.get(path);
+    if (cached !== undefined) return cached;
+  }
+  const newData = await readJson(path);
+  packageCache.set(path, newData);
+  return newData;
 }
 
 /**
- * Reads the exports field of the project package.json file and returns the top level export paths.
+ * Reads the exports field of the package.json file and returns the top level export paths.
+ * @param path - path to the package.json file (default = projects package.json file).
+ * @param cache - wether to use a previously cached result (default = true).
  * @returns an string[] containing all top level exports.
  * @public
  */
-export async function getProjectTopLevelExports(): Promise<string[]> {
-  let packageJson = await getProjectPackageJson();
+export async function getTopLevelExports(path: string = "package.json", cache: boolean = true): Promise<string[]> {
+  let packageJson = await readPackageJson(path, cache);
   if (!("exports" in packageJson) || (typeof packageJson.exports !== "object") || (packageJson.exports === null)) throw new Error("Package Exports must be an object");
   // only return entries wich have more than only an type definition
   return Object.entries(packageJson.exports)
@@ -51,40 +49,77 @@ export async function getProjectTopLevelExports(): Promise<string[]> {
 }
 
 /**
- * Reads the Dependencies field of the project package.json file.
+ * Reads the Dependencies field of the package.json file.
+ * @param path - path to the package.json file (default = projects package.json file).
+ * @param cache - wether to use a previously cached result (default = true).
  * @returns a Map of all dependencies.
  * @public
  */
-export async function getProjectDependencies(): Promise<Dependency> {
-  let packageJson = await getProjectPackageJson();
+export async function getDependencies(path: string = "package.json", cache: boolean = true): Promise<Dependency> {
+  let packageJson = await readPackageJson(path, cache);
   let dependencies = packageJson.dependencies;
   if (dependencies == undefined) dependencies = {};
   return dependencies;
 }
 
 /**
- * Reads the DevDependencies field of the project package.json file.
+ * Reads the DevDependencies field of the package.json file.
+ * @param path - path to the package.json file (default = projects package.json file).
+ * @param cache - wether to use a previously cached result (default = true).
  * @returns a Map of all devDependencies.
  * @public
  */
-export async function getProjectDevDependencies(): Promise<Dependency> {
-  let packageJson = await getProjectPackageJson();
+export async function getDevDependencies(path: string = "package.json", cache: boolean = true): Promise<Dependency> {
+  let packageJson = await readPackageJson(path, cache);
   let dependencies = packageJson.devDependencies;
   if (dependencies == undefined) dependencies = {};
   return dependencies;
 }
 
 /**
- * Reads the type field of the project package.json file.
+ * Reads the type field of the package.json file.
+ * @param path - path to the package.json file (default = projects package.json file).
+ * @param cache - wether to use a previously cached result (default = true).
  * @returns the type of the project package.json file ("commonjs" | "module" | undefined).
  * @public
  */
-export async function getProjectPackageType(): Promise<JSONSchemaForNPMPackageJsonFiles["type"]> {
-  let packageJson = await getProjectPackageJson();
+export async function getPackageType(path: string = "package.json", cache: boolean = true): Promise<JSONSchemaForNPMPackageJsonFiles["type"]> {
+  let packageJson = await readPackageJson(path, cache);
   return packageJson.type;
 }
 
-export async function getProjectPnpmVersion(): Promise<string | undefined> {
-  let packageJson = await getProjectPackageJson();
-  return packageJson.engines?.["pnpm"];
+/**
+ * Reads the node version to use under enginesToUse.node of the package.json file.
+ * @param path - path to the package.json file (default = projects package.json file).
+ * @param cache - wether to use a previously cached result (default = true).
+ * @returns the type of the project package.json file ("commonjs" | "module" | undefined).
+ * @public
+ */
+export async function getNodeVersionToUse(path: string = "package.json", cache: boolean = true): Promise<string | undefined> {
+  let packageJson = await readPackageJson(path, cache);
+  return packageJson["enginesToUse"]?.["node"];
+}
+
+/**
+ * Reads the version field of the package.json file.
+ * @param path - path to the package.json file (default = projects package.json file).
+ * @param cache - wether to use a previously cached result (default = true).
+ * @returns the type of the project package.json file ("commonjs" | "module" | undefined).
+ * @public
+ */
+export async function getPackageVersion(path: string = "package.json", cache: boolean = true): Promise<string | undefined> {
+  let packageJson = await readPackageJson(path, cache);
+  return packageJson.version;
+}
+
+/**
+ * Reads the name field of the package.json file.
+ * @param path - path to the package.json file (default = projects package.json file).
+ * @param cache - wether to use a previously cached result (default = true).
+ * @returns the type of the project package.json file ("commonjs" | "module" | undefined).
+ * @public
+ */
+export async function getPackageName(path: string = "package.json", cache: boolean = true): Promise<string | undefined> {
+  let packageJson = await readPackageJson(path, cache);
+  return packageJson.name;
 }

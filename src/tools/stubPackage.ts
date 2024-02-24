@@ -6,10 +6,10 @@ import { readPackageJson, type PackageJsonSchema } from "./package.js";
 import { binPath, nodeModulesPath, projectNodeModulesPath } from "./paths.js";
 
 /**
- * Options to create a stubPackage for a project dependency.
+ * Options to create a stubPackage.
  * @public
  */
-export type StubProjectPackageOptions = {
+export type StubPackageOptions = {
   /**
    * Name of the package which is the destination of the stubPackage.
    */
@@ -26,46 +26,23 @@ export type StubProjectPackageOptions = {
 };
 
 /**
- * Options to create a stubPackage.
- * @public
- */
-export type StubPackageOptions = {
-  /**
-   * Location of the package for wich a stubPackage should be created.
-   */
-  location: string;
-} & StubProjectPackageOptions;
-
-
-/**
- * Creates a stub Package in the temporary directory of the dlx operation, targeting a package prom the project.
- * @param options - options on how the stubPackage should be created.
- * @public
- */
-export async function stubProjectPackage(options: StubProjectPackageOptions) {
-  const opt = {
-    location: path.resolve(projectNodeModulesPath, options.name),
-    ...options,
-  };
-  await stubPackage(opt);
-}
-
-/**
  * Create multiple stubPackages in the temporary directory of the dlx operation.
  * @param options - array of options for how to create the stubPackage.
+ * @param location - path of the node_modules folder where the Packages can be found (default = node_modules folder of the project).
  * @public
  */
-export async function stubPackages(options: StubPackageOptions[]): Promise<void> {
-  await Promise.all(options.map(stubPackage));
+export async function stubPackages(options: StubPackageOptions[], location: string = projectNodeModulesPath): Promise<void> {
+  await Promise.all(options.map((opt) => stubPackage(opt, location)));
 }
 
 /**
  * Create a stubPackages in the temporary directory of the dlx operation.
  * @param options - options for how to create the stubPackage.
+ * @param location - path of the node_modules folder where the Packages can be found (default = node_modules folder of the project).
  * @public
  */
-export async function stubPackage(options: StubPackageOptions): Promise<void> {
-  const packageJson = await getPackageJson(options);
+export async function stubPackage(options: StubPackageOptions, location: string = projectNodeModulesPath): Promise<void> {
+  const packageJson = await getPackageJson(options, location);
   const packagePath = path.resolve(nodeModulesPath, options.name);
   try {
     await fs.stat(packagePath);
@@ -75,33 +52,33 @@ export async function stubPackage(options: StubPackageOptions): Promise<void> {
       throw e;
     }
   }
-  await stubIndexJs(options, packagePath);
-  await stubBinScripts(options, packagePath, packageJson);
+  await stubIndexJs(options, packagePath, location);
+  await stubBinScripts(options, packagePath, packageJson, location);
   await stubPackageJson(packagePath, packageJson);
-  await stubSubPaths(options, packagePath);
+  await stubSubPaths(options, packagePath, location);
 }
 
-async function stubSubPaths(options: StubPackageOptions, packagePath: string) {
+async function stubSubPaths(options: StubPackageOptions, packagePath: string, location: string) {
   if (!options.subpaths) return;
   await Promise.all(options.subpaths.map(async (subpath) => {
     const filePath = path.resolve(packagePath, subpath);
-    await writeReExportFile(filePath, options, subpath);
+    await writeReExportFile(filePath, options, location, subpath);
   }));
 }
 
-async function stubIndexJs(options: StubPackageOptions, packagePath: string) {
+async function stubIndexJs(options: StubPackageOptions, packagePath: string, location: string) {
   await fs.mkdir(packagePath, { recursive: true });
   const indexFilePath = path.resolve(packagePath, "index.js");
-  await writeReExportFile(indexFilePath, options);
+  await writeReExportFile(indexFilePath, options, location);
 }
 
-async function stubBinScripts(options: StubPackageOptions, packagePath: string, packageJson: PackageJsonSchema) {
+async function stubBinScripts(options: StubPackageOptions, packagePath: string, packageJson: PackageJsonSchema, location: string) {
   let bin = await resolveBinOptions(packageJson);
   await Promise.all([...Object.entries(bin)].map(async ([cmdName, cmdRelPath]) => {
     const cmdPath = path.resolve(packagePath, cmdRelPath).replaceAll("\\", "/");
     let subPath = cmdRelPath;
     if (subPath.startsWith("./")) subPath = subPath.slice(2);
-    await writeReExportFile(cmdPath, options, subPath);
+    await writeReExportFile(cmdPath, options, location, subPath);
     await writeShFile(cmdName, cmdPath);
     await writeCmdFile(cmdName, cmdPath);
     await writePs1File(cmdName, cmdPath);
@@ -118,14 +95,14 @@ async function stubPackageJson(packagePath: string, packageJson: PackageJsonSche
   await fs.writeFile(packageJsonPath, JSON.stringify(json), { flag: "wx" });
 }
 
-async function writeReExportFile(filePath: string, options: StubPackageOptions, subPath: string = "") {
+async function writeReExportFile(filePath: string, options: StubPackageOptions, location: string, subPath: string = "") {
   await fs.mkdir(path.dirname(filePath), { recursive: true });
   if (options.resolveFromLocation) {
-    const targetLocation = path.resolve(options.location).replaceAll("\\", "/");
+    const targetLocation = path.resolve(location).replaceAll("\\", "/");
     if (subPath !== "") subPath = "/" + subPath;
     return await fs.writeFile(filePath, `module.exports = require("module").createRequire("${targetLocation}")(${options.name})`);
   }
-  const targetLocation = path.resolve(options.location, subPath).replaceAll("\\", "/");
+  const targetLocation = path.resolve(location, options.name, subPath).replaceAll("\\", "/");
   return await fs.writeFile(filePath, `module.exports = require("${targetLocation}");`);
 }
 
@@ -210,10 +187,12 @@ async function resolveBinOptions(packageJson: PackageJsonSchema): Promise<{ [nam
   return Object.fromEntries([...Object.entries(bin)].filter((data): data is [string, string] => typeof data[1] === "string"));
 }
 
-async function getPackageJson(options: StubPackageOptions): Promise<PackageJsonSchema> {
-  let packagePath = path.resolve(options.location, "package.json");
+async function getPackageJson(options: StubPackageOptions, location: string): Promise<PackageJsonSchema> {
   if (options.resolveFromLocation) {
-    packagePath = createRequire(options.location).resolve(options.name + "/package.json");
+    const packagePath = createRequire(location).resolve(options.name + "/package.json");
+    return await readPackageJson(packagePath);
   }
+  const packagePath = path.resolve(location, options.name, "package.json");
   return await readPackageJson(packagePath);
+
 }

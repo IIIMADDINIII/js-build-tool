@@ -25,7 +25,7 @@
     "clean": "pnpm run gulp clean",
     "build": "pnpm run gulp build",
     "buildCi": "pnpm run gulp buildCi",
-    "gulp": "pnpm --package=@iiimaddiniii/js-build-tool@0.5.7 dlx js-build-tool"
+    "gulp": "pnpm --package=@iiimaddiniii/js-build-tool@0.5.10 dlx js-build-tool"
   },
   "repository": {
     "type": "git",
@@ -36,9 +36,9 @@
   "bugs": {
     "url": "https://github.com/IIIMADDINIII/node-package-template/issues"
   },
-  "engines": {
+  "enginesToInstall": {
     "node": "18.0.0",
-    "pnpm": ">=8"
+    "pnpm": "^7"
   },
   "homepage": "https://github.com/IIIMADDINIII/node-package-template#readme",
   "devDependencies": {
