@@ -11,7 +11,7 @@ export async function updatePnpmLockDependencies() {
   try { await fs.mkdir(tmpBuildDir); } catch { }
   await fs.copyFile(srcPackage, destPackage);
   await fs.copyFile(srcLock, destLock);
-  await tools.exec({ cwd: tmpBuildDir })`pnpm install --config.confirmModulesPurge=false --node-linker=hoisted`;
+  await tools.exec({ cwd: tmpBuildDir })`pnpm install --config.confirmModulesPurge=false --node-linker=hoisted --lockfile-only`;
   await fs.copyFile(destLock, srcLock);
 }
 
