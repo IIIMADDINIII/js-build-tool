@@ -1,5 +1,6 @@
 
 
+import type { Config } from "jest";
 import { createRequire } from "module";
 import * as path from "path";
 import { exec } from "./exec.js";
@@ -58,21 +59,35 @@ export function addToPath(folder: string): void {
   process.env["path"] = folder + ";" + process.env["path"];
 }
 
+const DefaultJestConfig: Config = {
+  roots: ["tests"],
+  testMatch: ["./**/*.[mc]js"],
+  collectCoverageFrom: ["./**/*.[mc]js"],
+  forceCoverageMatch: ["./**/*.[mc]js"],
+  collectCoverage: true,
+  coverageDirectory: "./tests/",
+  coverageProvider: "babel",
+  coverageReporters: ["lcov", "text"],
+};
+
 /**
  * Run the testfiles with jest.
  * @param testFiles - files wich should be executed as tests.
  * @public
  */
-export async function runTestFiles(testFiles: string[]) {
-  await exec({ env: { NODE_OPTIONS: "--experimental-vm-modules" } })`jest ${testFiles.map((testFile) => testFile.replaceAll("\\", "/"))}`;
+export async function runTestFiles(testFiles: string[], config: Config = DefaultJestConfig) {
+  const configArg = JSON.stringify(config);
+  const files = testFiles.map((testFile) => testFile.replaceAll("\\", "/"));
+  await exec({ env: { NODE_OPTIONS: "--experimental-vm-modules" } })`jest -c ${configArg} ${files}`;
 }
 
 /**
  * Runs all testfiles from the jest config.
  * @public
  */
-export async function runTests() {
-  await exec({ env: { NODE_OPTIONS: "--experimental-vm-modules" } })`jest`;
+export async function runTests(config: Config = DefaultJestConfig) {
+  const configArg = JSON.stringify(config);
+  await exec({ env: { NODE_OPTIONS: "--experimental-vm-modules" } })`jest -c ${configArg}`;
 }
 
 /**
