@@ -7,9 +7,6 @@ import { getDependencies, getPackageVersion } from "./tools/package.js";
 import { cwd, gulpFileName, gulpFilePath, jsBuildToolPath } from "./tools/paths.js";
 import { stubPackages, type StubPackageOptions } from "./tools/stubPackage.js";
 
-
-
-
 const stubSubPath: { [key: string]: string[]; } = {
   "rollup": ["dist/shared/loadConfigFile.js", "dist/shared/parseAst.js", "dist/shared/rollup.js"],
   "tslib": ["tslib.es6.js"],
@@ -30,6 +27,7 @@ main().then(process.exit).catch((e) => {
 async function ensureDependencies(): Promise<string> {
   const version = await getPackageVersion(path.resolve(jsBuildToolPath, "package.json")) || "0.0.0";
   const dependenciesDir = path.resolve(os.tmpdir(), "js-build-tool@" + version);
+  await fs.mkdir(dependenciesDir, { recursive: true });
   let retryCount = 0;
   while (retryCount < 20) {
     // Check if the Done File exists
@@ -76,7 +74,6 @@ async function ensureDependencies(): Promise<string> {
 }
 
 async function installDependencies(dependenciesDir: string): Promise<void> {
-  await fs.mkdir(dependenciesDir, { recursive: true });
   await fs.copyFile(path.resolve(jsBuildToolPath, "packageDependencies.json"), path.resolve(dependenciesDir, "package.json"));
   await fs.copyFile(path.resolve(jsBuildToolPath, "pnpm-lockDependencies.yaml"), path.resolve(dependenciesDir, "pnpm-lock.yaml"));
   await exec({ cwd: dependenciesDir, verbose: false, stdio: ["ignore", "ignore", "inherit"] })`pnpm install --frozen-lockfile --config.confirmModulesPurge=false --node-linker=hoisted`;
