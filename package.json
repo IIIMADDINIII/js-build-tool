@@ -25,7 +25,7 @@
     "clean": "pnpm run gulp clean",
     "build": "pnpm run gulp build",
     "buildCi": "pnpm run gulp buildCi",
-    "gulp": "pnpm --package=@iiimaddiniii/js-build-tool@0.6.7 dlx js-build-tool",
+    "gulp": "pnpm --package=@iiimaddiniii/js-build-tool@0.6.8 dlx js-build-tool",
     "test": "pnpm --package=@iiimaddiniii/js-build-tool@0.6.7 dlx js-build-tool build",
     "testCi": "pnpm --package=@iiimaddiniii/js-build-tool@0.6.7 dlx js-build-tool buildCi"
   },
@@ -66,7 +66,6 @@
     "gulp": "^4.0.2",
     "tslib": "^2.6.2",
     "typescript": "^5.3.3",
-    "jest": "^29.7.0",
     "@microsoft/api-extractor": "^7.40.6"
   },
   "pnpm": {
