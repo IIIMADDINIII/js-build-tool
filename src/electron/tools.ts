@@ -1,22 +1,47 @@
-// import { MakeOptions, api } from "@electron-forge/core";
+import { api, type MakeOptions, type PackageOptions, type StartOptions } from "@electron-forge/core";
 import path from "path";
-import { exec } from "../tools/exec.js";
 import { downloadGithubRelease, downloadLatestGithubRelease, type ReleaseAsset } from "../tools/github.js";
 import { addToPath } from "../tools/misc.js";
 import { dlxPath } from "../tools/paths.js";
 
-
-//export async function forgeMake(opts?: MakeOptions) {
-// await api.make(opts ? opts : {});
-//}
-
 /**
- * Starts the electron app in the current folder (executes "pnpx electron .").
+ * Package the electron app using electron forge.
+ * @param options - [Options](https://js.electronforge.io/interfaces/_electron_forge_core.PackageOptions.html) for the package Command (default = {}).
  * @public
  */
-export async function start() {
-  await exec`electron .`;
+export async function pack(options: PackageOptions = {}): Promise<void> {
+  await api.package(options);
 }
+
+/**
+ * Makes the electron app using electron forge.
+ * @param options - [Options](https://js.electronforge.io/interfaces/_electron_forge_core.MakeOptions.html) for the make Command (default = {}).
+ * @public
+ */
+export async function make(options: MakeOptions = {}): Promise<void> {
+  await api.make(options);
+}
+
+/**
+ * Starts the electron app in the current folder (using electron forge).
+ * @param options - [Options](https://js.electronforge.io/interfaces/_electron_forge_core.StartOptions.html) for the Start Command (default = {}).
+ * @public
+ */
+export async function publish(options: StartOptions = {}): Promise<void> {
+  await api.publish(options);
+}
+
+/**
+ * Starts the electron app in the current folder (using electron forge).
+ * @param options - [Options](https://js.electronforge.io/interfaces/_electron_forge_core.StartOptions.html) for the Start Command (default = {}).
+ * @public
+ */
+export async function start(options: StartOptions = {}): Promise<void> {
+  await api.start(options);
+}
+
+
+
 
 function getWixAsset(_version: string, assets: ReleaseAsset[]): ReleaseAsset | undefined {
   return assets.find((asset) => asset.name.endsWith("-binaries.zip"));
