@@ -155,3 +155,14 @@ export function runApiExtrator(projectPackageJsonPath: string, configObject: ICo
     await tools.runApiExtrator(projectPackageJsonPath, configObject);
   });
 }
+
+/**
+ * Waits for the specified amount of milliseconds and then continues with the following tasks.
+ * @param time - time in milliseconds to wait (default = 0).
+ * @public
+ */
+export function wait(time: number = 0): TaskFunction {
+  return setDisplayName("wait", async function wait() {
+    await tools.wait(time);
+  });
+}

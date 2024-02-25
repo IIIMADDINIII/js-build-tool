@@ -2,6 +2,7 @@
 
 import { createRequire } from "module";
 import * as path from "path";
+import * as timers from "timers/promises";
 import { exec } from "./exec.js";
 import type { TaskFunction } from "./gulp.js";
 import { dlxPath } from "./paths.js";
@@ -84,4 +85,13 @@ export async function runTests() {
  */
 export function resolveModule(module: string): string {
   return createRequire(path.resolve(dlxPath, "package.json")).resolve(module);
+}
+
+/**
+ * Waits for the specified amount of milliseconds and then resolves the Promise.
+ * @param time - time in milliseconds to wait (default = 0).
+ * @public
+ */
+export function wait(time: number = 0): Promise<void> {
+  return timers.setTimeout(time);
 }
