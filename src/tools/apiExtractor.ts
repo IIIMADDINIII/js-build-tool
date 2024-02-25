@@ -1,12 +1,4 @@
-//import { Extractor, ExtractorConfig, ExtractorLogLevel, type IConfigFile } from "@microsoft/api-extractor";
-import { Extractor, ExtractorConfig, type ExtractorLogLevel as ExtractorLogLevelType, type IConfigFile } from "@microsoft/api-extractor";
-
-// ToDo: Remove this as soon api-extractor is fixed to include not const enum
-// Uncomment first line and remove second line
-const ExtractorLogLevel: { [Key in "Error" | "Warning" | "Info" | "Verbose" | "None"]: ExtractorLogLevelType; } = {
-  //@ts-ignore
-  Error: "error", Warning: "warning", Info: "info", Verbose: "verbose", None: "none"
-};
+import { Extractor, ExtractorConfig, ExtractorLogLevel, type IConfigFile } from "@microsoft/api-extractor";
 
 /**
  * Runs the {@link https://api-extractor.com/ | ApiExtractor}.

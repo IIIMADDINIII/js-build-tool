@@ -17,6 +17,6 @@
     "gulp": "^4.0.2",
     "tslib": "^2.6.2",
     "typescript": "^5.3.3",
-    "@microsoft/api-extractor": "^7.40.6"
+    "@microsoft/api-extractor": "^7.41.0"
   }
 }

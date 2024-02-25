@@ -38,10 +38,6 @@
   "bugs": {
     "url": "https://github.com/IIIMADDINIII/js-build-tool/issues"
   },
-  "enginesToInstall": {
-    "node": "18.0.0",
-    "pnpm": "^7"
-  },
   "homepage": "https://github.com/IIIMADDINIII/js-build-tool#readme",
   "devDependencies": {
     "@types/gulp": "^4.0.17",
@@ -66,11 +62,6 @@
     "gulp": "^4.0.2",
     "tslib": "^2.6.2",
     "typescript": "^5.3.3",
-    "@microsoft/api-extractor": "^7.40.6"
-  },
-  "pnpm": {
-    "patchedDependencies": {
-      "@microsoft/api-extractor@7.40.6": "patches/@microsoft__api-extractor@7.40.6.patch"
-    }
+    "@microsoft/api-extractor": "^7.41.0"
   }
 }
