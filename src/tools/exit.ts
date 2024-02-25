@@ -1,5 +1,5 @@
-import { exit } from "../tasks.js";
 import { series, type TaskFunction } from "./gulp.js";
+import { setDisplayName } from "./misc.js";
 
 /**
  * Exists the gulp task after all tasks finished in series.
@@ -8,5 +8,20 @@ import { series, type TaskFunction } from "./gulp.js";
  * @public
  */
 export function exitAfter(...tasks: TaskFunction[]): TaskFunction {
-  return series(...tasks, exit());
+  return series(...tasks,
+    setDisplayName("exit", async function _exit() {
+      exit();
+    })
+  );
+}
+
+/**
+ * Exit the current process asynchronously.
+ * @param code - exit code to use (default = 0)
+ * @public
+ */
+export function exit(code: number = 0): void {
+  setTimeout(() => {
+    process.exit(code);
+  }, 50);
 }

@@ -111,9 +111,7 @@ export function runWorkspaceScriptParallel(script: string, filter: string = "*",
  */
 export function exit(): TaskFunction {
   return setDisplayName("exit", async function exit() {
-    setTimeout(() => {
-      process.exit();
-    }, 50);
+    tools.exit();
   });
 }
 
@@ -158,6 +156,7 @@ export function runApiExtrator(projectPackageJsonPath: string, configObject: ICo
 
 /**
  * Waits for the specified amount of milliseconds and then continues with the following tasks.
+ * Can directly be used as an Rollup Task.
  * @param time - time in milliseconds to wait (default = 0).
  * @public
  */
