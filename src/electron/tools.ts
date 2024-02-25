@@ -15,7 +15,7 @@ import { dlxPath } from "../tools/paths.js";
  * @public
  */
 export async function start() {
-  await exec`pnpx electron .`;
+  await exec`electron .`;
 }
 
 function getWixAsset(_version: string, assets: ReleaseAsset[]): ReleaseAsset | undefined {

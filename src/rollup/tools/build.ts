@@ -2,6 +2,7 @@ import { ExtractorLogLevel, type IConfigFile } from "@microsoft/api-extractor";
 import * as fs from "fs/promises";
 import * as path from "path";
 import type { OutputOptions, RollupOptions } from "rollup";
+import { getPackageType } from "../../tools.js";
 import { runApiExtrator } from "../../tools/apiExtractor.js";
 import { runTestFiles } from "../../tools/misc.js";
 import { cwd } from "../../tools/paths.js";
@@ -149,7 +150,7 @@ function resolvePath(...filePath: string[]): string {
 
 async function calculatePackageJsonTypes(defaultConfigOpts: DefaultConfigOpts): Promise<PackageJsonType[]> {
   let dirFormatMap: Map<string, OutputFormat> = new Map();
-  const packageType = "module" === "module" ? "es" : "commonjs";
+  const packageType = (await getPackageType()) === "module" ? "es" : "commonjs";
   const mainDir = resolvePath(".");
   dirFormatMap.set(mainDir, packageType);
   for (let defaultExportOpts of Object.values(defaultConfigOpts.entryPoints)) {
