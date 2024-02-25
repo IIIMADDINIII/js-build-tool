@@ -1,6 +1,7 @@
 /.rollup.cache/
 /node_modules/
 /dist/
+/tests/
 /*.tsbuildinfo
 /.tmpBuild/
 /modules/
