@@ -27,11 +27,12 @@ main().then(process.exit).catch((e) => {
 async function ensureDependencies(): Promise<string> {
   const version = await getPackageVersion(path.resolve(jsBuildToolPath, "package.json")) || "0.0.0";
   const dependenciesDir = path.resolve(os.tmpdir(), "js-build-tool@" + version);
+  const doneFile = path.resolve(dependenciesDir, "done");
+  const busyFile = path.resolve(dependenciesDir, "busy");
   await fs.mkdir(dependenciesDir, { recursive: true });
   let retryCount = 0;
-  while (retryCount < 20) {
+  while (retryCount < 30) {
     // Check if the Done File exists
-    const doneFile = path.resolve(dependenciesDir, "done");
     try {
       await fs.stat(doneFile);
       // Is so no installation necessary
@@ -42,7 +43,6 @@ async function ensureDependencies(): Promise<string> {
       if ((typeof e !== "object") || (e === null) || !("code" in e) || (e.code !== "ENOENT")) throw e;
     }
     // done File does not exist so create the Busy file when not already existing
-    const busyFile = path.resolve(dependenciesDir, "busy");
     try {
       await fs.writeFile(busyFile, "", { flag: "wx" });
       // Busy File did not exist so install dependencies
@@ -50,6 +50,11 @@ async function ensureDependencies(): Promise<string> {
         if (retryCount !== 0) process.stdout.write("\n");
         process.stdout.write(`Preparing Dependencies in ${dependenciesDir}\n`);
         await installDependencies(dependenciesDir);
+        try {
+          await fs.writeFile(doneFile, "");
+        } finally {
+          return dependenciesDir;
+        }
       } catch (e) {
         try {
           await fs.rm(busyFile);
@@ -57,7 +62,6 @@ async function ensureDependencies(): Promise<string> {
           throw e;
         }
       }
-      return dependenciesDir;
     } catch (e) {
       if ((typeof e !== "object") || (e === null) || !("code" in e) || (e.code !== "EEXIST")) throw e;
       // Busy File exists so redo t5he check until done file exists ore busy file is gone
@@ -70,7 +74,7 @@ async function ensureDependencies(): Promise<string> {
   }
   // max Retry's reached causes an error
   process.stdout.write("\n");
-  throw new Error(`Could not install dependencies in ${dependenciesDir} `);
+  throw new Error(`Could not install dependencies: If you are sure that no js-build-tool instances are running manually delete the file ${busyFile}`);
 }
 
 async function installDependencies(dependenciesDir: string): Promise<void> {
