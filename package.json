@@ -43,8 +43,10 @@
     "@types/gulp": "^4.0.17",
     "@types/js-build-tool-types": "npm:@iiimaddiniii/js-build-tool-types@^0.6.6",
     "@types/node": "^20.11.20",
+    "@types/fs-extra": "^11.0.4",
     "@schemastore/package": "^0.0.10",
     "execa": "^8.0.1",
+    "@electron-forge/shared-types": "^7.3.0",
     "@electron-forge/core": "^7.3.0",
     "@electron-forge/maker-wix": "^7.3.0",
     "@electron-forge/maker-zip": "^7.3.0",
@@ -63,8 +65,7 @@
     "gulp": "^4.0.2",
     "tslib": "^2.6.2",
     "typescript": "^5.3.3",
-    "@microsoft/api-extractor": "^7.41.0",
-    "electron": "^29.0.1"
+    "@microsoft/api-extractor": "^7.41.0"
   },
   "main": "./dist/index.js"
 }

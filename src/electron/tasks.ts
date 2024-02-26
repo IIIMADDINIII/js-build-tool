@@ -19,7 +19,7 @@ import * as tools from "./tools.js";
  */
 export function start(): TaskFunction {
   return setDisplayName("start", async function start() {
-    await tools.start();
+    await tools.startLegacy();
   });
 }
 
