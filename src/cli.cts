@@ -80,7 +80,7 @@ async function ensureDependencies(): Promise<string> {
 async function installDependencies(dependenciesDir: string): Promise<void> {
   await fs.copyFile(path.resolve(jsBuildToolPath, "packageDependencies.json"), path.resolve(dependenciesDir, "package.json"));
   await fs.copyFile(path.resolve(jsBuildToolPath, "pnpm-lockDependencies.yaml"), path.resolve(dependenciesDir, "pnpm-lock.yaml"));
-  await exec({ cwd: dependenciesDir, verbose: false, stdio: "inherit" })`pnpm install --frozen-lockfile --config.confirmModulesPurge=false --node-linker=hoisted`;
+  await exec({ cwd: dependenciesDir, verbose: false, stdio: "inherit" })`pnpm install --frozen-lockfile --config.confirmModulesPurge=false --config.package-import-method=copy`;
 }
 
 async function stubDependencies(dependenciesDir: string) {
