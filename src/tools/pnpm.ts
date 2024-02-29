@@ -102,3 +102,11 @@ export async function incrementVersion(semverInc: CountVersionOption = "patch"):
 export async function publishPackage(): Promise<void> {
   await exec`pnpm publish`;
 }
+
+/**
+ * Update all the dependencies with pnpm update.
+ * @public
+ */
+export async function updatePackages(): Promise<void> {
+  await exec`pnpm update`;
+}

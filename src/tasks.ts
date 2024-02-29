@@ -176,7 +176,7 @@ export function wait(time: number = 0): TaskFunction {
  * @public
  */
 export function incrementVersion(semverInc: CountVersionOption = "patch"): TaskFunction {
-  return setDisplayName("wait", async function incrementVersion() {
+  return setDisplayName("incrementVersion", async function incrementVersion() {
     await tools.incrementVersion(semverInc);
   });
 }
@@ -188,7 +188,19 @@ export function incrementVersion(semverInc: CountVersionOption = "patch"): TaskF
  * @public
  */
 export function publishPackage(): TaskFunction {
-  return setDisplayName("wait", async function publishPackage() {
+  return setDisplayName("publishPackage", async function publishPackage() {
     await tools.publishPackage();
+  });
+}
+
+/**
+ * Update all the dependencies with pnpm update.
+ * Can directly be used as an Rollup Task.
+ * @returns A Gulp Task.
+ * @public
+ */
+export function updatePackages(): TaskFunction {
+  return setDisplayName("updatePackages", async function updatePackages() {
+    await tools.updatePackages();
   });
 }
