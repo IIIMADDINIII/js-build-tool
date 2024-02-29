@@ -53,11 +53,7 @@ const bundle = rollup.tasks.build({
     "rollup-plugin-include-sourcemaps",
     "@rollup/pluginutils",
     "terser",
-    "@octokit/rest",
-    "@microsoft/api-extractor-model",
-    "@octokit/plugin-rest-endpoint-methods",
-    "@octokit/types",
-    "@octokit/openapi-types"],
+    "@microsoft/api-extractor-model"],
 }, { failAfterWarnings: false });
 
 export const clean = tools.exitAfter(tasks.cleanWithGit());

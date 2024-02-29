@@ -10,7 +10,4 @@
 /jest.config.mjs
 /gulpfile.mjs
 /src
-/dist/**/*.map
-/dist/**/*.ts
-/dist/**/*.cts
 /.tmpBuild/
