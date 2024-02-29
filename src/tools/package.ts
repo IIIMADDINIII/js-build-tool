@@ -123,3 +123,15 @@ export async function getPackageName(path: string = "package.json", cache: boole
   let packageJson = await readPackageJson(path, cache);
   return packageJson.name;
 }
+
+/**
+ * Reads the main field of the package.json file.
+ * @param path - path to the package.json file (default = projects package.json file).
+ * @param cache - wether to use a previously cached result (default = true).
+ * @returns the main entry point of the project package.json file.
+ * @public
+ */
+export async function getPackageMain(path: string = "package.json", cache: boolean = true): Promise<string | undefined> {
+  let packageJson = await readPackageJson(path, cache);
+  return packageJson.main;
+}

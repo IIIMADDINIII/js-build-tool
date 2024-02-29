@@ -3,7 +3,18 @@ import { createRequire } from "module";
 import path from "path";
 import { fs } from "./file.js";
 import { readPackageJson, type PackageJsonSchema } from "./package.js";
-import { binPath, nodeModulesPath, projectNodeModulesPath } from "./paths.js";
+import { binPath, dlxPath, nodeModulesPath, projectNodeModulesPath } from "./paths.js";
+
+
+/**
+ * Resolves the absolute filepath of a module.
+ * @param module - name of the module to resolve.
+ * @returns 
+ * @public
+ */
+export function resolveModule(module: string): string {
+  return createRequire(path.resolve(dlxPath, "package.json")).resolve(module);
+}
 
 /**
  * Options to create a stubPackage.

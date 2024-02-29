@@ -6,6 +6,7 @@ import { setDisplayName } from "./tools/misc.js";
 
 import * as electron from "./electron/tasks.js";
 import * as rollup from "./rollup/tasks.js";
+import type { CountVersionOption } from "./tools.js";
 export { electron, rollup };
 
 /**
@@ -163,5 +164,31 @@ export function runApiExtrator(projectPackageJsonPath: string, configObject: ICo
 export function wait(time: number = 0): TaskFunction {
   return setDisplayName("wait", async function wait() {
     await tools.wait(time);
+  });
+}
+
+/**
+ * Installs all dependencies of the package using pnpm.
+ * Will use the frozen lockfile in Production mode.
+ * Can directly be used as an Rollup Task.
+ * @param majorMinorPatch - how to increment the version string (same as [pnpm version ***](https://docs.npmjs.com/cli/v8/commands/npm-version)) (default = "patch").
+ * @returns A Gulp Task.
+ * @public
+ */
+export function incrementVersion(semverInc: CountVersionOption = "patch"): TaskFunction {
+  return setDisplayName("wait", async function incrementVersion() {
+    await tools.incrementVersion(semverInc);
+  });
+}
+
+/**
+ * Publishes the Package using pnpm publish command.
+ * Can directly be used as an Rollup Task.
+ * @returns A Gulp Task.
+ * @public
+ */
+export function publishPackage(): TaskFunction {
+  return setDisplayName("wait", async function publishPackage() {
+    await tools.publishPackage();
   });
 }

@@ -4,7 +4,21 @@ import type { ForgeConfig } from "@electron-forge/shared-types";
 import type { TaskFunction } from "../tools/gulp.js";
 import { setDisplayName } from "../tools/misc.js";
 import * as tools from "./tools.js";
+import type { CreateSetupsOptions } from "./tools/createSetups.js";
 
+
+/**
+ * Package and Make Setups with electron forge with sensible defaults.
+ * Can be directly used as an Gulp Task.
+ * @param options - [Options](https://js.electronforge.io/interfaces/_electron_forge_core.PackageOptions.html) for the package Command (default = {}).
+ * @returns A Gulp Task
+ * @public
+ */
+export function createSetups(options?: CreateSetupsOptions): TaskFunction {
+  return setDisplayName("createSetups", async function createSetups() {
+    await tools.createSetups(options);
+  });
+}
 
 /**
  * Package the electron app using electron forge.
@@ -15,7 +29,7 @@ import * as tools from "./tools.js";
  * @public
  */
 export function runForgePackage(options: PackageOptions = {}, config?: ForgeConfig): TaskFunction {
-  return setDisplayName("runForgeStart", async function start() {
+  return setDisplayName("runForgePackage", async function runForgePackage() {
     await tools.runForgePackage(options, config);
   });
 }
@@ -29,7 +43,7 @@ export function runForgePackage(options: PackageOptions = {}, config?: ForgeConf
  * @public
  */
 export function runForgeMake(options: MakeOptions = {}, config?: ForgeConfig): TaskFunction {
-  return setDisplayName("runForgeStart", async function start() {
+  return setDisplayName("runForgeMake", async function runForgeMake() {
     await tools.runForgeMake(options, config);
   });
 }
@@ -43,7 +57,7 @@ export function runForgeMake(options: MakeOptions = {}, config?: ForgeConfig): T
  * @public
  */
 export function runForgePublish(options: PublishOptions = {}, config?: ForgeConfig): TaskFunction {
-  return setDisplayName("runForgeStart", async function start() {
+  return setDisplayName("runForgePublish", async function runForgePublish() {
     await tools.runForgePublish(options, config);
   });
 }
@@ -57,7 +71,7 @@ export function runForgePublish(options: PublishOptions = {}, config?: ForgeConf
  * @public
  */
 export function runForgeStart(options: StartOptions = {}, config?: ForgeConfig): TaskFunction {
-  return setDisplayName("runForgeStart", async function start() {
+  return setDisplayName("runForgeStart", async function runForgeStart() {
     await tools.runForgeStart(options, config);
   });
 }

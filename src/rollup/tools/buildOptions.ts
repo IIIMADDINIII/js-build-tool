@@ -10,8 +10,8 @@ import type { Plugin } from "rollup";
 import consts from "rollup-plugin-consts";
 import sourceMaps, { type SourcemapsPluginOptions } from 'rollup-plugin-include-sourcemaps';
 import { fs } from "../../tools/file.js";
-import { isProd } from "../../tools/misc.js";
 import { getDependencies, getDevDependencies, getPackageType, getTopLevelExports } from "../../tools/package.js";
+import { isProd } from "../../tools/prod.js";
 import { manageDependencies, type ManageDependenciesConfig } from "../plugins.js";
 
 /**

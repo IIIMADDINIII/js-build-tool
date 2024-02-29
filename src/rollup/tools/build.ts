@@ -3,9 +3,9 @@ import * as fs from "fs/promises";
 import * as path from "path";
 import type { OutputOptions, RollupOptions } from "rollup";
 import { runApiExtrator } from "../../tools/apiExtractor.js";
-import { runTestFiles } from "../../tools/misc.js";
 import { getPackageType } from "../../tools/package.js";
 import { cwd } from "../../tools/paths.js";
+import { runTestFiles } from "../../tools/tests.js";
 import { getDefaultConfigOpts, type ConfigOpts, type DefaultConfigOpts, type DefaultExportOpts, type DefaultOutputOpts, type OutputFormat } from "./buildOptions.js";
 import { run, type CommandOptions } from "./run.js";
 

@@ -1,6 +1,7 @@
 
 import * as fs from "fs/promises";
 import path from "path";
+import YAML from "yaml";
 import { projectPath } from "./paths.js";
 
 
@@ -34,6 +35,16 @@ export async function read(relPath: string): Promise<string> {
  */
 export async function readJson(relPath: string): Promise<any> {
   return JSON.parse(await read(relPath));
+}
+
+/**
+ * Reads the content of a file in the project as yaml.
+ * @param relPath - path to the file relative to the project.
+ * @returns the parsed yaml data.
+ * @public
+ */
+export async function readYaml(relPath: string): Promise<any> {
+  return YAML.parse(await read(relPath));
 }
 
 /**

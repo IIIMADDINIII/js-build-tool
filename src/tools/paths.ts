@@ -3,6 +3,15 @@ import path from "path";
 import url from 'url';
 
 /**
+ * Adds an folder to the Path variable.
+ * @param folder - the folder which should be added to the path (should be absolute).
+ * @public
+ */
+export function addToPath(folder: string): void {
+  process.env["path"] = folder + ";" + process.env["path"];
+}
+
+/**
  * Finds the temporary project folder of the pnpm dlx operation.
  * @param packagePath - path inside the js-build-tool.
  * @returns the upper most folder with node_modules inside.

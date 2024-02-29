@@ -1,7 +1,6 @@
 import * as path from "path";
 import { downloadGithubRelease, downloadLatestGithubRelease, type ReleaseAsset } from "../../tools/github.js";
-import { addToPath } from "../../tools/misc.js";
-import { dlxPath } from "../../tools/paths.js";
+import { addToPath, dlxPath } from "../../tools/paths.js";
 
 function getWixAsset(_version: string, assets: ReleaseAsset[]): ReleaseAsset | undefined {
   return assets.find((asset) => asset.name.endsWith("-binaries.zip"));
