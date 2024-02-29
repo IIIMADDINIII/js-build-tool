@@ -3,7 +3,7 @@ import type { ForgeConfig } from "@electron-forge/shared-types";
 import * as path from "path";
 import { getPackageMain } from "../../tools/package.js";
 import { projectPath } from "../../tools/paths.js";
-import { runForgeMake } from "../tools/forge.js";
+import { runForgePackage } from "../tools/forge.js";
 
 /**
  * Options on how to create the Setups.
@@ -69,6 +69,5 @@ async function createForgeMakeOptions(_options?: CreateSetupsOptions): Promise<M
 export async function createSetups(options?: CreateSetupsOptions): Promise<void> {
   const forgeConfig = await createForgeConfig(options);
   const makeOptions = await createForgeMakeOptions(options);
-  console.log(forgeConfig);
-  await runForgeMake(makeOptions, forgeConfig);
+  await runForgePackage(makeOptions, forgeConfig);
 }
