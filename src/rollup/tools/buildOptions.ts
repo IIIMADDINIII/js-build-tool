@@ -6,7 +6,7 @@ import terser, { type Options as TerserOptions } from "@rollup/plugin-terser";
 import typescript, { type RollupTypescriptOptions } from "@rollup/plugin-typescript";
 import fastGlob from "fast-glob";
 import path from "path";
-import type { Plugin } from "rollup";
+import type { Plugin, TreeshakingOptions, TreeshakingPreset } from "rollup";
 import consts from "rollup-plugin-consts";
 import sourceMaps, { type SourcemapsPluginOptions } from 'rollup-plugin-include-sourcemaps';
 import { fs } from "../../tools/file.js";
@@ -369,6 +369,12 @@ export interface DefaultExportOpts {
    * @see {@link https://www.npmjs.com/package/@rollup/plugin-node-resolve | @rollup/plugin-node-resolve}
    */
   nodeResolvePlugin: RollupNodeResolveOptions;
+  /**
+   * Overrides the default Tree shaking options for rollup
+   * @see {@link https://rollupjs.org/configuration-options/#treeshake |  Rollup config treeshake}
+   * @default true
+   */
+  treeShakeOptions: boolean | TreeshakingPreset | TreeshakingOptions;
 }
 
 /**
@@ -570,6 +576,7 @@ async function getDefaultExportOpts(defaultConfigOpts: DefaultConfigOpts, config
     plugins: [],
     outputs: [],
     isSingleFormat: false,
+    treeShakeOptions: getDefault(exportOpts.treeShakeOptions, true),
   };
   defaultExportOpts.manageDependenciesPlugin = getDefault(exportOpts.manageDependenciesPlugin, await getManageDependenciesDefaultOptions(defaultExportOpts));
   defaultExportOpts.typescriptPlugin = getDefault(exportOpts.typescriptPlugin, getTypescriptDefaultOptions(defaultExportOpts));

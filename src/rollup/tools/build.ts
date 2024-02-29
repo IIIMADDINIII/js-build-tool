@@ -25,6 +25,7 @@ function getRollupOutput(defaultExportOpts: DefaultExportOpts, defaultOutputOpts
 function getRollupOption(defaultExportOpts: DefaultExportOpts): RollupOptions | undefined {
   if (defaultExportOpts.isTest && !defaultExportOpts.buildTest) return undefined;
   return {
+    treeshake: defaultExportOpts.treeShakeOptions,
     input: defaultExportOpts.inputFile,
     output: defaultExportOpts.outputs.map((defaultOutputOpts) => getRollupOutput(defaultExportOpts, defaultOutputOpts)),
     plugins: defaultExportOpts.plugins,
