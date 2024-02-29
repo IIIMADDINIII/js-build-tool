@@ -66,11 +66,12 @@ export const build = tools.exitAfter(
   tools.parallel(bundle, updatePnpmLockDependencies));
 export const buildCi = tools.exitAfter(
   tasks.cleanWithGit(),
-  tasks.setProd(),
-  tasks.installDependencies(),
+  tasks.prodInstallDependencies(),
   tools.parallel(bundle, updatePnpmLockDependencies));
 
 export const publishPatch = tools.exitAfter(
-  buildCi,
+  tasks.cleanWithGit(),
+  tasks.prodInstallDependencies(),
+  tools.parallel(bundle, updatePnpmLockDependencies),
   tasks.incrementVersion(),
   tasks.publishPackage());
