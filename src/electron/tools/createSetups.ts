@@ -28,7 +28,9 @@ async function generateIgnoreFunction(options: CreateSetupsOptions): Promise<(fi
       filesToInclude.add(path.resolve(file));
     }
   }
+  console.log("allow list: ", [...filesToInclude.values()]);
   return function ignore(file: string): boolean {
+    console.log(filesToInclude.has(path.resolve(file)), file, path.resolve(file));
     return !filesToInclude.has(path.resolve(file));
   };
 }
