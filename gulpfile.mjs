@@ -35,6 +35,9 @@ const bundle = rollup.tasks.build({
   blacklistDevDependencies: false,
   externalDependencies: deps,
   commonjsPlugin: { ignore: ["electron"] },
+  treeShakeOptions: {
+    moduleSideEffects: false,
+  },
   bundleDeclarationPackages: [
     "@schemastore/package",
     "execa",
@@ -66,3 +69,8 @@ export const buildCi = tools.exitAfter(
   tasks.setProd(),
   tasks.installDependencies(),
   tools.parallel(bundle, updatePnpmLockDependencies));
+
+export const publishPatch = tools.exitAfter(
+  buildCi,
+  tasks.incrementVersion(),
+  tasks.publishPackage());
