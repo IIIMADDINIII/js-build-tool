@@ -12,6 +12,7 @@ import sourceMaps, { type SourcemapsPluginOptions } from 'rollup-plugin-include-
 import { fs } from "../../tools/file.js";
 import { getDependencies, getDevDependencies, getPackageType, getTopLevelExports } from "../../tools/package.js";
 import { isProd } from "../../tools/prod.js";
+import { getDefault } from "../../util.js";
 import { manageDependencies, type ManageDependenciesConfig } from "../plugins.js";
 
 /**
@@ -810,9 +811,4 @@ async function runHookOutputOptions(options: OutputOpts): Promise<OutputOpts> {
     if (ret !== undefined) return ret;
   }
   return options;
-}
-
-function getDefault<T>(value: T | undefined, def: T): T {
-  if (typeof value === "undefined") return def;
-  return value;
 }
