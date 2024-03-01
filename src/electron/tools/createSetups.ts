@@ -17,11 +17,25 @@ export interface CreateSetupsOptions {
   additionalFilesToPackage?: string[];
 }
 
+class PathSet extends Set<string> {
+  addAllPaths(...paths: string[]): void {
+    for (let p of paths) {
+      p = path.resolve(p);
+      while (true) {
+        if (this.has(p)) break;
+        this.add(p);
+        p = path.resolve(p, "..");
+      }
+    }
+  }
+}
+
 async function generateIgnoreFunction(options: CreateSetupsOptions): Promise<(file: string) => boolean> {
-  const filesToInclude: Set<string> = new Set();
+  const filesToInclude = new PathSet();
+  filesToInclude.addAllPaths("package.json");
   const packageMain = await getPackageMain();
   if (packageMain !== undefined) {
-    filesToInclude.add(path.resolve(packageMain));
+    filesToInclude.addAllPaths(packageMain);
   }
   if (options.additionalFilesToPackage !== undefined) {
     for (const file of options.additionalFilesToPackage) {
