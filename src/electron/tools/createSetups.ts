@@ -71,7 +71,7 @@ async function addPackagesToFilesToInclude(options: CreateSetupOptionsNorm, file
 async function generateIgnoreFunction(options: CreateSetupOptionsNorm): Promise<(file: string) => boolean> {
   const filesToInclude = new PathSet(options.dir);
   filesToInclude.addAllPaths("package.json");
-  addPackagesToFilesToInclude(options, filesToInclude);
+  await addPackagesToFilesToInclude(options, filesToInclude);
   const packageMain = await getPackageMain();
   if (packageMain !== undefined) {
     filesToInclude.addAllPaths(packageMain);
