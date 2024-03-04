@@ -1,4 +1,4 @@
-import MakerZip from "@electron-forge/maker-zip";
+import { MakerZip } from "@electron-forge/maker-zip";
 import type { ForgeConfig, ForgeConfigMaker, ForgePackagerOptions, IForgeMaker } from "@electron-forge/shared-types";
 import * as path from "path";
 import { getAllPackageExportsPaths, getPackageMain } from "../../tools/package.js";
