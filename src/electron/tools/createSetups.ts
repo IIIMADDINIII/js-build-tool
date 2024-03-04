@@ -1,11 +1,22 @@
-import type { MakeOptions } from "@electron-forge/core";
-import type { ForgeConfig } from "@electron-forge/shared-types";
+import MakerZip from "@electron-forge/maker-zip";
+import type { ForgeConfig, ForgeConfigMaker, ForgePackagerOptions, IForgeMaker } from "@electron-forge/shared-types";
 import * as path from "path";
 import { getAllPackageExportsPaths, getPackageMain } from "../../tools/package.js";
 import { projectPath } from "../../tools/paths.js";
 import { getPnpmPackages } from "../../tools/pnpm.js";
 import { getDefault } from "../../util.js";
-import { runForgePackage } from "../tools/forge.js";
+import { runForgeMake, runForgePackage } from "../tools/forge.js";
+
+/**
+ * Architectures which are supported.
+ * @public
+ */
+export type CreateSetupsOptionsArch = "x64" | "arm64";
+/**
+ * Platforms wich are supported.
+ * @public
+ */
+export type CreateSetupsOptionsPlatform = "win32" | "linux" | "darwin";
 
 /**
  * Options on how to create the Setups.
@@ -25,6 +36,21 @@ export interface CreateSetupsOptions {
   * @default ["common"]
   */
   ignorePackages: string[];
+  /**
+  * Make zip files.
+  * @default true
+  */
+  makeZips: boolean;
+  /**
+  * Architectures wich should be build.
+  * @default true
+  */
+  arch: CreateSetupsOptionsArch[];
+  /**
+  * Platforms wich should be build.
+  * @default true
+  */
+  platform: CreateSetupsOptionsPlatform[];
   /**
   * The directory where the electron app is.
   * @default process.cwd()
@@ -79,14 +105,12 @@ async function generateIgnoreFunction(options: CreateSetupOptionsNorm): Promise<
   if (options.additionalFilesToPackage !== undefined) {
     filesToInclude.addAllPaths(...options.additionalFilesToPackage);
   }
-  console.log("allow list: ", [...filesToInclude.values()]);
   return function ignore(file: string): boolean {
-    console.log(filesToInclude.hasPath(file.substring(1)), file, path.resolve(options.dir, file.substring(1)));
     return !filesToInclude.hasPath(file.substring(1));
   };
 }
 
-async function createPackagerConfig(options: CreateSetupOptionsNorm): Promise<Exclude<ForgeConfig["packagerConfig"], undefined>> {
+async function createPackagerConfig(options: CreateSetupOptionsNorm): Promise<ForgePackagerOptions> {
   return {
     asar: true,
     derefSymlinks: true,
@@ -95,26 +119,38 @@ async function createPackagerConfig(options: CreateSetupOptionsNorm): Promise<Ex
   };
 }
 
+
+function addPluginMarker<T extends {}>(instance: T): T {
+  (<any>instance).__isElectronForgePlugin = true;
+  return instance;
+}
+
+async function createMakersConfig(options: CreateSetupsOptions): Promise<ForgeConfigMaker[]> {
+  const ret: IForgeMaker[] = [];
+  if (options.makeZips) {
+    ret.push(addPluginMarker(new MakerZip()));
+  }
+  return ret;
+}
+
 async function createForgeConfig(options: CreateSetupOptionsNorm): Promise<ForgeConfig> {
   return {
     packagerConfig: await createPackagerConfig(options),
+    makers: await createMakersConfig(options),
   };
 }
 
-async function createForgeMakeOptions(options: CreateSetupOptionsNorm): Promise<MakeOptions> {
-  return {
-    //@ts-ignore
-    arch: ["x64", "arm64"],
-    //@ts-ignore
-    platform: ["win32", "linux", "darwin"],
-    dir: options.dir,
-  };
+function deduplicateStringArray<T extends string>(arr: T[]): T[] {
+  return [...(new Set(arr)).values()];
 }
 
 function normalizeCreateSetupOptions(options?: CreateSetupsOptions): CreateSetupOptionsNorm {
   return {
     additionalFilesToPackage: getDefault(options?.additionalFilesToPackage, []),
     ignorePackages: getDefault(options?.ignorePackages, ["common"]),
+    makeZips: getDefault(options?.makeZips, true),
+    arch: deduplicateStringArray(getDefault(options?.arch, ["x64", "arm64"])),
+    platform: deduplicateStringArray(getDefault(options?.platform, ["win32", "linux", "darwin"])),
     dir: getDefault(options?.dir, projectPath),
   };
 }
@@ -127,6 +163,22 @@ function normalizeCreateSetupOptions(options?: CreateSetupsOptions): CreateSetup
 export async function createSetups(options?: CreateSetupsOptions): Promise<void> {
   const optionsNorm = normalizeCreateSetupOptions(options);
   const forgeConfig = await createForgeConfig(optionsNorm);
-  const makeOptions = await createForgeMakeOptions(optionsNorm);
-  await runForgePackage(makeOptions, forgeConfig);
+  await runForgePackage({
+    //@ts-ignore
+    arch: options.arch,
+    //@ts-ignore
+    platform: options.platform,
+    dir: optionsNorm.dir,
+  }, forgeConfig);
+  for (const arch of optionsNorm.arch) {
+    for (const platform of optionsNorm.platform) {
+      await runForgeMake({
+        arch,
+        platform,
+        dir: optionsNorm.dir,
+        skipPackage: true,
+      }, forgeConfig);
+    }
+  }
+
 }
