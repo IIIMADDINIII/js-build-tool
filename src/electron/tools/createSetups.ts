@@ -163,20 +163,12 @@ function normalizeCreateSetupOptions(options?: CreateSetupsOptions): CreateSetup
 export async function createSetups(options?: CreateSetupsOptions): Promise<void> {
   const optionsNorm = normalizeCreateSetupOptions(options);
   const forgeConfig = await createForgeConfig(optionsNorm);
-  await runForgePackage({
-    //@ts-ignore
-    arch: options.arch,
-    //@ts-ignore
-    platform: options.platform,
-    dir: optionsNorm.dir,
-  }, forgeConfig);
   for (const arch of optionsNorm.arch) {
     for (const platform of optionsNorm.platform) {
       await runForgeMake({
         arch,
         platform,
         dir: optionsNorm.dir,
-        skipPackage: true,
       }, forgeConfig);
     }
   }
