@@ -5,7 +5,7 @@ import { getAllPackageExportsPaths, getPackageMain } from "../../tools/package.j
 import { projectPath } from "../../tools/paths.js";
 import { getPnpmPackages } from "../../tools/pnpm.js";
 import { getDefault } from "../../util.js";
-import { runForgeMake, runForgePackage } from "../tools/forge.js";
+import { runForgeMake } from "../tools/forge.js";
 
 /**
  * Architectures which are supported.
