@@ -29,6 +29,18 @@ export async function readPackageJson(path: string = "package.json", cache: bool
 }
 
 /**
+ * Reads the exports field of the package.json.
+ * @param path - path to the package.json file (default = projects package.json file).
+ * @param cache - wether to use a previously cached result (default = true).
+ * @returns the string or object/array defined in the exports field in the package.
+ * @public
+ */
+export async function getPackageExports(path: string = "package.json", cache: boolean = true): Promise<JSONSchemaForNPMPackageJsonFiles["exports"]> {
+  let packageJson = await readPackageJson(path, cache);
+  return packageJson.exports;
+}
+
+/**
  * Reads the exports field of the package.json file and returns the top level export paths.
  * @param path - path to the package.json file (default = projects package.json file).
  * @param cache - wether to use a previously cached result (default = true).
@@ -36,16 +48,55 @@ export async function readPackageJson(path: string = "package.json", cache: bool
  * @public
  */
 export async function getTopLevelExports(path: string = "package.json", cache: boolean = true): Promise<string[]> {
-  let packageJson = await readPackageJson(path, cache);
-  if (!("exports" in packageJson) || (typeof packageJson.exports !== "object") || (packageJson.exports === null)) throw new Error("Package Exports must be an object");
+  const exports = await getPackageExports(path, cache);
+  if ((typeof exports !== "object") || (exports === null)) throw new Error("Package Exports must be an object");
   // only return entries wich have more than only an type definition
-  return Object.entries(packageJson.exports)
+  return Object.entries(exports)
     .filter(([_key, value]) => {
       if (typeof value !== "object" || value === null) return true;
       let keys = Object.keys(value);
       return keys.length > 1 || !keys.includes("types");
     })
     .map(([key, _value]) => key);
+}
+
+
+/**
+ * Returns all the mentioned path inside the provided Exports.
+ * @param ignoreEntries - fields to ignore while searching the exports field eg.: "require", "import" or "."  (default = ["types"]). 
+ * @returns string[] including all the path found inside the exports field.
+ * @public
+ */
+export function getAllExportsPaths(exports: JSONSchemaForNPMPackageJsonFiles["exports"], ignoreFilter: string[] = ["types"]): string[] {
+  if (typeof exports === "object" && exports !== null) {
+    if (Array.isArray(exports)) {
+      return exports.map((v) => getAllExportsPaths(v, ignoreFilter)).flat();
+    }
+    let ret: string[] = [];
+    for (const [key, value] of Object.entries(exports)) {
+      if (ignoreFilter.includes(key)) continue;
+      const values = getAllExportsPaths(value);
+      ret.push(...values);
+    }
+    return ret;
+  } else if (typeof exports === "string") {
+    return [exports];
+  } else {
+    return [];
+  }
+}
+
+/**
+ * Reads the exports field of the package.json and returns all the mentioned path inside there.
+ * @param path - path to the package.json file (default = projects package.json file).
+ * @param cache - wether to use a previously cached result (default = true).
+ * @param ignoreEntries - fields to ignore while searching the exports field eg.: "require", "import" or "."  (default = ["types"]). 
+ * @returns string[] including all the path found inside the exports field.
+ * @public
+ */
+export async function getAllPackageExportsPaths(path: string = "package.json", cache: boolean = true, ignoreEntries: string[] = ["types"]) {
+  const exports = await getPackageExports(path, cache);
+  return getAllExportsPaths(exports, ignoreEntries);
 }
 
 /**
