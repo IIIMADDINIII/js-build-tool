@@ -1,4 +1,4 @@
-import { MakerZip } from "@electron-forge/maker-zip";
+import { MakerZIP } from "@electron-forge/maker-zip";
 import type { ForgeConfig, ForgeConfigMaker, ForgePackagerOptions, IForgeMaker } from "@electron-forge/shared-types";
 import * as path from "path";
 import { getAllPackageExportsPaths, getPackageMain } from "../../tools/package.js";
@@ -128,7 +128,7 @@ function addPluginMarker<T extends {}>(instance: T): T {
 async function createMakersConfig(options: CreateSetupsOptions): Promise<ForgeConfigMaker[]> {
   const ret: IForgeMaker[] = [];
   if (options.makeZips) {
-    ret.push(addPluginMarker(new MakerZip()));
+    ret.push(addPluginMarker(new MakerZIP()));
   }
   return ret;
 }
