@@ -6,7 +6,7 @@ import { setDisplayName } from "./tools/misc.js";
 
 import * as electron from "./electron/tasks.js";
 import * as rollup from "./rollup/tasks.js";
-import type { CountVersionOption } from "./tools.js";
+import type { CountVersionOption, CreateCommitOptions } from "./tools.js";
 export { electron, rollup };
 
 /**
@@ -202,5 +202,18 @@ export function publishPackage(): TaskFunction {
 export function updatePackages(): TaskFunction {
   return setDisplayName("updatePackages", async function updatePackages() {
     await tools.updatePackages();
+  });
+}
+
+/**
+ * Creates a commit using git commit command.
+ * Can directly be used as an Rollup Task.
+ * @param options - how to create the commit.
+ * @returns A Gulp Task.
+ * @public
+ */
+export function createCommit(options: CreateCommitOptions): TaskFunction {
+  return setDisplayName("createCommit", async function createCommit() {
+    await tools.createCommit(options);
   });
 }

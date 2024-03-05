@@ -5,7 +5,7 @@ import { getAllPackageExportsPaths, getPackageMain } from "../../tools/package.j
 import { projectPath } from "../../tools/paths.js";
 import { getPnpmPackages } from "../../tools/pnpm.js";
 import { getDefault } from "../../util.js";
-import { runForgeMake } from "../tools/forge.js";
+import { runForgeMake, runForgePackage } from "../tools/forge.js";
 
 /**
  * Architectures which are supported.
@@ -173,10 +173,19 @@ export async function createSetups(options?: CreateSetupsOptions): Promise<void>
   for (const target of optionsNorm.targets) {
     const [platform, arch] = getPlatformArch(target);
     const forgeConfig = await createForgeConfig(optionsNorm, platform, arch);
-    await runForgeMake({
-      arch,
-      platform,
-      dir: optionsNorm.dir,
-    }, forgeConfig);
+    // if there are no makers then only package
+    if (forgeConfig.makers === undefined || forgeConfig.makers.length === 0) {
+      await runForgePackage({
+        arch,
+        platform,
+        dir: optionsNorm.dir,
+      }, forgeConfig);
+    } else {
+      await runForgeMake({
+        arch,
+        platform,
+        dir: optionsNorm.dir,
+      }, forgeConfig);
+    }
   }
 }
