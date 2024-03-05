@@ -34,6 +34,13 @@ function registerForgeConfigForDirectory(dir: string = process.cwd(), config: Fo
   module._pathCache[resolved + "\x00"] = resolved;
 }
 
+function makeInteractiveDefault<T extends { interactive?: boolean; }>(options: T): T {
+  return {
+    interactive: true,
+    ...options,
+  };
+}
+
 /**
  * Package the electron app using electron forge.
  * @param options - [Options](https://js.electronforge.io/interfaces/_electron_forge_core.PackageOptions.html) for the package Command (default = {}).
@@ -41,6 +48,7 @@ function registerForgeConfigForDirectory(dir: string = process.cwd(), config: Fo
  * @public
  */
 export async function runForgePackage(options: PackageOptions = {}, config?: ForgeConfig): Promise<void> {
+  options = makeInteractiveDefault(options);
   registerForgeConfigForDirectory(options.dir, config);
   await api.package(options);
   registerForgeConfigForDirectory(options.dir, null);
@@ -53,6 +61,7 @@ export async function runForgePackage(options: PackageOptions = {}, config?: For
  * @public
  */
 export async function runForgeMake(options: MakeOptions = {}, config?: ForgeConfig): Promise<void> {
+  options = makeInteractiveDefault(options);
   registerForgeConfigForDirectory(options.dir, config);
   await api.make(options);
   registerForgeConfigForDirectory(options.dir, null);
@@ -65,6 +74,7 @@ export async function runForgeMake(options: MakeOptions = {}, config?: ForgeConf
  * @public
  */
 export async function runForgePublish(options: PublishOptions = {}, config?: ForgeConfig): Promise<void> {
+  options = makeInteractiveDefault(options);
   registerForgeConfigForDirectory(options.dir, config);
   await api.publish(options);
   registerForgeConfigForDirectory(options.dir, null);
@@ -77,7 +87,9 @@ export async function runForgePublish(options: PublishOptions = {}, config?: For
  * @public
  */
 export async function runForgeStart(options: StartOptions = {}, config?: ForgeConfig): Promise<void> {
-  registerForgeConfigForDirectory(options.dir, config);
+  options = makeInteractiveDefault(options);
+  if (options.interactive)
+    registerForgeConfigForDirectory(options.dir, config);
   await api.start(options);
   registerForgeConfigForDirectory(options.dir, null);
 }

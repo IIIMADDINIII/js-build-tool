@@ -19,6 +19,12 @@ export type CreateSetupsOptionsArch = "x64" | "arm64";
 export type CreateSetupsOptionsPlatform = "win32" | "linux" | "darwin";
 
 /**
+ * List of supported Targets for building.
+ * @public
+ */
+export type CreateSetupsOptionsTarget = `${CreateSetupsOptionsPlatform}-${CreateSetupsOptionsArch}`;
+
+/**
  * Options on how to create the Setups.
  * @public
  */
@@ -42,15 +48,10 @@ export interface CreateSetupsOptions {
   */
   makeZips: boolean;
   /**
-  * Architectures wich should be build.
-  * @default true
+  * list of platform-architecture combinations to build.
+  * @default ["win32-x64","win32-arm64","linux-x64","linux-arm64","darwin-x64","darwin-arm64"]
   */
-  arch: CreateSetupsOptionsArch[];
-  /**
-  * Platforms wich should be build.
-  * @default true
-  */
-  platform: CreateSetupsOptionsPlatform[];
+  targets: CreateSetupsOptionsTarget[];
   /**
   * The directory where the electron app is.
   * @default process.cwd()
@@ -125,18 +126,22 @@ function addPluginMarker<T extends {}>(instance: T): T {
   return instance;
 }
 
-async function createMakersConfig(options: CreateSetupsOptions): Promise<ForgeConfigMaker[]> {
+async function createMakersConfig(options: CreateSetupsOptions, platform: CreateSetupsOptionsPlatform, _arch: CreateSetupsOptionsArch): Promise<ForgeConfigMaker[]> {
   const ret: IForgeMaker[] = [];
   if (options.makeZips) {
-    ret.push(addPluginMarker(new MakerZIP()));
+    if (process.platform === "win32" && platform === "darwin") {
+      console.warn("Building Darwin zips on windows is not supported => Skipped");
+    } else {
+      ret.push(addPluginMarker(new MakerZIP()));
+    }
   }
   return ret;
 }
 
-async function createForgeConfig(options: CreateSetupOptionsNorm): Promise<ForgeConfig> {
+async function createForgeConfig(options: CreateSetupOptionsNorm, platform: CreateSetupsOptionsPlatform, arch: CreateSetupsOptionsArch): Promise<ForgeConfig> {
   return {
     packagerConfig: await createPackagerConfig(options),
-    makers: await createMakersConfig(options),
+    makers: await createMakersConfig(options, platform, arch),
   };
 }
 
@@ -149,10 +154,13 @@ function normalizeCreateSetupOptions(options?: CreateSetupsOptions): CreateSetup
     additionalFilesToPackage: getDefault(options?.additionalFilesToPackage, []),
     ignorePackages: getDefault(options?.ignorePackages, ["common"]),
     makeZips: getDefault(options?.makeZips, true),
-    arch: deduplicateStringArray(getDefault(options?.arch, ["x64", "arm64"])),
-    platform: deduplicateStringArray(getDefault(options?.platform, ["win32", "linux", "darwin"])),
+    targets: deduplicateStringArray(getDefault(options?.targets, ["win32-x64", "win32-arm64", "linux-x64", "linux-arm64", "darwin-x64", "darwin-arm64"])),
     dir: getDefault(options?.dir, projectPath),
   };
+}
+
+function getPlatformArch(target: CreateSetupsOptionsTarget): [CreateSetupsOptionsPlatform, CreateSetupsOptionsArch] {
+  return target.split("-") as [CreateSetupsOptionsPlatform, CreateSetupsOptionsArch];
 }
 
 /**
@@ -162,15 +170,13 @@ function normalizeCreateSetupOptions(options?: CreateSetupsOptions): CreateSetup
  */
 export async function createSetups(options?: CreateSetupsOptions): Promise<void> {
   const optionsNorm = normalizeCreateSetupOptions(options);
-  const forgeConfig = await createForgeConfig(optionsNorm);
-  for (const arch of optionsNorm.arch) {
-    for (const platform of optionsNorm.platform) {
-      await runForgeMake({
-        arch,
-        platform,
-        dir: optionsNorm.dir,
-      }, forgeConfig);
-    }
+  for (const target of optionsNorm.targets) {
+    const [platform, arch] = getPlatformArch(target);
+    const forgeConfig = await createForgeConfig(optionsNorm, platform, arch);
+    await runForgeMake({
+      arch,
+      platform,
+      dir: optionsNorm.dir,
+    }, forgeConfig);
   }
-
 }
