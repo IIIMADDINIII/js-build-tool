@@ -130,8 +130,8 @@ async function createPackagerConfig(options: CreateSetupOptionsNorm): Promise<Fo
 }
 
 
-function addPluginMarker<T extends { __isElectronForgePlugin?: boolean; }>(instance: T): T {
-  if (instance.__isElectronForgePlugin === true) return instance;
+function addPluginMarker<T extends {}>(instance: T): T {
+  if ("__isElectronForgePlugin" in instance && instance.__isElectronForgePlugin === true) return instance;
   (<any>instance).__isElectronForgePlugin = true;
   return instance;
 }
