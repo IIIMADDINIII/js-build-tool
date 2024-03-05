@@ -1,5 +1,5 @@
 import { api, type MakeOptions, type PackageOptions, type PublishOptions, type StartOptions } from "@electron-forge/core";
-import type { ForgeConfig } from "@electron-forge/shared-types";
+import type { ElectronProcess, ForgeConfig } from "@electron-forge/shared-types";
 import fs from "fs-extra";
 import * as module from "module";
 import * as path from "path";
@@ -90,6 +90,30 @@ export async function runForgeStart(options: StartOptions = {}, config?: ForgeCo
   options = makeInteractiveDefault(options);
   if (options.interactive)
     registerForgeConfigForDirectory(options.dir, config);
-  await api.start(options);
+  const spawned = await api.start(options);
+  // Wait until electron process exits
+  await new Promise<void>((resolve, reject) => {
+    function listenForExit(child: ElectronProcess) {
+      function removeListeners() {
+        child.removeListener('exit', onExit);
+        child.removeListener('restarted', onRestart);
+      };
+      function onExit(code: number) {
+        removeListeners();
+        if (spawned.restarted) return;
+        if (code !== 0) {
+          return reject(new Error("electron exited with exitCode " + code));
+        }
+        resolve();
+      };
+      function onRestart(newChild: ElectronProcess) {
+        removeListeners();
+        listenForExit(newChild);
+      };
+      child.on('exit', onExit);
+      child.on('restarted', onRestart);
+    };
+    listenForExit(spawned);
+  });
   registerForgeConfigForDirectory(options.dir, null);
 }
