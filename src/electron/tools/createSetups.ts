@@ -24,7 +24,7 @@ export type CreateSetupsOptionsPlatform = "win32" | "linux" | "darwin";
  * List of supported Targets for building.
  * @public
  */
-export type CreateSetupsOptionsTarget = `${CreateSetupsOptionsPlatform}-${CreateSetupsOptionsArch}`;
+export type CreateSetupsOptionsTarget = Exclude<`${CreateSetupsOptionsPlatform}-${CreateSetupsOptionsArch}`, "darwin-arm64">;
 
 /**
  * Options on how to create the Setups.
@@ -51,7 +51,7 @@ export interface CreateSetupsOptions {
   makeZips: boolean;
   /**
   * list of platform-architecture combinations to build.
-  * @default ["win32-x64","win32-arm64","linux-x64","linux-arm64","darwin-x64","darwin-arm64"]
+  * @default ["win32-x64","win32-arm64","linux-x64","linux-arm64","darwin-x64"]
   */
   targets: CreateSetupsOptionsTarget[];
   /**
@@ -183,7 +183,7 @@ function normalizeCreateSetupOptions(options?: CreateSetupsOptions): CreateSetup
     additionalFilesToPackage: getDefault(options?.additionalFilesToPackage, []),
     ignorePackages: getDefault(options?.ignorePackages, ["common"]),
     makeZips: getDefault(options?.makeZips, true),
-    targets: deduplicateStringArray(getDefault(options?.targets, ["win32-x64", "win32-arm64", "linux-x64", "linux-arm64", "darwin-x64", "darwin-arm64"])),
+    targets: deduplicateStringArray(getDefault(options?.targets, ["win32-x64", "win32-arm64", "linux-x64", "linux-arm64", "darwin-x64"])),
     dir: getDefault(options?.dir, projectPath),
     fuseRunAsNode: getDefault(options?.fuseRunAsNode, false),
   };
