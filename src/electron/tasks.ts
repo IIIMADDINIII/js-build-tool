@@ -88,3 +88,17 @@ export function prepareWixTools(releaseTag?: string): TaskFunction {
     await tools.prepareWixTools(releaseTag);
   });
 }
+
+/**
+ * Generates a forge config and then runs electron forge start command.
+ * Can be directly used as an Gulp Task.
+ * @param startOptions - options on how to start electron.
+ * @param configOptions - options on how to create the forge config.
+ * @returns A Gulp Task
+ * @public
+ */
+export function start(startOptions?: StartOptions, configOptions?: CreateSetupsOptions): TaskFunction {
+  return setDisplayName("start", async function start() {
+    await tools.start(startOptions, configOptions);
+  });
+}

@@ -1,13 +1,13 @@
 import { MakerZIP } from "@electron-forge/maker-zip";
 import { FusesPlugin } from "@electron-forge/plugin-fuses";
-import type { ForgeConfig, ForgeConfigMaker, ForgeConfigPlugin, ForgePackagerOptions, IForgeMaker } from "@electron-forge/shared-types";
+import type { ForgeConfig, ForgeConfigMaker, ForgeConfigPlugin, ForgePackagerOptions, IForgeMaker, StartOptions } from "@electron-forge/shared-types";
 import { FuseV1Options, FuseVersion } from "@electron/fuses";
 import * as path from "path";
 import { getAllPackageExportsPaths, getPackageMain } from "../../tools/package.js";
 import { projectPath } from "../../tools/paths.js";
 import { getPnpmPackages } from "../../tools/pnpm.js";
 import { getDefault } from "../../util.js";
-import { runForgeMake, runForgePackage } from "../tools/forge.js";
+import { runForgeMake, runForgePackage, runForgeStart } from "../tools/forge.js";
 
 /**
  * Architectures which are supported.
@@ -166,7 +166,26 @@ async function createPluginsConfig(options: CreateSetupsOptions): Promise<ForgeC
   return [await createFusePlugin(options)];
 }
 
-async function createForgeConfig(options: CreateSetupOptionsNorm, platform: CreateSetupsOptionsPlatform, arch: CreateSetupsOptionsArch): Promise<ForgeConfig> {
+
+function getRunningTarget(): CreateSetupsOptionsTarget {
+  const platform = process.platform;
+  if (platform !== "win32" && platform !== "linux" && platform !== "darwin") throw new Error("running on unsupported platform: " + platform);
+  const arch = process.arch;
+  if (arch !== "x64" && arch !== "arm64") throw new Error("running on unsupported architecture: " + arch);
+  const target = `${platform}-${arch}` as const;
+  if (target === "darwin-arm64") throw new Error("arm64 on darwin is not supported");
+  return target;
+}
+
+/**
+ * Generates an forge config to use with the runForge commands.
+ * @param options - options on how to create the config.
+ * @param platform - target platform of the config (default = process.platform).
+ * @returns the generated forge config as a js object
+ * @public
+ */
+export async function createForgeConfig(options: CreateSetupOptionsNorm, target: CreateSetupsOptionsTarget = getRunningTarget()): Promise<ForgeConfig> {
+  const [platform, arch] = getPlatformArch(target);
   return {
     packagerConfig: await createPackagerConfig(options),
     makers: await createMakersConfig(options, platform, arch),
@@ -202,7 +221,7 @@ export async function createSetups(options?: CreateSetupsOptions): Promise<void>
   const optionsNorm = normalizeCreateSetupOptions(options);
   for (const target of optionsNorm.targets) {
     const [platform, arch] = getPlatformArch(target);
-    const forgeConfig = await createForgeConfig(optionsNorm, platform, arch);
+    const forgeConfig = await createForgeConfig(optionsNorm, target);
     // if there are no makers then only package
     if (forgeConfig.makers === undefined || forgeConfig.makers.length === 0) {
       await runForgePackage({
@@ -218,4 +237,15 @@ export async function createSetups(options?: CreateSetupsOptions): Promise<void>
       }, forgeConfig);
     }
   }
+}
+
+/**
+ * Generates a forge config and then runs electron forge start command.
+ * @param startOptions - options on how to start electron.
+ * @param configOptions - options on how to create the forge config.
+ * @public
+ */
+export async function start(startOptions?: StartOptions, configOptions?: CreateSetupsOptions) {
+  const optionsNorm = normalizeCreateSetupOptions(configOptions);
+  await runForgeStart({ dir: optionsNorm.dir, ...startOptions }, await createForgeConfig(optionsNorm));
 }
