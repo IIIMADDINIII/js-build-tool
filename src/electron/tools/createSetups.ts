@@ -1,5 +1,7 @@
 import { MakerZIP } from "@electron-forge/maker-zip";
-import type { ForgeConfig, ForgeConfigMaker, ForgePackagerOptions, IForgeMaker } from "@electron-forge/shared-types";
+import { FusesPlugin } from "@electron-forge/plugin-fuses";
+import type { ForgeConfig, ForgeConfigMaker, ForgeConfigPlugin, ForgePackagerOptions, IForgeMaker } from "@electron-forge/shared-types";
+import { FuseV1Options, FuseVersion } from "@electron/fuses";
 import * as path from "path";
 import { getAllPackageExportsPaths, getPackageMain } from "../../tools/package.js";
 import { projectPath } from "../../tools/paths.js";
@@ -57,6 +59,13 @@ export interface CreateSetupsOptions {
   * @default process.cwd()
   */
   dir: string;
+  /**
+   * Enable electron to run as node via the ELECTRON_RUN_AS_NODE env variable.
+   * This feature is needed for process.fork to work.
+   * Before setting this to true try to use the electron Utility Processes.
+   * @default false
+   */
+  fuseRunAsNode: boolean;
 }
 
 type CreateSetupOptionsNorm = Required<CreateSetupsOptions>;
@@ -138,10 +147,29 @@ async function createMakersConfig(options: CreateSetupsOptions, platform: Create
   return ret;
 }
 
+async function createFusePlugin(options: CreateSetupsOptions): Promise<ForgeConfigPlugin> {
+  return addPluginMarker(new FusesPlugin({
+    version: FuseVersion.V1,
+    [FuseV1Options.RunAsNode]: options.fuseRunAsNode,
+    [FuseV1Options.EnableCookieEncryption]: true,
+    [FuseV1Options.EnableNodeOptionsEnvironmentVariable]: false,
+    [FuseV1Options.EnableNodeCliInspectArguments]: false,
+    [FuseV1Options.EnableEmbeddedAsarIntegrityValidation]: false,
+    [FuseV1Options.OnlyLoadAppFromAsar]: true,
+    [FuseV1Options.LoadBrowserProcessSpecificV8Snapshot]: false,
+    [FuseV1Options.GrantFileProtocolExtraPrivileges]: false,
+  }));
+}
+
+async function createPluginsConfig(options: CreateSetupsOptions): Promise<ForgeConfigPlugin[]> {
+  return [await createFusePlugin(options)];
+}
+
 async function createForgeConfig(options: CreateSetupOptionsNorm, platform: CreateSetupsOptionsPlatform, arch: CreateSetupsOptionsArch): Promise<ForgeConfig> {
   return {
     packagerConfig: await createPackagerConfig(options),
     makers: await createMakersConfig(options, platform, arch),
+    plugins: await createPluginsConfig(options),
   };
 }
 
@@ -156,6 +184,7 @@ function normalizeCreateSetupOptions(options?: CreateSetupsOptions): CreateSetup
     makeZips: getDefault(options?.makeZips, true),
     targets: deduplicateStringArray(getDefault(options?.targets, ["win32-x64", "win32-arm64", "linux-x64", "linux-arm64", "darwin-x64", "darwin-arm64"])),
     dir: getDefault(options?.dir, projectPath),
+    fuseRunAsNode: getDefault(options?.fuseRunAsNode, false),
   };
 }
 

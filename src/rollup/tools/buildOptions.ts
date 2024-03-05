@@ -238,6 +238,11 @@ export interface DefaultExportOpts {
    */
   tsOutDir: string;
   /**
+   * If true incremental typescript option is set true and the tsBuildInfoFile is specified.
+   * @default false
+   */
+  incremental: boolean;
+  /**
    * Tsbuildinfo filename for this entrypoint.
    * needs to be different for each entrypoint else incremental builds don't work.
    * By default it is generated based on inputFileName.
@@ -570,6 +575,7 @@ async function getDefaultExportOpts(defaultConfigOpts: DefaultConfigOpts, config
     tsconfig: getDefault(exportOpts.tsconfig, "./tsconfig.json"),
     tsOutDir: getDefault(exportOpts.tsOutDir, isTest ? "./tests/" : "./dist/"),
     tsBuildInfoFileName: getDefault(exportOpts.tsBuildInfoFileName, inputFileName.replaceAll(/[\/\\]/g, "+") + ".tsbuildinfo"),
+    incremental: getDefault(exportOpts.incremental, false),
     sourceMapsPlugin: getDefault(exportOpts.sourceMapsPlugin, {}),
     nodeResolvePlugin: getDefault(exportOpts.nodeResolvePlugin, getNodeResolveDefaultOptions(environment)),
     manageDependenciesPlugin: {},
@@ -713,9 +719,12 @@ function getTypescriptDefaultOptions(defaultExportOpts: DefaultExportOpts): Roll
     declarationMap: defaultExportOpts.generateDeclaration,
     lib,
     tsconfig: defaultExportOpts.tsconfig,
-    tsBuildInfoFile: defaultExportOpts.tsBuildInfoFileName,
     outDir: defaultExportOpts.tsOutDir,
+    incremental: defaultExportOpts.incremental,
   };
+  if (defaultExportOpts.incremental) {
+    rollupTypescriptOptions.tsBuildInfoFile = defaultExportOpts.tsBuildInfoFileName;
+  }
   if (defaultExportOpts.generateDeclaration) {
     rollupTypescriptOptions.declarationDir = defaultExportOpts.declarationDir;
   }

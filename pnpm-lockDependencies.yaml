@@ -14,6 +14,12 @@ dependencies:
   '@electron-forge/maker-zip':
     specifier: ^7.3.0
     version: 7.3.0
+  '@electron-forge/plugin-fuses':
+    specifier: ^7.3.0
+    version: 7.3.0(@electron/fuses@1.7.0)
+  '@electron/fuses':
+    specifier: ^1.7.0
+    version: 1.7.0
   '@microsoft/api-extractor':
     specifier: ^7.41.0
     version: 7.41.0
@@ -195,6 +201,21 @@ packages:
       - supports-color
     dev: false
 
+  /@electron-forge/plugin-fuses@7.3.0(@electron/fuses@1.7.0):
+    resolution: {integrity: sha512-+p23S+NQwia+uX1D6Hx01R2b0Ck2bNVDgS1JL8lyU8cz3OXAA3J52Ck94wMslwmj2TfdV0ErsMxI/QOQlPffiw==}
+    engines: {node: '>= 16.4.0'}
+    peerDependencies:
+      '@electron/fuses': '>=1.0.0'
+    dependencies:
+      '@electron-forge/plugin-base': 7.3.0
+      '@electron-forge/shared-types': 7.3.0
+      '@electron/fuses': 1.7.0
+    transitivePeerDependencies:
+      - bluebird
+      - enquirer
+      - supports-color
+    dev: false
+
   /@electron-forge/publisher-base@7.3.0:
     resolution: {integrity: sha512-iO8QuM0zTLcEA0/7adEUOzMrhu/h6Qk9UiWNUllBctZXZ+FO0CbAY7eGzOgjOKqH5akbEKHwCSRnjrFt91QpQg==}
     engines: {node: '>= 16.4.0'}
@@ -302,6 +323,15 @@ packages:
       commander: 5.1.0
       glob: 7.2.3
       minimatch: 3.1.2
+    dev: false
+
+  /@electron/fuses@1.7.0:
+    resolution: {integrity: sha512-mfhLoZGQdqrSU/SeOFBs6r+D7g1tYiVs2C/hh7t3NFQ0chcXGoWrrad17rCQL1ImNJuCXs4cu23YBj5CAnj5SA==}
+    hasBin: true
+    dependencies:
+      chalk: 4.1.2
+      fs-extra: 9.1.0
+      minimist: 1.2.8
     dev: false
 
   /@electron/get@3.0.0:

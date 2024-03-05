@@ -53,7 +53,9 @@ const bundle = rollup.tasks.build({
     "rollup-plugin-include-sourcemaps",
     "@rollup/pluginutils",
     "terser",
-    "@microsoft/api-extractor-model"],
+    "@microsoft/api-extractor-model",
+    "@electron-forge/core",
+    "@electron-forge/shared-types"],
 }, { failAfterWarnings: false });
 
 export const clean = tools.exitAfter(tasks.cleanWithGit());
