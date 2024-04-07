@@ -1,4 +1,4 @@
-import { exec } from "./exec.js";
+import { execNode } from "./exec.js";
 
 /**
  * Run the testfiles with jest.
@@ -7,7 +7,7 @@ import { exec } from "./exec.js";
  */
 export async function runTestFiles(testFiles: string[]) {
   const files = testFiles.map((testFile) => testFile.replaceAll("\\", "/"));
-  await exec({ env: { NODE_OPTIONS: "--experimental-vm-modules" } })`jest ${files}`;
+  await execNode("jest", files, { nodeOptions: ["--experimental-vm-modules", "--expose-gc"] });
 }
 
 /**
@@ -15,5 +15,5 @@ export async function runTestFiles(testFiles: string[]) {
  * @public
  */
 export async function runTests() {
-  await exec({ env: { NODE_OPTIONS: "--experimental-vm-modules" } })`jest`;
+  await execNode("jest", [], { nodeOptions: ["--experimental-vm-modules", "--expose-gc"] });
 }

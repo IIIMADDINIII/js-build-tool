@@ -1,4 +1,4 @@
-import { $ } from "execa";
+import { $, execaNode } from "execa";
 
 /**
  * Utility for executing Processes.
@@ -14,3 +14,13 @@ import { $ } from "execa";
  * @public
  */
 export const exec: typeof $ = $({ verbose: true, stdio: "inherit", cleanup: true });
+
+/**
+ * Utility for executing nodejs scripts.
+ * @public
+ */
+export const execNode: typeof execaNode = ((scriptPath, args, options) => {
+  const opts = options || args;
+  const arg = opts === args ? [] : args;
+  return execaNode(scriptPath, arg, { verbose: true, stdio: "inherit", cleanup: true });
+}) as typeof execaNode;
