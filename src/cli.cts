@@ -27,11 +27,11 @@ main().then(process.exit).catch((e) => {
 function getAppDataDir(): string | undefined {
   switch (process.platform) {
     case "darwin":
-      return process.env["APPDATA"] ? path.join(process.env["APPDATA"], "..", "Local") : undefined;
-    case "linux":
       return process.env["HOME"] ? path.join(process.env["HOME"], "Library", "Application Support") : undefined;
-    case "win32":
+    case "linux":
       return process.env["HOME"] ? path.join(process.env["HOME"], ".local", "share") : undefined;
+    case "win32":
+      return process.env["APPDATA"] ? path.join(process.env["APPDATA"], "..", "Local") : undefined;
     case "cygwin":
     case "netbsd":
     case "aix":
