@@ -19,8 +19,8 @@ export const exec: typeof $ = $({ verbose: true, stdio: "inherit", cleanup: true
  * Utility for executing nodejs scripts.
  * @public
  */
-export const execNode: typeof execaNode = ((scriptPath, args, options) => {
+export const execNode: typeof execaNode = ((scriptPath: string, args: string[], options: {}) => {
   const opts = options || args;
   const arg = opts === args ? [] : args;
-  return execaNode(scriptPath, arg, { verbose: true, stdio: "inherit", cleanup: true });
-}) as typeof execaNode;
+  return execaNode(scriptPath, arg, { verbose: true, stdio: "inherit", cleanup: true, ...opts });
+}) as unknown as typeof execaNode;
