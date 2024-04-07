@@ -24,9 +24,36 @@ main().then(process.exit).catch((e) => {
   process.exit(-1);
 });
 
+function getAppDataDir(): string | undefined {
+  switch (process.platform) {
+    case "darwin":
+      return process.env["APPDATA"] ? path.join(process.env["APPDATA"], "..", "Local") : undefined;
+    case "linux":
+      return process.env["HOME"] ? path.join(process.env["HOME"], "Library", "Application Support") : undefined;
+    case "win32":
+      return process.env["HOME"] ? path.join(process.env["HOME"], ".local", "share") : undefined;
+    case "cygwin":
+    case "netbsd":
+    case "aix":
+    case "android":
+    case "freebsd":
+    case "haiku":
+    case "openbsd":
+    case "sunos":
+      throw new Error(`${process.platform} is not supported.`);
+  }
+}
+
 async function ensureDependencies(): Promise<string> {
   const version = await getPackageVersion(path.resolve(jsBuildToolPath, "package.json")) || "0.0.0";
-  const dependenciesDir = path.resolve(os.tmpdir(), "js-build-tool@" + version);
+  let appDataFolder = getAppDataDir();
+  let isTemp = false;
+  if (appDataFolder === undefined) {
+    isTemp = true;
+    appDataFolder = os.tmpdir();
+  }
+  let dependenciesDir = path.resolve(appDataFolder, "js-build-tool", version);
+  if (isTemp) dependenciesDir = path.resolve(dependenciesDir, (Math.random() * 999999999).toFixed(0));
   const doneFile = path.resolve(dependenciesDir, "done");
   const busyFile = path.resolve(dependenciesDir, "busy");
   await fs.mkdir(dependenciesDir, { recursive: true });
