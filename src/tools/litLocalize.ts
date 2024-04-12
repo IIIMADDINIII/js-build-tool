@@ -1,10 +1,5 @@
-
-import { RuntimeLitLocalizer } from "@lit/localize-tools/lib/modes/runtime.js";
-import type { Config } from "@lit/localize-tools/lib/types/config.js";
-import type { Locale } from "@lit/localize-tools/lib/types/locale.js";
-import type { RuntimeOutputConfig } from "@lit/localize-tools/lib/types/modes.js";
 import { resolve } from "path";
-import { projectPath } from "./paths.js";
+import { buildToolDependenciesPath, projectPath } from "./paths.js";
 
 /**
  * Options for @lit/localize-tools.
@@ -124,19 +119,17 @@ export interface OutputConfig {
   outputDir?: string;
 }
 
-type ResolvedLitConfig = Config & { output: RuntimeOutputConfig; };
-
 /**
  * Resolves a Config to a valid LitLocalizeConfig.
  * @param config - the Config to Resolve.
  * @returns the resolved Config.
  */
-function resolveLitLocalizeConfig(config?: LitConfig): ResolvedLitConfig {
+function resolveLitLocalizeConfig(config?: LitConfig): unknown {
   return {
     baseDir: projectPath,
     resolve: (path: string) => resolve(projectPath, path),
-    sourceLocale: (config?.sourceLocale || "en") as Locale,
-    targetLocales: (config?.targetLocales || ["en"]) as Locale[],
+    sourceLocale: (config?.sourceLocale || "en"),
+    targetLocales: (config?.targetLocales || ["en"]),
     inputFiles: config?.inputFiles || [".\/**\/src\/**\/*"],
     interchange: config?.interchange?.format === "xlb" ? {
       outputFile: "./translations",
@@ -163,6 +156,14 @@ function resolveLitLocalizeConfig(config?: LitConfig): ResolvedLitConfig {
  * @param config - The config for @lit/localize-tools.
  */
 export async function litLocalizeExtract(config?: LitConfig): Promise<void> {
+  if (buildToolDependenciesPath === undefined) throw new Error("Build Tool dependencies not found.");
+  let RuntimeLitLocalizer: (new (config: unknown) => { extractSourceMessages(): { messages: unknown[], errors: unknown[]; }; writeInterchangeFiles(): Promise<void>; }) | undefined = undefined;
+  try {
+    RuntimeLitLocalizer = (await import(resolve(buildToolDependenciesPath, "node_modules", "@lit", "localize-tools", "lib", "modes", "runtime.js")))?.RuntimeLitLocalizer;
+  } catch {
+    throw new Error("Build Tool dependencies not found.");
+  }
+  if (RuntimeLitLocalizer === undefined) throw new Error("Build Tool dependencies not found.");
   const localizer = new RuntimeLitLocalizer(resolveLitLocalizeConfig(config));
   const { messages, errors } = localizer.extractSourceMessages();
   console.log('Extracting messages');
@@ -181,6 +182,14 @@ export async function litLocalizeExtract(config?: LitConfig): Promise<void> {
  * @param config - The config for @lit/localize-tools.
  */
 export async function litLocalizeBuild(config?: LitConfig): Promise<void> {
+  if (buildToolDependenciesPath === undefined) throw new Error("Build Tool dependencies not found.");
+  let RuntimeLitLocalizer: (new (config: unknown) => { validateTranslations(): { errors: unknown[]; }; build(): Promise<void>; }) | undefined = undefined;
+  try {
+    RuntimeLitLocalizer = (await import(resolve(buildToolDependenciesPath, "node_modules", "@lit", "localize-tools", "lib", "modes", "runtime.js")))?.RuntimeLitLocalizer;
+  } catch {
+    throw new Error("Build Tool dependencies not found.");
+  }
+  if (RuntimeLitLocalizer === undefined) throw new Error("Build Tool dependencies not found.");
   const localizer = new RuntimeLitLocalizer(resolveLitLocalizeConfig(config));
   console.log('Building');
   const { errors } = localizer.validateTranslations();

@@ -10,13 +10,12 @@ import { stubPackages, type StubPackageOptions } from "./tools/stubPackage.js";
 const stubSubPath: { [key: string]: string[]; } = {
   "rollup": ["dist/shared/loadConfigFile.js", "dist/shared/parseAst.js", "dist/shared/rollup.js"],
   "tslib": ["tslib.es6.js"],
-  "@lit/localize-tools": ["lib/modes/runtime.js",],
 };
 
 async function main(): Promise<never> {
   const dependenciesDir = await ensureDependencies();
   await stubDependencies(dependenciesDir);
-  await runGulp();
+  await runGulp(dependenciesDir);
   process.exit(-1);
 }
 
@@ -123,12 +122,12 @@ async function stubDependencies(dependenciesDir: string) {
   await stubPackages(stubOptions, path.resolve(dependenciesDir, "node_modules"));
 }
 
-async function runGulp(): Promise<never> {
+async function runGulp(dependenciesDir: string): Promise<never> {
   let src = path.resolve(cwd, gulpFileName);
   await fs.copyFile(src, gulpFilePath);
   const args = process.argv.slice(2);
   try {
-    const result = await exec({ reject: false })`gulp -f ${gulpFilePath} --cwd ${cwd} ${args}`;
+    const result = await exec({ reject: false, env: { "DEPENDENCIES_DIR": dependenciesDir } })`gulp -f ${gulpFilePath} --cwd ${cwd} ${args}`;
     process.exit(result.exitCode);
   } catch (e) {
     if ((typeof e !== "object") || (e === null) || !("exitCode" in e) || (typeof e.exitCode !== "number")) process.exit(-1);

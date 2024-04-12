@@ -62,6 +62,12 @@ export const cwd = process.cwd();
 export const projectPath = cwd;
 
 /**
+ * Location of the build tool dependencies.
+ * Path ends just before the node_modules folder.
+ */
+export const buildToolDependenciesPath = process.env["DEPENDENCIES_DIR"];
+
+/**
  * node_modules folder inside the project.
  * @public
  */
