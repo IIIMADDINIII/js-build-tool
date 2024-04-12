@@ -6,7 +6,7 @@ import { setDisplayName } from "./tools/misc.js";
 
 import * as electron from "./electron/tasks.js";
 import * as rollup from "./rollup/tasks.js";
-import type { CountVersionOption, CreateCommitOptions } from "./tools.js";
+import type { CountVersionOption, CreateCommitOptions, LitConfig } from "./tools.js";
 export { electron, rollup };
 
 /**
@@ -215,5 +215,31 @@ export function updatePackages(): TaskFunction {
 export function createCommit(options: CreateCommitOptions): TaskFunction {
   return setDisplayName("createCommit", async function createCommit() {
     await tools.createCommit(options);
+  });
+}
+
+/**
+ * Extract the Translation Messages using @lit/localize-tools extract command.
+ * Only Runtime Mode is Supported.
+ * Can directly be used as an Rollup Task.
+ * @param config - The config for @lit/localize-tools.
+ * @public
+ */
+export function litLocalizeExtract(config?: LitConfig): TaskFunction {
+  return setDisplayName("createCommit", async function createCommit() {
+    await tools.litLocalizeExtract(config);
+  });
+}
+
+/**
+ * Generate the Translation files using @lit/localize-tools build command.
+ * Only Runtime Mode is Supported.
+ * Can directly be used as an Rollup Task.
+ * @param config - The config for @lit/localize-tools.
+ * @public
+ */
+export function litLocalizeBuild(config?: LitConfig): TaskFunction {
+  return setDisplayName("createCommit", async function createCommit() {
+    await tools.litLocalizeBuild(config);
   });
 }

@@ -8,6 +8,7 @@ export * from "./tools/file.js";
 export * from "./tools/git.js";
 export * from "./tools/github.js";
 export * from "./tools/gulp.js";
+export * from "./tools/litLocalize.js";
 export * from "./tools/misc.js";
 export * from "./tools/package.js";
 export * from "./tools/paths.js";

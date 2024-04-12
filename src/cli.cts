@@ -10,6 +10,7 @@ import { stubPackages, type StubPackageOptions } from "./tools/stubPackage.js";
 const stubSubPath: { [key: string]: string[]; } = {
   "rollup": ["dist/shared/loadConfigFile.js", "dist/shared/parseAst.js", "dist/shared/rollup.js"],
   "tslib": ["tslib.es6.js"],
+  "@lit/localize-tools": ["lib/modes/runtime.js",],
 };
 
 async function main(): Promise<never> {
