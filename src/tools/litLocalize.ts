@@ -162,7 +162,6 @@ export async function litLocalizeExtract(config?: LitConfig): Promise<void> {
   try {
     RuntimeLitLocalizer = (await import(pathToFileURL(resolve(buildToolDependenciesPath, "node_modules", "@lit", "localize-tools", "lib", "modes", "runtime.js")).toString()))?.RuntimeLitLocalizer;
   } catch (e) {
-    console.log("error", e);
     throw new Error("Build Tool dependencies not found.");
   }
   if (RuntimeLitLocalizer === undefined) throw new Error("Build Tool dependencies not found.");
