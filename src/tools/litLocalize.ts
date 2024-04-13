@@ -9,7 +9,7 @@ import { buildToolDependenciesPath, projectPath } from "./paths.js";
 export interface LitConfig {
   /**
    * Locale code that messages in the source code are written in.
-   * @default "en"
+   * @default "en-x-dev"
    */
   sourceLocale?: string;
   /**
@@ -129,7 +129,7 @@ function resolveLitLocalizeConfig(config?: LitConfig): unknown {
   return {
     baseDir: projectPath,
     resolve: (path: string) => resolve(projectPath, path),
-    sourceLocale: (config?.sourceLocale || "en"),
+    sourceLocale: (config?.sourceLocale || "en-x-dev"),
     targetLocales: (config?.targetLocales || ["en"]),
     inputFiles: config?.inputFiles || [".\/**\/src\/**\/*"],
     interchange: config?.interchange?.format === "xlb" ? {
