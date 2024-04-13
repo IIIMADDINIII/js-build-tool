@@ -1,4 +1,5 @@
 import { resolve } from "path";
+import { pathToFileURL } from "url";
 import { buildToolDependenciesPath, projectPath } from "./paths.js";
 
 /**
@@ -159,9 +160,8 @@ export async function litLocalizeExtract(config?: LitConfig): Promise<void> {
   if (buildToolDependenciesPath === undefined) throw new Error("Build Tool dependencies not found.");
   let RuntimeLitLocalizer: (new (config: unknown) => { extractSourceMessages(): { messages: unknown[], errors: unknown[]; }; writeInterchangeFiles(): Promise<void>; }) | undefined = undefined;
   try {
-    RuntimeLitLocalizer = (await import(resolve(buildToolDependenciesPath, "node_modules", "@lit", "localize-tools", "lib", "modes", "runtime.js")))?.RuntimeLitLocalizer;
+    RuntimeLitLocalizer = (await import(pathToFileURL(resolve(buildToolDependenciesPath, "node_modules", "@lit", "localize-tools", "lib", "modes", "runtime.js")).toString()))?.RuntimeLitLocalizer;
   } catch (e) {
-    console.log("error", e);
     throw new Error("Build Tool dependencies not found.");
   }
   if (RuntimeLitLocalizer === undefined) throw new Error("Build Tool dependencies not found.");
@@ -186,7 +186,7 @@ export async function litLocalizeBuild(config?: LitConfig): Promise<void> {
   if (buildToolDependenciesPath === undefined) throw new Error("Build Tool dependencies not found.");
   let RuntimeLitLocalizer: (new (config: unknown) => { validateTranslations(): { errors: unknown[]; }; build(): Promise<void>; }) | undefined = undefined;
   try {
-    RuntimeLitLocalizer = (await import(resolve(buildToolDependenciesPath, "node_modules", "@lit", "localize-tools", "lib", "modes", "runtime.js")))?.RuntimeLitLocalizer;
+    RuntimeLitLocalizer = (await import(pathToFileURL(resolve(buildToolDependenciesPath, "node_modules", "@lit", "localize-tools", "lib", "modes", "runtime.js")).toString()))?.RuntimeLitLocalizer;
   } catch {
     throw new Error("Build Tool dependencies not found.");
   }
