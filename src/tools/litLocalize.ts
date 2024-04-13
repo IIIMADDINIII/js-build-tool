@@ -156,6 +156,7 @@ function resolveLitLocalizeConfig(config?: LitConfig): unknown {
  * @param config - The config for @lit/localize-tools.
  */
 export async function litLocalizeExtract(config?: LitConfig): Promise<void> {
+  console.log("path", buildToolDependenciesPath);
   if (buildToolDependenciesPath === undefined) throw new Error("Build Tool dependencies not found.");
   let RuntimeLitLocalizer: (new (config: unknown) => { extractSourceMessages(): { messages: unknown[], errors: unknown[]; }; writeInterchangeFiles(): Promise<void>; }) | undefined = undefined;
   try {
