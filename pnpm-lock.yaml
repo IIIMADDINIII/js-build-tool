@@ -57,8 +57,8 @@ devDependencies:
     specifier: ^4.0.17
     version: 4.0.17
   '@types/js-build-tool-types':
-    specifier: npm:@iiimaddiniii/js-build-tool-types@^0.7.0
-    version: /@iiimaddiniii/js-build-tool-types@0.7.0(@types/node@20.12.5)(typescript@5.4.4)
+    specifier: npm:@iiimaddiniii/js-build-tool-types@^0.7.2
+    version: /@iiimaddiniii/js-build-tool-types@0.7.2(@types/node@20.12.5)(typescript@5.4.4)
   '@types/node':
     specifier: ^20.12.5
     version: 20.12.5
@@ -501,8 +501,8 @@ packages:
     resolution: {integrity: sha512-k2Ty1JcVojjJFwrg/ThKi2ujJ7XNLYaFGNB/bWT9wGR+oSMJHMa5w+CUq6p/pVrKeNNgA7pCqEcjSnHVoqJQFw==}
     dev: true
 
-  /@iiimaddiniii/js-build-tool-types@0.7.0(@types/node@20.12.5)(typescript@5.4.4):
-    resolution: {integrity: sha512-Urvrur3GdttI/VpaiLlg1J/gKMm7JSoJU7fJj8Ov2feFeI1leoEliWTFUWPlFOosd5Idz3yXThRnEyU+5Re8LA==}
+  /@iiimaddiniii/js-build-tool-types@0.7.2(@types/node@20.12.5)(typescript@5.4.4):
+    resolution: {integrity: sha512-IspQibvKz4LFyXdeylmDBeKU/CcraGBE7P2QIfoJnWCoyughX6Yay/M+9bK4bpRnWotL+Fibor9WzRWauNxOOg==}
     peerDependencies:
       '@types/node': '>=20.8.10'
       typescript: '>=5.2.2'

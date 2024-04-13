@@ -26,9 +26,9 @@
     "build": "pnpm run gulp build",
     "buildCi": "pnpm run gulp buildCi",
     "publishPatch": "pnpm run gulp publishPatch",
-    "gulp": "pnpm --package=@iiimaddiniii/js-build-tool@0.7.1 dlx js-build-tool",
-    "test": "pnpm --package=@iiimaddiniii/js-build-tool@0.7.1 dlx js-build-tool build",
-    "testCi": "pnpm --package=@iiimaddiniii/js-build-tool@0.7.1 dlx js-build-tool buildCi"
+    "gulp": "pnpm --package=@iiimaddiniii/js-build-tool@0.7.2 dlx js-build-tool",
+    "test": "pnpm --package=@iiimaddiniii/js-build-tool@0.7.2 dlx js-build-tool build",
+    "testCi": "pnpm --package=@iiimaddiniii/js-build-tool@0.7.2 dlx js-build-tool buildCi"
   },
   "repository": {
     "type": "git",
@@ -42,7 +42,7 @@
   "homepage": "https://github.com/IIIMADDINIII/js-build-tool#readme",
   "devDependencies": {
     "@types/gulp": "^4.0.17",
-    "@types/js-build-tool-types": "npm:@iiimaddiniii/js-build-tool-types@^0.7.0",
+    "@types/js-build-tool-types": "npm:@iiimaddiniii/js-build-tool-types@^0.7.2",
     "@types/node": "^20.12.5",
     "@types/fs-extra": "^11.0.4",
     "@schemastore/package": "^0.0.10",
