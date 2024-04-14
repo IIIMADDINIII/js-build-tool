@@ -1,7 +1,7 @@
 import type { Config, RuntimeOutputConfig } from "@lit/localize-tools/lib/config.js";
 import type { XliffConfig } from "@lit/localize-tools/lib/types/formatters.js";
 import type { Locale } from "@lit/localize-tools/lib/types/locale.js";
-import { relative, resolve } from "path";
+import { dirname, relative, resolve } from "path";
 import { pathToFileURL } from "url";
 import { file, fs, writeJson } from "./file.js";
 import { readPackageJson } from "./package.js";
@@ -210,8 +210,8 @@ export async function writePackageJsonExports(translationDir: string) {
   const entries = (await fs.readdir(translationDir, { withFileTypes: true }))
     .filter((e) => e.isFile() && e.name.endsWith(".js"))
     .map(({ name }) => {
-      const relativePath = relative(packageFile, translationDir);
-      const key: string = name.slice(0, -3);
+      const relativePath = relative(dirname(packageFile), resolve(translationDir, name));
+      const key: string = "./" + name.slice(0, -3);
       const value = {
         import: {
           default: relativePath
