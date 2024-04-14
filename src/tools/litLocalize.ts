@@ -108,11 +108,12 @@ async function resolveLitLocalizeConfig(config?: LitLocalizeConfig): Promise<Con
     placeholderStyle: "x",
     ...config?.interchange
   };
+  const res = (path: string) => resolve(baseDir, path);
   return {
     baseDir,
-    resolve: (path: string) => resolve(baseDir, path),
+    resolve: res,
     sourceLocale: sourceLocale as Locale,
-    targetLocales: (config?.targetLocales || await detectLocalesFromTranslationDir(interchange.xliffDir, sourceLocale)) as Locale[],
+    targetLocales: (config?.targetLocales || await detectLocalesFromTranslationDir(res(interchange.xliffDir), sourceLocale)) as Locale[],
     inputFiles: config?.inputFiles || [".\/**\/src\/**\/*"],
     interchange,
     output: {
