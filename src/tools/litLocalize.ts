@@ -210,7 +210,7 @@ export async function writePackageJsonExports(translationDir: string) {
   const entries = (await fs.readdir(translationDir, { withFileTypes: true }))
     .filter((e) => e.isFile() && e.name.endsWith(".js"))
     .map(({ name }) => {
-      const relativePath = relative(dirname(packageFile), resolve(translationDir, name));
+      const relativePath = "./" + relative(dirname(packageFile), resolve(translationDir, name)).replaceAll("\\", "/");
       const key: string = "./" + name.slice(0, -3);
       const value = {
         import: {
