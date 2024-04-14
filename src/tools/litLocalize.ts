@@ -99,7 +99,7 @@ export interface OutputConfig {
  * @param config - the Config to Resolve.
  * @returns the resolved Config.
  */
-function resolveLitLocalizeConfig(config?: LitLocalizeConfig): Config & { interchange: XliffConfig; output: RuntimeOutputConfig; } {
+async function resolveLitLocalizeConfig(config?: LitLocalizeConfig): Promise<Config & { interchange: XliffConfig; output: RuntimeOutputConfig; }> {
   const baseDir = resolve(projectPath, config?.baseDir === undefined ? "" : config?.baseDir);
   const sourceLocale = config?.sourceLocale || "en-x-dev";
   const interchange: XliffConfig = {
@@ -112,7 +112,7 @@ function resolveLitLocalizeConfig(config?: LitLocalizeConfig): Config & { interc
     baseDir,
     resolve: (path: string) => resolve(baseDir, path),
     sourceLocale: sourceLocale as Locale,
-    targetLocales: (config?.targetLocales || detectLocalesFromTranslationDir(interchange.xliffDir, sourceLocale)) as Locale[],
+    targetLocales: (config?.targetLocales || await detectLocalesFromTranslationDir(interchange.xliffDir, sourceLocale)) as Locale[],
     inputFiles: config?.inputFiles || [".\/**\/src\/**\/*"],
     interchange,
     output: {
@@ -139,7 +139,7 @@ export async function litLocalizeExtract(config?: LitLocalizeConfig): Promise<vo
     throw new Error("Build Tool dependencies not found.");
   }
   if (RuntimeLitLocalizer === undefined) throw new Error("Build Tool dependencies not found.");
-  const localizer = new RuntimeLitLocalizer(resolveLitLocalizeConfig(config));
+  const localizer = new RuntimeLitLocalizer(await resolveLitLocalizeConfig(config));
   const { messages, errors } = localizer.extractSourceMessages();
   console.log('Extracting messages');
   if (errors.length > 0) {
@@ -166,7 +166,7 @@ export async function litLocalizeBuild(config?: LitLocalizeConfig): Promise<void
     throw new Error("Build Tool dependencies not found.");
   }
   if (RuntimeLitLocalizer === undefined) throw new Error("Build Tool dependencies not found.");
-  const localizer = new RuntimeLitLocalizer(resolveLitLocalizeConfig(config));
+  const localizer = new RuntimeLitLocalizer(await resolveLitLocalizeConfig(config));
   console.log('Building');
   const { errors } = localizer.validateTranslations();
   if (errors.length > 0) {
@@ -234,7 +234,7 @@ export async function writePackageJsonExports(translationDir: string) {
  * @public
  */
 export async function buildTranslationPackage(config?: LitLocalizeConfig): Promise<void> {
-  const conf = resolveLitLocalizeConfig(config);
+  const conf = await resolveLitLocalizeConfig(config);
   await litLocalizeBuild({ baseDir: "..", ...config });
   await transformTranslationFilesToUseDependencyInjection(conf.output.outputDir);
   await writePackageJsonExports(conf.output.outputDir);
