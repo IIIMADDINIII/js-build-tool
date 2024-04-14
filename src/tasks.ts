@@ -6,7 +6,7 @@ import { setDisplayName } from "./tools/misc.js";
 
 import * as electron from "./electron/tasks.js";
 import * as rollup from "./rollup/tasks.js";
-import type { CountVersionOption, CreateCommitOptions, LitConfig } from "./tools.js";
+import type { CountVersionOption, CreateCommitOptions, LitLocalizeConfig } from "./tools.js";
 export { electron, rollup };
 
 /**
@@ -223,10 +223,11 @@ export function createCommit(options: CreateCommitOptions): TaskFunction {
  * Only Runtime Mode is Supported.
  * Can directly be used as an Rollup Task.
  * @param config - The config for @lit/localize-tools.
+ * @returns A Gulp Task.
  * @public
  */
-export function litLocalizeExtract(config?: LitConfig): TaskFunction {
-  return setDisplayName("createCommit", async function createCommit() {
+export function litLocalizeExtract(config?: LitLocalizeConfig): TaskFunction {
+  return setDisplayName("litLocalizeExtract", async function litLocalizeExtract() {
     await tools.litLocalizeExtract(config);
   });
 }
@@ -236,10 +237,27 @@ export function litLocalizeExtract(config?: LitConfig): TaskFunction {
  * Only Runtime Mode is Supported.
  * Can directly be used as an Rollup Task.
  * @param config - The config for @lit/localize-tools.
+ * @returns A Gulp Task.
  * @public
  */
-export function litLocalizeBuild(config?: LitConfig): TaskFunction {
-  return setDisplayName("createCommit", async function createCommit() {
+export function litLocalizeBuild(config?: LitLocalizeConfig): TaskFunction {
+  return setDisplayName("litLocalizeBuild", async function litLocalizeBuild() {
     await tools.litLocalizeBuild(config);
+  });
+}
+
+/**
+* Calls litLocalizeBuild, transformTranslationFilesToUseDependencyInjection and writePackageJsonExports.
+ * Also overrides the baseDir default to "..".
+ * Will generate a folder dist with a file for every translation, when called from a sub package named localize with default values.
+ * Also Converts the generated output from litLocalizeBuild to use dependency injection (a function named templates is exported wich needs to be called with a str and html templateTag implementation as augments).
+ * Can directly be used as an Rollup Task.
+ * @param config - configuration of the litLocalizeBuild.
+ * @returns A Gulp Task.
+ * @public
+ */
+export function buildTranslationPackage(config?: LitLocalizeConfig): TaskFunction {
+  return setDisplayName("buildTranslationPackage", async function buildTranslationPackage() {
+    await tools.buildTranslationPackage(config);
   });
 }

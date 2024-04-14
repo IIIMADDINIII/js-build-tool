@@ -1,12 +1,21 @@
-import { resolve } from "path";
+import type { Config, RuntimeOutputConfig } from "@lit/localize-tools/lib/config.js";
+import type { XliffConfig } from "@lit/localize-tools/lib/types/formatters.js";
+import type { Locale } from "@lit/localize-tools/lib/types/locale.js";
+import { relative, resolve } from "path";
 import { pathToFileURL } from "url";
+import { file, fs, writeJson } from "./file.js";
+import { readPackageJson } from "./package.js";
 import { buildToolDependenciesPath, projectPath } from "./paths.js";
 
 /**
  * Options for @lit/localize-tools.
  * @public
  */
-export interface LitConfig {
+export interface LitLocalizeConfig {
+  /**
+   * Base directory where the Paths a resolved against.
+   */
+  baseDir?: string;
   /**
    * Locale code that messages in the source code are written in.
    * @default "en-x-dev"
@@ -14,7 +23,8 @@ export interface LitConfig {
   sourceLocale?: string;
   /**
    * Locale codes that messages will be localized to.
-   * @default ["en"]
+   * Will look at the files in the Translations folder and use the file names as targetLocales.
+   * If the folder does not exist will output sourceLocale (excluding -x-dev if it exists).
    */
   targetLocales?: string[];
   /**
@@ -25,59 +35,23 @@ export interface LitConfig {
   /**
    * Localization interchange format and configuration specific to that format.
    */
-  interchange?: XlbConfig | XliffConfig;
+  interchange?: LitXliffConfig;
   /**
    * Set and configure the output mode.
-   * @default {language: "js", outputDir: "./locales"}
+   * @default {language: "js", outputDir: "./locales/dist"}
    */
   output?: OutputConfig;
-}
-
-/**
- * Parse an XLB XML file. These files contain translations organized using the
- * same message names that we originally requested.
- * Configuration for XLB interchange format.
- * @public
- */
-export interface XlbConfig {
-  /**
-   * Format of the Translation files to use.
-   * "xliff" | "xlb"
-   * @default "xliff"
-   */
-  format: 'xlb';
-  /**
-   * Output path on disk to the XLB XML file that will be created containing all
-   * messages extracted from the source. E.g. "data/localization/en.xlb".
-   * @default "./translations"
-   */
-  outputFile?: string;
-  /**
-   * Glob pattern of XLB XML files to read from disk containing translated
-   * messages. E.g. "data/localization/*.xlb".
-   *
-   * See https://github.com/isaacs/node-glob#README for valid glob syntax.
-   * @default ".\/translations\/**\/*"
-   */
-  translationsGlob?: string;
-
 }
 
 /**
  * Configuration for XLIFF interchange format.
  * @public
  */
-export interface XliffConfig {
-  /**
-   * Format of the Translation files to use.
-   * "xliff" | "xlb"
-   * @default "xliff"
-   */
-  format: 'xliff';
+export interface LitXliffConfig {
   /**
    * Directory on disk to read/write .xlf XML files. For each target locale,
    * the file path "<xliffDir>/<locale>.xlf" will be used.
-   * @default "./translations"
+   * @default "./locales/translations"
    */
   xliffDir?: string;
   /**
@@ -115,7 +89,7 @@ export interface OutputConfig {
    * Output directory for generated modules. Into this directory will be
    * generated a <locale>.ts for each `targetLocale`, each a module that exports
    * the translations in that locale keyed by message ID.
-   * @default "./locales"
+   * @default "./locales/dist"
    */
   outputDir?: string;
 }
@@ -125,26 +99,25 @@ export interface OutputConfig {
  * @param config - the Config to Resolve.
  * @returns the resolved Config.
  */
-function resolveLitLocalizeConfig(config?: LitConfig): unknown {
+function resolveLitLocalizeConfig(config?: LitLocalizeConfig): Config & { interchange: XliffConfig; output: RuntimeOutputConfig; } {
+  const baseDir = resolve(projectPath, config?.baseDir === undefined ? "" : config?.baseDir);
+  const sourceLocale = config?.sourceLocale || "en-x-dev";
+  const interchange: XliffConfig = {
+    format: "xliff",
+    xliffDir: "./locales/translations",
+    placeholderStyle: "x",
+    ...config?.interchange
+  };
   return {
-    baseDir: projectPath,
-    resolve: (path: string) => resolve(projectPath, path),
-    sourceLocale: (config?.sourceLocale || "en-x-dev"),
-    targetLocales: (config?.targetLocales || ["en"]),
+    baseDir,
+    resolve: (path: string) => resolve(baseDir, path),
+    sourceLocale: sourceLocale as Locale,
+    targetLocales: (config?.targetLocales || detectLocalesFromTranslationDir(interchange.xliffDir, sourceLocale)) as Locale[],
     inputFiles: config?.inputFiles || [".\/**\/src\/**\/*"],
-    interchange: config?.interchange?.format === "xlb" ? {
-      outputFile: "./translations",
-      translationsGlob: ".\/translations\/**\/*",
-      ...config?.interchange
-    } : {
-      format: "xliff",
-      xliffDir: "./translations",
-      placeholderStyle: "x",
-      ...config?.interchange
-    },
+    interchange,
     output: {
       mode: "runtime",
-      outputDir: "./locales",
+      outputDir: "./locales/dist",
       language: "js",
       ...config?.output
     },
@@ -155,8 +128,9 @@ function resolveLitLocalizeConfig(config?: LitConfig): unknown {
  * Extract the Translation Messages using @lit/localize-tools extract command.
  * Only Runtime Mode is Supported.
  * @param config - The config for @lit/localize-tools.
+ * @public
  */
-export async function litLocalizeExtract(config?: LitConfig): Promise<void> {
+export async function litLocalizeExtract(config?: LitLocalizeConfig): Promise<void> {
   if (buildToolDependenciesPath === undefined) throw new Error("Build Tool dependencies not found.");
   let RuntimeLitLocalizer: (new (config: unknown) => { extractSourceMessages(): { messages: unknown[], errors: unknown[]; }; writeInterchangeFiles(): Promise<void>; }) | undefined = undefined;
   try {
@@ -181,8 +155,9 @@ export async function litLocalizeExtract(config?: LitConfig): Promise<void> {
  * Generate the Translation files using @lit/localize-tools build command.
  * Only Runtime Mode is Supported.
  * @param config - The config for @lit/localize-tools.
+ * @public
  */
-export async function litLocalizeBuild(config?: LitConfig): Promise<void> {
+export async function litLocalizeBuild(config?: LitLocalizeConfig): Promise<void> {
   if (buildToolDependenciesPath === undefined) throw new Error("Build Tool dependencies not found.");
   let RuntimeLitLocalizer: (new (config: unknown) => { validateTranslations(): { errors: unknown[]; }; build(): Promise<void>; }) | undefined = undefined;
   try {
@@ -203,4 +178,87 @@ export async function litLocalizeBuild(config?: LitConfig): Promise<void> {
     );
   }
   await localizer.build();
+}
+
+/**
+ * Transforms the Translation Files to use Dependency injection instead of importing str and html template tags.
+ * @param translationDir - folder with the Translation files to transform.
+ * @public
+ */
+export async function transformTranslationFilesToUseDependencyInjection(translationDir: string): Promise<void> {
+  await Promise.all((await fs.readdir(translationDir, { withFileTypes: true }))
+    .filter((e) => e.isFile() && e.name.endsWith(".js"))
+    .map(async ({ name }) => {
+      const file = resolve(translationDir, name);
+      let content = await fs.readFile(file, { encoding: "utf8" });
+      // Replace all import statements with an empty string
+      content = content.replaceAll(/^[^\S\r\n]*import[^\r\n]*$/mg, "");
+      // Find export and surround it with a function 
+      content = content.replace(/^[^\S\r\n]*export([\s\S]*)/mg, "const cache = undefined;\n export function templates(str, html) {\nif (cache !== undefined) return cache;\n $1 cache = {templates}; \n return cache;}");
+      await fs.writeFile(file, content);
+    }));
+}
+
+/**
+ * Sets the exports field of a Package.json file to the files in the translationDir.
+ * @param translationDir - folder with the Translation files to write to the Exports field.
+ * @public
+ */
+export async function writePackageJsonExports(translationDir: string) {
+  const packageFile = file("package.json");
+  const entries = (await fs.readdir(translationDir, { withFileTypes: true }))
+    .filter((e) => e.isFile() && e.name.endsWith(".js"))
+    .map(({ name }) => {
+      const relativePath = relative(packageFile, translationDir);
+      const key: string = name.slice(0, -3);
+      const value = {
+        import: {
+          default: relativePath
+        }
+      };
+      return [key, value];
+    });
+  const exports = Object.fromEntries(entries);
+  const pack = await readPackageJson(packageFile);
+  pack.exports = exports;
+  await writeJson(packageFile, pack, true);
+}
+
+
+/**
+ * Calls litLocalizeBuild, transformTranslationFilesToUseDependencyInjection and writePackageJsonExports.
+ * Also overrides the baseDir default to "..".
+ * Will generate a folder dist with a file for every translation, when called from a sub package named localize with default values.
+ * Also Converts the generated output from litLocalizeBuild to use dependency injection (a function named templates is exported wich needs to be called with a str and html templateTag implementation as augments).
+ * @param config - configuration of the litLocalizeBuild.
+ * @public
+ */
+export async function buildTranslationPackage(config?: LitLocalizeConfig): Promise<void> {
+  const conf = resolveLitLocalizeConfig(config);
+  await litLocalizeBuild({ baseDir: "..", ...config });
+  await transformTranslationFilesToUseDependencyInjection(conf.output.outputDir);
+  await writePackageJsonExports(conf.output.outputDir);
+}
+
+/**
+ * Will strip the -x-dev suffix from a locale, if it exists.
+ * @param locale - the locale to strip.
+ * @public
+ */
+export function stripXDevFromLocale(locale: string): string {
+  if (!locale.endsWith("-x-dev")) return locale;
+  return locale.slice(0, -6);
+}
+
+/**
+ * Automatically generate a list of translation targets based on the files in the translation dir.
+ * @param translationDir - directory where the Translations are Stored (default = "./locales/translations/")
+ * @public
+ */
+export async function detectLocalesFromTranslationDir(xliffDir: string, sourceLocale: string): Promise<string[]> {
+  const locales = (await fs.readdir(xliffDir, { withFileTypes: true }))
+    .filter((e) => e.isFile() && e.name.endsWith(".xlb"))
+    .map((e) => e.name.slice(0, -4));
+  if (locales.length === 0) locales.push(stripXDevFromLocale(sourceLocale));
+  return locales;
 }
