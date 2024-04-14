@@ -257,7 +257,7 @@ export function stripXDevFromLocale(locale: string): string {
  */
 export async function detectLocalesFromTranslationDir(xliffDir: string, sourceLocale: string): Promise<string[]> {
   const locales = (await fs.readdir(xliffDir, { withFileTypes: true }))
-    .filter((e) => e.isFile() && e.name.endsWith(".xlb"))
+    .filter((e) => e.isFile() && e.name.endsWith(".xlf"))
     .map((e) => e.name.slice(0, -4));
   if (locales.length === 0) locales.push(stripXDevFromLocale(sourceLocale));
   return locales;
