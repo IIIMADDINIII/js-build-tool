@@ -557,7 +557,7 @@ async function getDefaultExportOpts(defaultConfigOpts: DefaultConfigOpts, config
     sourceMap: getDefault(exportOpts.sourceMap, !prod || isTest),
     sourceMapType: getDefault(exportOpts.sourceMapType, isTest ? "inline" : "external"),
     buildTest: getDefault(exportOpts.buildTest, false),
-    terserPlugin: getDefault(exportOpts.terserPlugin, {}),
+    terserPlugin: getDefault(exportOpts.terserPlugin, { format: { comments: false } }),
     externalDependencies: getDefault(exportOpts.externalDependencies, []),
     blacklistDependencies: getDefault(exportOpts.blacklistDependencies, []),
     allowedDevDependencies: getDefault(exportOpts.allowedDevDependencies, []),
