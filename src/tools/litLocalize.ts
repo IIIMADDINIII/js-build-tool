@@ -234,10 +234,11 @@ export async function writePackageJsonExports(translationDir: string) {
  * @public
  */
 export async function buildTranslationPackage(config?: LitLocalizeConfig): Promise<void> {
-  const conf = await resolveLitLocalizeConfig(config);
+  const conf = await resolveLitLocalizeConfig({ baseDir: "..", ...config });
   await litLocalizeBuild({ baseDir: "..", ...config });
-  await transformTranslationFilesToUseDependencyInjection(conf.output.outputDir);
-  await writePackageJsonExports(conf.output.outputDir);
+  const translationDir = conf.resolve(conf.output.outputDir);
+  await transformTranslationFilesToUseDependencyInjection(translationDir);
+  await writePackageJsonExports(translationDir);
 }
 
 /**
