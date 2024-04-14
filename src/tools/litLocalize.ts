@@ -195,7 +195,7 @@ export async function transformTranslationFilesToUseDependencyInjection(translat
       // Replace all import statements with an empty string
       content = content.replaceAll(/^[^\S\r\n]*import[^\r\n]*$/mg, "");
       // Find export and surround it with a function 
-      content = content.replace(/^[^\S\r\n]*export([\s\S]*)/mg, "const cache = undefined;\n export function templates(str, html) {\nif (cache !== undefined) return cache;\n $1 cache = {templates}; \n return cache;}");
+      content = content.replace(/^[^\S\r\n]*export([\s\S]*)/mg, "const cache = undefined;\nexport function templates(str, html) {\n  if (cache !== undefined) return cache;\n $1cache = {templates};\n  return cache;}");
       await fs.writeFile(file, content);
     }));
 }
