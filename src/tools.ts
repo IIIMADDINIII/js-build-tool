@@ -14,7 +14,6 @@ export * from "./tools/package.js";
 export * from "./tools/paths.js";
 export * from "./tools/pnpm.js";
 export * from "./tools/prod.js";
-export * from "./tools/stubPackage.js";
 export * from "./tools/tests.js";
 export { electron, rollup };
 

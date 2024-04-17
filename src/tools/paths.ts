@@ -1,40 +1,18 @@
 
-import path from "path";
+import { basename, delimiter, dirname, resolve } from "path";
 import url from 'url';
 
 /**
  * Adds an folder to the Path variable.
  * @param folder - the folder which should be added to the path (should be absolute).
+ * @param append - put the folder at the end => low priority (default = false; path is prepended => higher priority).
  * @public
  */
-export function addToPath(folder: string): void {
-  process.env["path"] = folder + ";" + process.env["path"];
-}
-
-/**
- * Finds the temporary project folder of the pnpm dlx operation.
- * @param packagePath - path inside the js-build-tool.
- * @returns the upper most folder with node_modules inside.
- * @public
- */
-export function findDlxPath(packagePath: string): string {
-  return packagePath.slice(0, packagePath.indexOf("node_modules"));
-}
-
-/**
- * Finds the path where js-build-tool was installed by pnpm.
- * @param start - path inside the js-build-tool.
- * @returns path to the folder named "js-build-tool".
- * @public
- */
-export function findJsBuildToolPath(start: string) {
-  let dir = start;
-  while (!dir.endsWith("js-build-tool")) {
-    const newDir = path.resolve(dir, "..");
-    if (newDir === dir) throw new Error("js-build-tool Path could not be found");
-    dir = newDir;
-  }
-  return dir;
+export function addToPath(folder: string, append: boolean = false): void {
+  const path = (process.env["path"] || "").split(delimiter);
+  if (append) { path.push(resolve(folder)); }
+  else { path.unshift(resolve(folder)); }
+  process.env["path"] = path.join(delimiter);
 }
 
 /**
@@ -44,13 +22,7 @@ export function findJsBuildToolPath(start: string) {
 export const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 /**
- * The temporary project folder of the pnpm dlx operation.
- * @public
- */
-export const dlxPath = findDlxPath(__dirname);
-
-/**
- * Current working directory.
+ * Current working directory at start of the Application.
  * @public
  */
 export const cwd = process.cwd();
@@ -62,44 +34,34 @@ export const cwd = process.cwd();
 export const projectPath = cwd;
 
 /**
- * Location of the build tool dependencies.
- * Path ends just before the node_modules folder.
- * @public
- */
-export const buildToolDependenciesPath = process.env["DEPENDENCIES_DIR"];
-
-/**
  * node_modules folder inside the project.
  * @public
  */
-export const projectNodeModulesPath = path.resolve(projectPath, "node_modules");
-
-/**
- * The name of the gulpfile.
- * @public
- */
-export const gulpFileName = "gulpfile.mjs";
+export const projectNodeModulesPath = resolve(projectPath, "node_modules");
 
 /**
  * The path to the gulpfile.
  * @public
  */
-export const gulpFilePath = path.resolve(dlxPath, gulpFileName);
+export const gulpFilePath = process.env["GULP_FILE"];
+if (gulpFilePath === undefined) throw new Error("Environment Variable GULP_FILE is not set. Please execute using @iiimaddiniii/js-build-tool-cli");
 
 /**
- * Path where the js-build-tool was installed.
+ * The name of the gulpfile.
  * @public
  */
-export const jsBuildToolPath = findJsBuildToolPath(__dirname);
+export const gulpFileName = basename(gulpFilePath);
 
 /**
- * The node_modules folder inside the temporary project folder of the pnpm dlx operation.
+ * Directory where the gulp file is.
  * @public
  */
-export const nodeModulesPath = path.resolve(dlxPath, "node_modules");
+export const gulpDirectory = dirname(gulpFilePath);
 
 /**
- * The path of the executables (.bin) inside the temporary folder for the dlx operation.
+ * Folder of the GulpFile where this codes Executes.
+ * Is also home to the node_modules for additional packages when specified.
+ * Can be used to store temporary files wich will be deleted after the task finished.
  * @public
  */
-export const binPath = path.resolve(nodeModulesPath, ".bin");
+export const buildDir = gulpFilePath;
