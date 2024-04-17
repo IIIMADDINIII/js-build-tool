@@ -1,0 +1,12 @@
+/.rollup.cache/
+/.vscode/
+/patches/
+/node_modules/
+/tests/
+/pnpm-lock.yaml
+/tsconfig.json
+/tsconfig.*.json
+/*.tsbuildinfo
+/jest.config.mjs
+/gulpfile.mjs
+/src
