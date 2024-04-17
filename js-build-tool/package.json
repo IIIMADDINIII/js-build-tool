@@ -1,0 +1,72 @@
+{
+  "name": "@iiimaddiniii/js-build-tool",
+  "version": "0.7.6",
+  "description": "Tool for building my javascript projects",
+  "bin": {
+    "js-build-tool": "./dist/cli.cjs"
+  },
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "clean": "pnpm run gulp clean",
+    "build": "pnpm run gulp build",
+    "buildCi": "pnpm run gulp buildCi",
+    "publishPatch": "pnpm run gulp publishPatch",
+    "gulp": "pnpm --package=@iiimaddiniii/js-build-tool@0.7.2 dlx js-build-tool",
+    "test": "pnpm --package=@iiimaddiniii/js-build-tool@0.7.2 dlx js-build-tool build",
+    "testCi": "pnpm --package=@iiimaddiniii/js-build-tool@0.7.2 dlx js-build-tool buildCi"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IIIMADDINIII/js-build-tool"
+  },
+  "author": "IIIMADDINIII <martin@elend.name>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/IIIMADDINIII/js-build-tool/issues"
+  },
+  "homepage": "https://github.com/IIIMADDINIII/js-build-tool#readme",
+  "devDependencies": {
+    "@types/gulp": "^4.0.17",
+    "@types/js-build-tool-types": "npm:@iiimaddiniii/js-build-tool-types@^0.7.2",
+    "@types/node": "^20.12.5",
+    "@types/fs-extra": "^11.0.4",
+    "@schemastore/package": "^0.0.10",
+    "@electron-forge/shared-types": "^7.3.1"
+  },
+  "dependencies": {
+    "execa": "8.0.1",
+    "@electron-forge/core": "7.3.1",
+    "@electron-forge/maker-wix": "7.3.1",
+    "@electron-forge/maker-zip": "7.3.1",
+    "@electron-forge/plugin-fuses": "7.3.1",
+    "@electron/fuses": "1.8.0",
+    "fs-extra": "10.0.0",
+    "@rollup/plugin-commonjs": "25.0.7",
+    "@rollup/plugin-json": "6.1.0",
+    "@rollup/plugin-node-resolve": "15.2.3",
+    "@rollup/plugin-terser": "0.4.4",
+    "@rollup/plugin-typescript": "11.1.6",
+    "@rollup/pluginutils": "5.1.0",
+    "fast-glob": "3.3.2",
+    "fetch-github-release": "1.0.0",
+    "rollup-plugin-consts": "1.2.0",
+    "rollup-plugin-include-sourcemaps": "0.7.0",
+    "rollup": "^4.14.0",
+    "gulp": "4.0.2",
+    "tslib": "2.6.2",
+    "typescript": "5.4.4",
+    "yaml": "2.4.0",
+    "@lit/localize-tools": "0.7.2",
+    "@microsoft/api-extractor": "7.43.0"
+  },
+  "main": "./dist/index.js"
+}

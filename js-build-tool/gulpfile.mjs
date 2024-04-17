@@ -28,13 +28,6 @@ const rollupOptions = {
     "@electron-forge/shared-types"],
 };
 
-export const clean = tools.exitAfter(tasks.cleanWithGit());
-
 export const build = tools.exitAfter(
   tasks.installDependencies(),
-  tasks.runWorkspaceScript("build"));
-
-export const buildCi = tools.exitAfter(
-  tasks.cleanWithGit(),
-  tasks.prodInstallDependencies(),
-  tasks.runWorkspaceScript("build"));
+  rollup.tasks.build(rollupOptions));

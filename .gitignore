@@ -1,10 +1,1 @@
-/.rollup.cache/
 /node_modules/
-/dist/
-/tests/
-/*.tsbuildinfo
-/.tmpBuild/
-/modules/
-/node_modules.asar
-/node_modules.asar.unpacked/
-/locales/src
