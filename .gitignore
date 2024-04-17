@@ -1,1 +1,5 @@
 /node_modules/
+/js-build-tool/dist/
+/js-build-tool/node_modules/
+/js-build-tool-types/index.d.ts
+/js-build-tool-types/pnpm-lock.yaml
