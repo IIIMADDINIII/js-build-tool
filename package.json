@@ -6,6 +6,7 @@
     "build": "pnpm run gulp build",
     "buildCi": "pnpm run gulp buildCi",
     "version": "pnpm run gulp version",
+    "publish": "pnpm run gulp publish",
     "gulp": "pnpm --package=@iiimaddiniii/js-build-tool@0.7.6 dlx js-build-tool"
   },
   "repository": {

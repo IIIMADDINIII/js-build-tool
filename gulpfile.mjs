@@ -28,3 +28,8 @@ export async function version() {
   await tools.createCommit({ message: `v${version}`, all: true });
   await tools.exec`git tag -m v${version} v${version}`;
 }
+
+export async function publish() {
+  await version();
+  await tools.exec`pnpm -r publish`;
+}
