@@ -1,6 +1,6 @@
 {
   "name": "@iiimaddiniii/js-build-tool",
-  "version": "0.7.6",
+  "version": "0.7.7",
   "description": "Tool for building my javascript projects",
   "scripts": {
     "clean": "pnpm run gulp clean",
