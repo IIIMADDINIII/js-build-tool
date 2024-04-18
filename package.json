@@ -7,7 +7,7 @@
     "buildCi": "pnpm run gulp buildCi",
     "version": "pnpm run gulp version",
     "publish": "pnpm run gulp publish",
-    "gulp": "pnpm --package=@iiimaddiniii/js-build-tool@0.7.6 dlx js-build-tool"
+    "gulp": "pnpm --package=@iiimaddiniii/js-build-tool-cli@0.7.8 dlx js-build-tool"
   },
   "repository": {
     "type": "git",
@@ -20,6 +20,6 @@
   },
   "homepage": "https://github.com/IIIMADDINIII/js-build-tool#readme",
   "devDependencies": {
-    "@types/js-build-tool-types": "npm:@iiimaddiniii/js-build-tool-types@0.7.6"
+    "@types/js-build-tool-types": "npm:@iiimaddiniii/js-build-tool-types@0.7.8"
   }
 }

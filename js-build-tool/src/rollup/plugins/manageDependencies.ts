@@ -1,6 +1,5 @@
 
-import { normalizePath } from "@rollup/pluginutils";
-import { resolve } from "path";
+import { posix, resolve, win32 } from "path";
 import type { Plugin } from "rollup";
 import { fs } from "../../tools/file.js";
 
@@ -21,6 +20,16 @@ export interface ManageDependenciesConfig {
    */
   blacklist?: string[];
 }
+
+/**
+ * Normalize the path to unix separator.
+ * Replacing \\ with /.
+ * @param filename - the path to normalize.
+ * @returns the normalized path.
+ */
+function normalizePath(filename: string) {
+  return filename.split(win32.sep).join(posix.sep);
+};
 
 /**
  * ManageDependencies Rollup Plugin for managing bundled dependencies.

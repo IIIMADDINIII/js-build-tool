@@ -1,8 +1,6 @@
-import { MakerZIP } from "@electron-forge/maker-zip";
-import { FusesPlugin } from "@electron-forge/plugin-fuses";
 import type { ForgeConfig, ForgeConfigMaker, ForgeConfigPlugin, ForgePackagerOptions, IForgeMaker, StartOptions } from "@electron-forge/shared-types";
-import { FuseV1Options, FuseVersion } from "@electron/fuses";
 import * as path from "path";
+import { FusesPlugin, MakerZIP, fuses } from "../../lateImports.js";
 import { getAllPackageExportsPaths, getPackageMain } from "../../tools/package.js";
 import { projectPath } from "../../tools/paths.js";
 import { getPnpmPackages } from "../../tools/pnpm.js";
@@ -142,23 +140,23 @@ async function createMakersConfig(options: CreateSetupsOptions, platform: Create
     if (process.platform === "win32" && platform === "darwin") {
       console.warn("Building Darwin zips on windows is not supported => Skipped");
     } else {
-      ret.push(addPluginMarker(new MakerZIP()));
+      ret.push(addPluginMarker(new (await MakerZIP()).MakerZIP()));
     }
   }
   return ret;
 }
 
 async function createFusePlugin(options: CreateSetupsOptions): Promise<ForgeConfigPlugin> {
-  return addPluginMarker(new FusesPlugin({
-    version: FuseVersion.V1,
-    [FuseV1Options.RunAsNode]: options.fuseRunAsNode,
-    [FuseV1Options.EnableCookieEncryption]: true,
-    [FuseV1Options.EnableNodeOptionsEnvironmentVariable]: false,
-    [FuseV1Options.EnableNodeCliInspectArguments]: false,
-    [FuseV1Options.EnableEmbeddedAsarIntegrityValidation]: false,
-    [FuseV1Options.OnlyLoadAppFromAsar]: true,
-    [FuseV1Options.LoadBrowserProcessSpecificV8Snapshot]: false,
-    [FuseV1Options.GrantFileProtocolExtraPrivileges]: false,
+  return addPluginMarker(new (await FusesPlugin()).FusesPlugin({
+    version: (await fuses()).FuseVersion.V1,
+    [(await fuses()).FuseV1Options.RunAsNode]: options.fuseRunAsNode,
+    [(await fuses()).FuseV1Options.EnableCookieEncryption]: true,
+    [(await fuses()).FuseV1Options.EnableNodeOptionsEnvironmentVariable]: false,
+    [(await fuses()).FuseV1Options.EnableNodeCliInspectArguments]: false,
+    [(await fuses()).FuseV1Options.EnableEmbeddedAsarIntegrityValidation]: false,
+    [(await fuses()).FuseV1Options.OnlyLoadAppFromAsar]: true,
+    [(await fuses()).FuseV1Options.LoadBrowserProcessSpecificV8Snapshot]: false,
+    [(await fuses()).FuseV1Options.GrantFileProtocolExtraPrivileges]: false,
   }));
 }
 

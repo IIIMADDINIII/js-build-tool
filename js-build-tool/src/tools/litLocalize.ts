@@ -1,8 +1,8 @@
 import type { Config, RuntimeOutputConfig } from "@lit/localize-tools/lib/config.js";
-import { RuntimeLitLocalizer } from "@lit/localize-tools/lib/modes/runtime.js";
 import type { XliffConfig } from "@lit/localize-tools/lib/types/formatters.js";
 import type { Locale } from "@lit/localize-tools/lib/types/locale.js";
 import { dirname, relative, resolve } from "path";
+import { RuntimeLitLocalizer } from "../lateImports.js";
 import { file, fs, writeJson } from "./file.js";
 import { readPackageJson } from "./package.js";
 import { projectPath } from "./paths.js";
@@ -133,7 +133,7 @@ async function resolveLitLocalizeConfig(config?: LitLocalizeConfig): Promise<Con
  */
 export async function litLocalizeExtract(config?: LitLocalizeConfig): Promise<void> {
   //    RuntimeLitLocalizer = (await import(pathToFileURL(resolve(buildToolDependenciesPath, "node_modules", "@lit", "localize-tools", "lib", "modes", "runtime.js")).toString()))?.RuntimeLitLocalizer;
-  const localizer = new RuntimeLitLocalizer(await resolveLitLocalizeConfig(config));
+  const localizer = new (await RuntimeLitLocalizer()).RuntimeLitLocalizer(await resolveLitLocalizeConfig(config));
   const { messages, errors } = localizer.extractSourceMessages();
   console.log('Extracting messages');
   if (errors.length > 0) {
@@ -152,7 +152,7 @@ export async function litLocalizeExtract(config?: LitLocalizeConfig): Promise<vo
  * @public
  */
 export async function litLocalizeBuild(config?: LitLocalizeConfig): Promise<void> {
-  const localizer = new RuntimeLitLocalizer(await resolveLitLocalizeConfig(config));
+  const localizer = new (await RuntimeLitLocalizer()).RuntimeLitLocalizer(await resolveLitLocalizeConfig(config));
   console.log('Building');
   const { errors } = localizer.validateTranslations();
   if (errors.length > 0) {

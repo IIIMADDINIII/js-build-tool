@@ -1,8 +1,9 @@
-import { api, type MakeOptions, type PackageOptions, type PublishOptions, type StartOptions } from "@electron-forge/core";
+import { type MakeOptions, type PackageOptions, type PublishOptions, type StartOptions } from "@electron-forge/core";
 import type { ElectronProcess, ForgeConfig } from "@electron-forge/shared-types";
 import fs from "fs-extra";
 import * as module from "module";
 import * as path from "path";
+import { forge } from "../../lateImports.js";
 
 // ToDo: Remove these helpers as soon it is possible to provide a config through the api
 declare module "module" {
@@ -50,7 +51,7 @@ function makeInteractiveDefault<T extends { interactive?: boolean; }>(options: T
 export async function runForgePackage(options: PackageOptions = {}, config?: ForgeConfig): Promise<void> {
   options = makeInteractiveDefault(options);
   registerForgeConfigForDirectory(options.dir, config);
-  await api.package(options);
+  await (await forge()).api.package(options);
   registerForgeConfigForDirectory(options.dir, null);
 }
 
@@ -63,7 +64,7 @@ export async function runForgePackage(options: PackageOptions = {}, config?: For
 export async function runForgeMake(options: MakeOptions = {}, config?: ForgeConfig): Promise<void> {
   options = makeInteractiveDefault(options);
   registerForgeConfigForDirectory(options.dir, config);
-  await api.make(options);
+  await (await forge()).api.make(options);
   registerForgeConfigForDirectory(options.dir, null);
 }
 
@@ -76,7 +77,7 @@ export async function runForgeMake(options: MakeOptions = {}, config?: ForgeConf
 export async function runForgePublish(options: PublishOptions = {}, config?: ForgeConfig): Promise<void> {
   options = makeInteractiveDefault(options);
   registerForgeConfigForDirectory(options.dir, config);
-  await api.publish(options);
+  await (await forge()).api.publish(options);
   registerForgeConfigForDirectory(options.dir, null);
 }
 
@@ -90,7 +91,7 @@ export async function runForgeStart(options: StartOptions = {}, config?: ForgeCo
   options = makeInteractiveDefault(options);
   if (options.interactive)
     registerForgeConfigForDirectory(options.dir, config);
-  const spawned = await api.start(options);
+  const spawned = await (await forge()).api.start(options);
   // Wait until electron process exits
   await new Promise<void>((resolve, reject) => {
     function listenForExit(child: ElectronProcess) {

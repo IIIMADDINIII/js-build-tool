@@ -1,8 +1,7 @@
 
 import type { RollupOptions, SerializedTimings } from "rollup";
-import * as loadConfigFile_js from "rollup/dist/shared/loadConfigFile.js";
-import * as parseAst_js from "rollup/dist/shared/parseAst.js";
-import * as rollup from "rollup/dist/shared/rollup.js";
+import { getLoadConfigFileJs, parseAst_js, rollupJs } from "../../lateImports.js";
+
 
 const BYTE_UNITS = [
   'B',
@@ -81,7 +80,8 @@ async function build(inputOptions: RollupOptions, warnings: Warnings, silent = f
   if (outputOptions === undefined) outputOptions = [];
   if (!Array.isArray(outputOptions)) outputOptions = [outputOptions];
   const start = Date.now();
-  const files = outputOptions.map(t => parseAst_js.relativeId(t.file || t.dir));
+  const relativeId = (await parseAst_js()).relativeId;
+  const files = outputOptions.map(t => relativeId(t.file || t.dir));
   if (!silent) {
     let inputFiles;
     if (typeof inputOptions.input === 'string') {
@@ -93,28 +93,28 @@ async function build(inputOptions: RollupOptions, warnings: Warnings, silent = f
     else if (typeof inputOptions.input === 'object' && inputOptions.input !== null) {
       inputFiles = Object.values(inputOptions.input).join(', ');
     }
-    rollup.stderr(rollup.cyan(`\n${rollup.bold(inputFiles)} → ${rollup.bold(files.join(', '))}...`));
+    (await rollupJs()).stderr((await rollupJs()).cyan(`\n${(await rollupJs()).bold(inputFiles)} → ${(await rollupJs()).bold(files.join(', '))}...`));
   }
-  const bundle = await rollup.rollup(inputOptions);
+  const bundle = await (await rollupJs()).rollup(inputOptions);
   await Promise.all(outputOptions.map(bundle.write));
   await bundle.close();
   if (!silent) {
     warnings.flush();
-    rollup.stderr(rollup.green(`created ${rollup.bold(files.join(', '))} in ${rollup.bold(prettyMilliseconds(Date.now() - start))}`));
+    (await rollupJs()).stderr((await rollupJs()).green(`created ${(await rollupJs()).bold(files.join(', '))} in ${(await rollupJs()).bold(prettyMilliseconds(Date.now() - start))}`));
     if (bundle && bundle.getTimings) {
-      printTimings(bundle.getTimings());
+      await printTimings(bundle.getTimings());
     }
   }
 }
 
-function printTimings(timings: SerializedTimings) {
+async function printTimings(timings: SerializedTimings) {
   for (const [label, [time, memory, total]] of Object.entries(timings)) {
     let appliedColor = (text: string) => text;
     if (label[0] === '#') {
       if (label[1] === '#') {
-        appliedColor = rollup.bold;
+        appliedColor = (await rollupJs()).bold;
       } else {
-        appliedColor = rollup.underline;
+        appliedColor = (await rollupJs()).underline;
       }
     }
     const row = `${label}: ${time.toFixed(0)}ms, ${prettyBytes(memory)} / ${prettyBytes(total)}`;
@@ -145,18 +145,18 @@ interface Warnings {
 
 async function getConfigList(config: RollupOptions[] | RollupOptions): Promise<RollupOptions[]> {
   if (Object.keys(config).length === 0) {
-    return rollup.error(rollup.errorMissingConfig());
+    return (await rollupJs()).error((await rollupJs()).errorMissingConfig());
   }
   return Array.isArray(config) ? config : [config];
 }
 
 async function loadConfigFile(rollupOptions: RollupOptions[] | RollupOptions, commandOptions: CommandOptions) {
   const configs = await getConfigList(rollupOptions);
-  const warnings = loadConfigFile_js.batchWarnings(commandOptions.silent);
+  const warnings = (await getLoadConfigFileJs()).batchWarnings(commandOptions.silent);
   try {
     const normalizedConfigs = [];
     for (const config of configs) {
-      const options = await rollup.mergeOptions(config, { external: [], globals: undefined }, warnings.add);
+      const options = await (await rollupJs()).mergeOptions(config, { external: [], globals: undefined }, warnings.add);
       normalizedConfigs.push(options);
     }
     return { options: normalizedConfigs, warnings };
@@ -184,15 +184,15 @@ export async function run(rollupOptions?: RollupOptions[] | RollupOptions, comma
       }
       if (command.failAfterWarnings && warnings.warningOccurred) {
         warnings.flush();
-        rollup.handleError(rollup.errorFailAfterWarnings(), true);
+        (await rollupJs()).handleError((await rollupJs()).errorFailAfterWarnings(), true);
       }
     } catch (error) {
       warnings.flush();
-      rollup.handleError(error, true);
+      (await rollupJs()).handleError(error, true);
       throw error;
     }
   } catch (error) {
-    rollup.handleError(error, true);
+    (await rollupJs()).handleError(error, true);
     throw error;
   }
 }

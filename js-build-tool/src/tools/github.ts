@@ -1,4 +1,5 @@
-import { fetchLatestRelease, fetchReleaseByTag, type FetchReleaseOptions } from "fetch-github-release";
+import { type FetchReleaseOptions } from "fetch-github-release";
+import { fetchGithubRelease } from "../lateImports.js";
 
 /**
  * A list of multiple Assets.
@@ -48,7 +49,7 @@ export interface DownloadLatestGithubReleaseOptions {
  * @public
  */
 export async function downloadLatestGithubRelease(options: DownloadLatestGithubReleaseOptions): Promise<void> {
-  await fetchLatestRelease(options);
+  await (await fetchGithubRelease()).fetchLatestRelease(options);
 }
 
 /**
@@ -91,5 +92,5 @@ export interface DownloadGithubReleaseOptions {
  * @public
  */
 export async function downloadGithubRelease(options: DownloadGithubReleaseOptions): Promise<void> {
-  await fetchReleaseByTag(options);
+  await (await fetchGithubRelease()).fetchReleaseByTag(options);
 }

@@ -1,14 +1,13 @@
 
-import commonjs, { type RollupCommonJSOptions } from "@rollup/plugin-commonjs";
-import json, { type RollupJsonOptions } from "@rollup/plugin-json";
-import { nodeResolve, type RollupNodeResolveOptions } from '@rollup/plugin-node-resolve';
-import terser, { type Options as TerserOptions } from "@rollup/plugin-terser";
-import typescript, { type RollupTypescriptOptions } from "@rollup/plugin-typescript";
-import fastGlob from "fast-glob";
+import { type RollupCommonJSOptions } from "@rollup/plugin-commonjs";
+import { type RollupJsonOptions } from "@rollup/plugin-json";
+import { type RollupNodeResolveOptions } from '@rollup/plugin-node-resolve';
+import { type Options as TerserOptions } from "@rollup/plugin-terser";
+import { type RollupTypescriptOptions } from "@rollup/plugin-typescript";
 import path from "path";
 import type { Plugin, TreeshakingOptions, TreeshakingPreset } from "rollup";
-import consts from "rollup-plugin-consts";
-import sourceMaps, { type SourcemapsPluginOptions } from 'rollup-plugin-include-sourcemaps';
+import { type SourcemapsPluginOptions } from 'rollup-plugin-include-sourcemaps';
+import { commonjs, consts, fastGlob, json, nodeResolve, sourceMaps, terser, typescript } from "../../lateImports.js";
 import { fs } from "../../tools/file.js";
 import { getDependencies, getDevDependencies, getPackageType, getTopLevelExports } from "../../tools/package.js";
 import { isProd } from "../../tools/prod.js";
@@ -650,7 +649,7 @@ async function getDefaultExports(): Promise<ExportsOpts> {
 
 async function getDefaultTests(defaultConfigOpts: DefaultConfigOpts): Promise<ExportsOpts> {
   const searchPath = path.resolve(defaultConfigOpts.inputBasePath);
-  const files = await fastGlob(defaultConfigOpts.testFileGlobPatterns, { cwd: searchPath });
+  const files = await (await fastGlob()).default(defaultConfigOpts.testFileGlobPatterns, { cwd: searchPath });
   const testFiles: ExportsOpts = {};
   await Promise.all(files.map(async (file) => {
     const inputFileExt = path.extname(file).toLocaleLowerCase();
@@ -670,15 +669,15 @@ async function getDefaultTests(defaultConfigOpts: DefaultConfigOpts): Promise<Ex
 async function getDefaultPlugins(defaultExportOpts: DefaultExportOpts): Promise<Plugin[]> {
   let plugins = [
     manageDependencies(defaultExportOpts.manageDependenciesPlugin),
-    consts(defaultExportOpts.constsPlugin),
-    json(defaultExportOpts.jsonPlugin),
-    commonjs(defaultExportOpts.commonjsPlugin),
-    typescript(defaultExportOpts.typescriptPlugin),
-    sourceMaps(defaultExportOpts.sourceMapsPlugin),
-    nodeResolve(defaultExportOpts.nodeResolvePlugin),
+    (await consts()).default(defaultExportOpts.constsPlugin),
+    (await json()).default(defaultExportOpts.jsonPlugin),
+    (await commonjs()).default(defaultExportOpts.commonjsPlugin),
+    (await typescript()).default(defaultExportOpts.typescriptPlugin),
+    (await sourceMaps()).default(defaultExportOpts.sourceMapsPlugin),
+    (await nodeResolve()).nodeResolve(defaultExportOpts.nodeResolvePlugin),
   ];
   if (defaultExportOpts.minify) {
-    plugins.push(terser(defaultExportOpts.terserPlugin));
+    plugins.push((await terser()).default(defaultExportOpts.terserPlugin));
   }
   return plugins;
 }

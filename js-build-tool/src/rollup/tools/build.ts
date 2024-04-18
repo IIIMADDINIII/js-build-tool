@@ -1,7 +1,8 @@
-import { ExtractorLogLevel, type IConfigFile } from "@microsoft/api-extractor";
+import { type IConfigFile } from "@microsoft/api-extractor";
 import * as fs from "fs/promises";
 import * as path from "path";
 import type { OutputOptions, RollupOptions } from "rollup";
+import { apiExtractor } from "../../lateImports.js";
 import { runApiExtrator } from "../../tools/apiExtractor.js";
 import { getPackageType } from "../../tools/package.js";
 import { cwd } from "../../tools/paths.js";
@@ -77,16 +78,16 @@ export async function bundleDeclarations(defaultConfigOpts: DefaultConfigOpts): 
       pathsToRemove.add(declDir);
       const apiExtractorConfig: IConfigFile = {
         messages: {
-          compilerMessageReporting: { default: { logLevel: ExtractorLogLevel.Warning } },
+          compilerMessageReporting: { default: { logLevel: (await apiExtractor()).ExtractorLogLevel.Warning } },
           extractorMessageReporting: {
-            default: { logLevel: ExtractorLogLevel.Warning },
-            "ae-unresolved-link": { logLevel: ExtractorLogLevel.None },
+            default: { logLevel: (await apiExtractor()).ExtractorLogLevel.Warning },
+            "ae-unresolved-link": { logLevel: (await apiExtractor()).ExtractorLogLevel.None },
           },
           tsdocMessageReporting: {
-            default: { logLevel: ExtractorLogLevel.Warning },
-            "tsdoc-undefined-tag": { logLevel: ExtractorLogLevel.None },
-            "tsdoc-escape-right-brace": { logLevel: ExtractorLogLevel.None },
-            "tsdoc-malformed-inline-tag": { logLevel: ExtractorLogLevel.None },
+            default: { logLevel: (await apiExtractor()).ExtractorLogLevel.Warning },
+            "tsdoc-undefined-tag": { logLevel: (await apiExtractor()).ExtractorLogLevel.None },
+            "tsdoc-escape-right-brace": { logLevel: (await apiExtractor()).ExtractorLogLevel.None },
+            "tsdoc-malformed-inline-tag": { logLevel: (await apiExtractor()).ExtractorLogLevel.None },
           },
         },
         mainEntryPointFilePath: source,
@@ -100,7 +101,7 @@ export async function bundleDeclarations(defaultConfigOpts: DefaultConfigOpts): 
           untrimmedFilePath: defaultOutputOpts.declarationTarget,
         },
       };
-      runApiExtrator(path.resolve("package.json"), apiExtractorConfig);
+      await runApiExtrator(path.resolve("package.json"), apiExtractorConfig);
     }
   }
   await Promise.all([...pathsToRemove.values()].map(async (path) => fs.rm(path, { recursive: true })));

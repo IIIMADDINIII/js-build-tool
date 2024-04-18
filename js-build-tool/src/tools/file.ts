@@ -1,7 +1,7 @@
 
 import * as fs from "fs/promises";
 import path from "path";
-import { parse } from "yaml";
+import { yaml } from "../lateImports.js";
 import { projectPath } from "./paths.js";
 
 export { fs };
@@ -43,7 +43,7 @@ export async function readJson(relPath: string): Promise<any> {
  * @public
  */
 export async function readYaml(relPath: string): Promise<any> {
-  return parse(await read(relPath));
+  return (await yaml()).parse(await read(relPath));
 }
 
 /**
