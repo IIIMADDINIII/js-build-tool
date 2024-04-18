@@ -26,5 +26,5 @@ export async function version() {
     tools.exec({ cwd: tools.file("./js-build-tool-types") })`pnpm version -f --no-git-tag-version ${version}`,
   ]);
   await tools.createCommit({ message: `v${version}`, all: true });
-  await exec`git tag -m v${version} v${version}`;
+  await tools.exec`git tag -m v${version} v${version}`;
 }
