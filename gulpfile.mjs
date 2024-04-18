@@ -10,4 +10,5 @@ export const build = tools.exitAfter(
 export const buildCi = tools.exitAfter(
   tasks.cleanWithGit(),
   tasks.prodInstallDependencies(),
-  tools.parallel(tasks.runWorkspaceScript("build", "./js-build-tool"), tasks.runWorkspaceScript("build", "./js-build-tool-cli")));
+  tools.parallel(tasks.runWorkspaceScript("build", "./js-build-tool"), tasks.runWorkspaceScript("build", "./js-build-tool-cli")),
+  tasks.runWorkspaceScript("build", "./js-build-tool-types"));
