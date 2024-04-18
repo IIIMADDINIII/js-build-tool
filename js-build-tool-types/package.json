@@ -2,6 +2,10 @@
   "name": "@iiimaddiniii/js-build-tool-types",
   "version": "0.7.1",
   "description": "Global packages made available by the js-buid-tool",
+  "scripts": {
+    "build": "pnpm run gulp build",
+    "gulp": "pnpm --package=@iiimaddiniii/js-build-tool@0.7.6 dlx js-build-tool"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/IIIMADDINIII/js-build-tool"
@@ -12,10 +16,6 @@
     "url": "https://github.com/IIIMADDINIII/js-build-tool/issues"
   },
   "homepage": "https://github.com/IIIMADDINIII/js-build-tool#readme",
-  "scripts": {
-    "build": "pnpm run gulp build",
-    "gulp": "pnpm --package=@iiimaddiniii/js-build-tool@0.7.6 dlx js-build-tool"
-  },
   "main": "",
   "types": "index.d.ts",
   "peerDependencies": {

@@ -20,11 +20,8 @@
     }
   },
   "scripts": {
-    "clean": "pnpm run gulp clean",
     "build": "pnpm run gulp build",
-    "buildCi": "pnpm run gulp buildCi",
-    "gulp": "pnpm --package=@iiimaddiniii/js-build-tool@0.7.6 dlx js-build-tool",
-    "test": "pnpm --package=@iiimaddiniii/js-build-tool-cli@0.7.7-5 dlx js-build-tool build"
+    "gulp": "pnpm --package=@iiimaddiniii/js-build-tool@0.7.6 dlx js-build-tool"
   },
   "repository": {
     "type": "git",
