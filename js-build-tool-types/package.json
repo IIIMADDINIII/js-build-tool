@@ -23,6 +23,6 @@
     "typescript": ">=5.2.2"
   },
   "devDependencies": {
-    "@iiimaddiniii/js-build-tool": "^0.7.1"
+    "@types/js-build-tool-types": "npm:@iiimaddiniii/js-build-tool-types@0.7.6"
   }
 }

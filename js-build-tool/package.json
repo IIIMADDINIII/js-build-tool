@@ -28,7 +28,7 @@
   "homepage": "https://github.com/IIIMADDINIII/js-build-tool#readme",
   "devDependencies": {
     "@types/gulp": "^4.0.17",
-    "@types/js-build-tool-types": "npm:@iiimaddiniii/js-build-tool-types@^0.7.6",
+    "@types/js-build-tool-types": "npm:@iiimaddiniii/js-build-tool-types@0.7.6",
     "@types/node": "^20.12.5",
     "@types/fs-extra": "^11.0.4",
     "@schemastore/package": "^0.0.10",

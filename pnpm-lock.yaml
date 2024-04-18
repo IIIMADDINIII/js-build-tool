@@ -9,7 +9,7 @@ importers:
   .:
     devDependencies:
       '@types/js-build-tool-types':
-        specifier: npm:@iiimaddiniii/js-build-tool-types@^0.7.2
+        specifier: npm:@iiimaddiniii/js-build-tool-types@0.7.6
         version: /@iiimaddiniii/js-build-tool-types@0.7.6(@types/node@20.12.7)(typescript@5.4.4)
 
   js-build-tool:
@@ -100,7 +100,7 @@ importers:
         specifier: ^4.0.17
         version: 4.0.17
       '@types/js-build-tool-types':
-        specifier: npm:@iiimaddiniii/js-build-tool-types@^0.7.2
+        specifier: npm:@iiimaddiniii/js-build-tool-types@0.7.6
         version: /@iiimaddiniii/js-build-tool-types@0.7.6(@types/node@20.12.7)(typescript@5.4.4)
       '@types/node':
         specifier: ^20.12.5
@@ -119,7 +119,7 @@ importers:
         version: 2.6.2
     devDependencies:
       '@types/js-build-tool-types':
-        specifier: npm:@iiimaddiniii/js-build-tool-types@^0.7.6
+        specifier: npm:@iiimaddiniii/js-build-tool-types@0.7.6
         version: /@iiimaddiniii/js-build-tool-types@0.7.6(@types/node@20.12.7)(typescript@5.4.4)
       '@types/node':
         specifier: ^20.8.10
@@ -137,9 +137,9 @@ importers:
         specifier: '>=5.2.2'
         version: 5.4.4
     devDependencies:
-      '@iiimaddiniii/js-build-tool':
-        specifier: ^0.7.1
-        version: link:../js-build-tool
+      '@types/js-build-tool-types':
+        specifier: npm:@iiimaddiniii/js-build-tool-types@0.7.6
+        version: /@iiimaddiniii/js-build-tool-types@0.7.6(@types/node@20.12.7)(typescript@5.4.4)
 
 packages:
 
