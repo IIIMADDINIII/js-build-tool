@@ -10,4 +10,5 @@
 /jest.config.mjs
 /gulpfile.mjs
 /src
-/.tmpBuild/
+/dist/index.d.ts
+/dist/index.js.map

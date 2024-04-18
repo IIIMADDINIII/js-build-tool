@@ -10,3 +10,4 @@
 /jest.config.mjs
 /gulpfile.mjs
 /src
+/dependencies.json
