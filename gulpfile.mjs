@@ -12,3 +12,15 @@ export const buildCi = tools.exitAfter(
   tasks.prodInstallDependencies(),
   tools.parallel(tasks.runWorkspaceScript("build", "./js-build-tool"), tasks.runWorkspaceScript("build", "./js-build-tool-cli")),
   tasks.runWorkspaceScript("build", "./js-build-tool-types"));
+
+export async function version() {
+  let arg = process.argv.at(-1);
+  if (arg === undefined || !arg.startsWith("--")) arg = "--patch";
+  arg = arg.slice(2);
+  await tools.exec()`pnpm version -f --no-git-tag-version ${arg}`;
+  const version = await tools.getPackageVersion(undefined, false);
+  if (version === undefined) throw new Error("Could not Read main package Version.");
+  await tools.exec({ cwd: tools.file("./js-build-tool") })`pnpm version -f --no-git-tag-version ${version}`;
+  await tools.exec({ cwd: tools.file("./js-build-tool-cli") })`pnpm version -f --no-git-tag-version ${version}`;
+  await tools.exec({ cwd: tools.file("./js-build-tool-types") })`pnpm version -f --no-git-tag-version ${version}`;
+}
