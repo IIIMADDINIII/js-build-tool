@@ -20,5 +20,10 @@
   "homepage": "https://github.com/IIIMADDINIII/js-build-tool#readme",
   "devDependencies": {
     "@types/js-build-tool-types": "npm:@iiimaddiniii/js-build-tool-types@^0.7.2"
-  }
+  },
+  "workspaces": [
+    "js-build-tool",
+    "js-build-tool-cli",
+    "js-build-tool-types"
+  ]
 }
