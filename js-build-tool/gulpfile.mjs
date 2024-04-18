@@ -29,5 +29,4 @@ const rollupOptions = {
 };
 
 export const build = tools.exitAfter(
-  tasks.installDependencies(),
   rollup.tasks.build(rollupOptions));

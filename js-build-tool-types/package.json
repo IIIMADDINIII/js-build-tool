@@ -4,21 +4,18 @@
   "description": "Global packages made available by the js-buid-tool",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/IIIMADDINIII/js-build-tool-types"
+    "url": "git+https://github.com/IIIMADDINIII/js-build-tool"
   },
   "author": "IIIMADDINIII <martin@elend.name>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/IIIMADDINIII/js-build-tool-types/issues"
+    "url": "https://github.com/IIIMADDINIII/js-build-tool/issues"
   },
+  "homepage": "https://github.com/IIIMADDINIII/js-build-tool#readme",
   "scripts": {
-    "clean": "pnpm run gulp clean",
     "build": "pnpm run gulp build",
-    "buildCi": "pnpm run gulp buildCi",
-    "publishPackage": "pnpm run gulp publishPackage",
-    "gulp": "pnpm --package=@iiimaddiniii/js-build-tool@0.7.1 dlx js-build-tool"
+    "gulp": "pnpm --package=@iiimaddiniii/js-build-tool@0.7.6 dlx js-build-tool"
   },
-  "homepage": "https://github.com/IIIMADDINIII/js-build-tool-types#readme",
   "main": "",
   "types": "index.d.ts",
   "peerDependencies": {

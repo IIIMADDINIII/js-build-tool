@@ -1,2 +1,4 @@
 packages:
   - "js-build-tool"
+  - "js-build-tool-cli"
+  - "js-build-tool-types"

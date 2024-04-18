@@ -1,3 +1,4 @@
+import dependencies from "#dependencies";
 import { mkdir, readFile, stat, writeFile } from "fs/promises";
 import { tmpdir } from "os";
 import { join, resolve } from "path";
@@ -6,42 +7,13 @@ import { setTimeout } from "timers/promises";
 import { pnpmInstall } from "./pnpmInstall.js";
 
 /**
- * List of dependencies wich should be installed.
- */
-const dependencies = {
-  "@iiimaddiniii/js-build-tool": "0.7.6",
-  "@electron-forge/core": "7.3.1",
-  "@electron-forge/maker-wix": "7.3.1",
-  "@electron-forge/maker-zip": "7.3.1",
-  "@electron-forge/plugin-fuses": "7.3.1",
-  "@electron/fuses": "1.8.0",
-  "fs-extra": "10.0.0",
-  "@rollup/plugin-commonjs": "25.0.7",
-  "@rollup/plugin-json": "6.1.0",
-  "@rollup/plugin-node-resolve": "15.2.3",
-  "@rollup/plugin-terser": "0.4.4",
-  "@rollup/plugin-typescript": "11.1.6",
-  "@rollup/pluginutils": "5.1.0",
-  "fast-glob": "3.3.2",
-  "fetch-github-release": "1.0.0",
-  "rollup-plugin-consts": "1.2.0",
-  "rollup-plugin-include-sourcemaps": "0.7.0",
-  "rollup": "4.14.0",
-  "gulp": "4.0.2",
-  "tslib": "2.6.2",
-  "typescript": "5.4.4",
-  "yaml": "2.4.0",
-  "@lit/localize-tools": "0.7.2",
-  "@microsoft/api-extractor": "7.43.0"
-};
-
-/**
  * Makes sure that the dependencies are installed.
  * Either because they are already installed or they get installed.
  * @returns the path of the Dependency directory.
  */
 export async function ensureDependencies(): Promise<string> {
-  const dependenciesDir = await getDependenciesDir();
+  const ownVersion = await getOwnVersion();
+  const dependenciesDir = await getDependenciesDir(ownVersion || "0.0.0");
   const doneFile = resolve(dependenciesDir, "done");
   const busyFile = resolve(dependenciesDir, "busy");
   let retryCount = 0;
@@ -62,6 +34,7 @@ export async function ensureDependencies(): Promise<string> {
       try {
         if (retryCount !== 0) process.stdout.write("\n");
         process.stdout.write(`Preparing Dependencies in ${dependenciesDir}\n`);
+        (dependencies as { [key: string]: string; })["@iiimaddiniii/js-build-tool"] = ownVersion || ">=0";
         await pnpmInstall(dependenciesDir, dependencies);
         try {
           await writeFile(doneFile, "");
@@ -90,15 +63,14 @@ export async function ensureDependencies(): Promise<string> {
  * Generates a folder based on appData folder (or temp dir if not found) and version.
  * @returns the path where the dependencies should be installed.
  */
-async function getDependenciesDir(): Promise<string> {
-  const version = await getOwnVersion() || "0.0.0";
+async function getDependenciesDir(ownVersion: string): Promise<string> {
   let appDataFolder = getAppDataDir();
   let isTemp = false;
   if (appDataFolder === undefined) {
     isTemp = true;
     appDataFolder = tmpdir();
   }
-  let dependenciesDir = resolve(appDataFolder, "js-build-tool", version);
+  let dependenciesDir = resolve(appDataFolder, "js-build-tool", ownVersion);
   if (isTemp) dependenciesDir = resolve(dependenciesDir, (Math.random() * 999999999).toFixed(0));
   await mkdir(dependenciesDir, { recursive: true });
   return dependenciesDir;
