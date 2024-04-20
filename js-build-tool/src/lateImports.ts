@@ -31,8 +31,5 @@ export const fuses = createCachedImportFunction<typeof import("@electron/fuses")
 export const forge = createCachedImportFunction<typeof import("@electron-forge/core")>("@electron-forge/core");
 export const fetchGithubRelease = createCachedImportFunction<typeof import("fetch-github-release")>("fetch-github-release");
 export const RuntimeLitLocalizer = createCachedImportFunction<typeof import("@lit/localize-tools/lib/modes/runtime.js")>("@lit/localize-tools/lib/modes/runtime.js");
-
-
-
-
-
+export const minimatch = createCachedImportFunction<typeof import("minimatch")>("minimatch");
+export const chalk = createCachedImportFunction<typeof import("chalk")>("chalk");

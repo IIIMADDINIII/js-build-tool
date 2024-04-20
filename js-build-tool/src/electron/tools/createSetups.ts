@@ -94,7 +94,6 @@ async function addPackagesToFilesToInclude(options: CreateSetupOptionsNorm, file
   if (packages === undefined) return;
   for (const pack of packages) {
     if (options.ignorePackages.includes(pack)) continue;
-    if (pack.includes("*")) console.warn(`Entry ${pack} inside pnpm-workspace.yaml is ignored because it includes a wildcard`);
     const packPath = path.resolve(options.dir, pack);
     const jsonPath = path.resolve(packPath, "package.json");
     const exports = (await getAllPackageExportsPaths(jsonPath)).map((p) => path.resolve(packPath, p));

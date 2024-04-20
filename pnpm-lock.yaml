@@ -53,6 +53,9 @@ importers:
       '@rollup/pluginutils':
         specifier: 5.1.0
         version: 5.1.0(rollup@4.14.0)
+      chalk:
+        specifier: 5.3.0
+        version: 5.3.0
       execa:
         specifier: 8.0.1
         version: 8.0.1
@@ -68,6 +71,9 @@ importers:
       gulp:
         specifier: 4.0.2
         version: 4.0.2
+      minimatch:
+        specifier: ^9.0.4
+        version: 9.0.4
       rollup:
         specifier: 4.14.0
         version: 4.14.0
@@ -911,6 +917,10 @@ packages:
   chalk@4.1.2:
     resolution: {integrity: sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==}
     engines: {node: '>=10'}
+
+  chalk@5.3.0:
+    resolution: {integrity: sha512-dLitG79d+GV1Nb/VYcCDFivJeK1hiukt9QjRNVOsUtTy1rR1YJsmpGGTZ3qJos+uw7WmWF4wUwBd9jxjocFC2w==}
+    engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
 
   chokidar@2.1.8:
     resolution: {integrity: sha512-ZmZUazfOzf0Nve7duiCKD23PFSCs4JPoYyccjUFF3aQkQadqBhfzhjkwBH2mNOG9cTBwhamM37EIsIkZw3nRgg==}
@@ -2283,8 +2293,8 @@ packages:
   nice-try@1.0.5:
     resolution: {integrity: sha512-1nh45deeb5olNY7eX82BkPO7SSxR5SSYJiPTrTdFUVYwAl8CKMA5N9PjTYkHiRjisVcxcQ1HXdLhx2qxxJzLNQ==}
 
-  node-abi@3.58.0:
-    resolution: {integrity: sha512-pXY1jnGf5T7b8UNzWzIqf0EkX4bx/w8N2AvwlGnk2SYYA/kzDVPaH0Dh0UG4EwxBB5eKOIZKPr8VAHSHL1DPGg==}
+  node-abi@3.60.0:
+    resolution: {integrity: sha512-zcGgwoXbzw9NczqbGzAWL/ToDYAxv1V8gL1D67ClbdkIfeeDBbY0GelZtC25ayLvVjr2q2cloHeQV1R0QAWqRQ==}
     engines: {node: '>=10'}
 
   node-api-version@0.2.0:
@@ -2551,8 +2561,8 @@ packages:
     resolution: {integrity: sha512-dUnb5dXUf+kzhC/W/F4e5/SkluXIFf5VUHolW1Eg1irn1hGWjPGdsRcvYJ1nD6lhk8Ir7VM0bHJKsYTx8Jx9OQ==}
     engines: {node: '>=4'}
 
-  pe-library@1.0.0:
-    resolution: {integrity: sha512-yZ+4d3YHKUjO0BX03oXFfHRKLdYKDO2HmCt1RcApPxme/P5ASPbbKnuQkzFrmT482wi2kfO+sPgqasrz5QeU1w==}
+  pe-library@1.0.1:
+    resolution: {integrity: sha512-nh39Mo1eGWmZS7y+mK/dQIqg7S1lp38DpRxkyoHf0ZcUs/HDc+yyTjuOtTvSMZHmfSLuSQaX945u05Y2Q6UWZg==}
     engines: {node: '>=14', npm: '>=7'}
 
   pend@1.2.0:
@@ -2744,8 +2754,8 @@ packages:
   require-main-filename@1.0.1:
     resolution: {integrity: sha512-IqSUtOVP4ksd1C/ej5zeEh/BIP2ajqpn8c5x+q99gvcIG/Qf0cud5raVnE/Dwd0ua9TXYDoDc0RE5hBSdz22Ug==}
 
-  resedit@2.0.0:
-    resolution: {integrity: sha512-vrrJCabKxAW4MT1QivtAAb0poGp8KT2qhnSzfN9tFIxb2rQu1hRHNn1VgGSZR7nmxGaW5Yz0YeW1bjgvRfNoKA==}
+  resedit@2.0.2:
+    resolution: {integrity: sha512-UKTnq602iVe+W5SyRAQx/WdWMnlDiONfXBLFg/ur4QE4EQQ8eP7Jgm5mNXdK12kKawk1vvXPja2iXKqZiGDW6Q==}
     engines: {node: '>=14', npm: '>=7'}
 
   resolve-alpn@1.2.1:
@@ -3694,7 +3704,7 @@ snapshots:
       junk: 3.1.0
       parse-author: 2.0.0
       plist: 3.1.0
-      resedit: 2.0.0
+      resedit: 2.0.2
       resolve: 1.22.8
       semver: 7.6.0
       yargs-parser: 21.1.1
@@ -3709,7 +3719,7 @@ snapshots:
       detect-libc: 2.0.3
       fs-extra: 10.0.0
       got: 11.8.6
-      node-abi: 3.58.0
+      node-abi: 3.60.0
       node-api-version: 0.2.0
       node-gyp: 9.4.1
       ora: 5.4.1
@@ -4496,6 +4506,8 @@ snapshots:
     dependencies:
       ansi-styles: 4.3.0
       supports-color: 7.2.0
+
+  chalk@5.3.0: {}
 
   chokidar@2.1.8:
     dependencies:
@@ -6090,7 +6102,7 @@ snapshots:
 
   nice-try@1.0.5: {}
 
-  node-abi@3.58.0:
+  node-abi@3.60.0:
     dependencies:
       semver: 7.6.0
 
@@ -6353,7 +6365,7 @@ snapshots:
     dependencies:
       pify: 2.3.0
 
-  pe-library@1.0.0: {}
+  pe-library@1.0.1: {}
 
   pend@1.2.0: {}
 
@@ -6544,9 +6556,9 @@ snapshots:
 
   require-main-filename@1.0.1: {}
 
-  resedit@2.0.0:
+  resedit@2.0.2:
     dependencies:
-      pe-library: 1.0.0
+      pe-library: 1.0.1
 
   resolve-alpn@1.2.1: {}
 

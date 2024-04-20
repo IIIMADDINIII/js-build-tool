@@ -64,4 +64,4 @@ export const gulpDirectory = dirname(gulpFilePath);
  * Can be used to store temporary files wich will be deleted after the task finished.
  * @public
  */
-export const buildDir = gulpFilePath;
+export const buildDir = gulpDirectory;

@@ -13,7 +13,7 @@ export async function runGulp(tempDir: string, args: string[]): Promise<number> 
   const cwd = process.cwd();
   await copyFile(resolve(cwd, "gulpfile.mjs"), gulpFilePath);
   try {
-    const result = await $({ reject: false, verbose: true, stdio: "inherit", cleanup: true, env: { GULP_FILE: gulpFilePath } })`gulp -f ${gulpFilePath} --cwd ${cwd} ${args}`;
+    const result = await $({ reject: false, verbose: true, stdio: "inherit", cleanup: true, env: { GULP_FILE: gulpFilePath }, preferLocal: false })`gulp -f ${gulpFilePath} --cwd ${cwd} ${args}`;
     return result.exitCode;
   } catch (e) {
     if ((typeof e !== "object") || (e === null) || !("exitCode" in e) || (typeof e.exitCode !== "number")) return -1;

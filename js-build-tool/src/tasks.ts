@@ -261,3 +261,33 @@ export function buildTranslationPackage(config?: LitLocalizeConfig): TaskFunctio
     await tools.buildTranslationPackage(config);
   });
 }
+
+/**
+ * Runs a Gulp Script in a temporary folder.
+ * Can directly be used as an Rollup Task. 
+ * @param gulpScript - the script to run. Can be a folder, then "gulpfile.mjs" is used as the file.
+ * @param args - args to send to the gulp process (default = []).
+ * @param label - prefix for the cli output (default = gulpScript + arg[0]).
+ * @param dependencies - object, listing additional dependencies wich to install.
+ * @returns A Gulp Task.
+ * @public
+ */
+export function runGulpScript(gulpScript: string, args: string[] = [], label?: string | undefined, dependencies?: { [key: string]: string; } | undefined): TaskFunction {
+  return setDisplayName("runGulpScript", async function runGulpScript() {
+    await tools.runGulpScript(gulpScript, args, label, dependencies);
+  });
+}
+
+/**
+ * Executes scripts in local packages matching the glob pattern.
+ * Can directly be used as an Rollup Task. 
+ * @param globPattern - object with glob patterns as keys and the args for the matching scripts as values.
+ * @param respectLocalDependencies - only start functions for Packages, when dependencies finished (default = true).
+ * @returns A Gulp Task.
+ * @public
+ */
+export function runScriptsInPackages(globPattern: tools.PackagesScripts, respectLocalDependencies: boolean = true): TaskFunction {
+  return setDisplayName("runScriptsInPackages", async function runScriptsInPackages() {
+    await tools.runScriptsInPackages(globPattern, respectLocalDependencies);
+  });
+}
