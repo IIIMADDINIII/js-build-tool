@@ -1,6 +1,6 @@
 {
   "name": "@iiimaddiniii/js-build-tool-types",
-  "version": "0.7.9",
+  "version": "0.7.10",
   "description": "Global packages made available by the js-build-tool",
   "scripts": {
     "build": "pnpm run gulp build",
