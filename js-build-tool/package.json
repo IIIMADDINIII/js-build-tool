@@ -1,6 +1,6 @@
 {
   "name": "@iiimaddiniii/js-build-tool",
-  "version": "0.7.8",
+  "version": "0.7.9",
   "description": "Tool for building my javascript projects",
   "exports": {
     ".": {
