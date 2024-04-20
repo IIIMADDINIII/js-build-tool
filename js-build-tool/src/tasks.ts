@@ -266,15 +266,16 @@ export function buildTranslationPackage(config?: LitLocalizeConfig): TaskFunctio
  * Runs a Gulp Script in a temporary folder.
  * Can directly be used as an Rollup Task. 
  * @param gulpScript - the script to run. Can be a folder, then "gulpfile.mjs" is used as the file.
- * @param args - args to send to the gulp process (default = []).
+ * @param tasks - args to send to the gulp process (default = []).
  * @param label - prefix for the cli output (default = gulpScript + arg[0]).
  * @param dependencies - object, listing additional dependencies wich to install.
+ * @param ignoreTaskMissing - ignores if the Task is missing (default = false).
  * @returns A Gulp Task.
  * @public
  */
-export function runGulpScript(gulpScript: string, args: string[] = [], label?: string | undefined, dependencies?: { [key: string]: string; } | undefined): TaskFunction {
+export function runGulpScript(gulpScript: string, args: string[] = [], label?: string | undefined, dependencies?: { [key: string]: string; } | undefined, ignoreTaskMissing: boolean = false): TaskFunction {
   return setDisplayName("runGulpScript", async function runGulpScript() {
-    await tools.runGulpScript(gulpScript, args, label, dependencies);
+    await tools.runGulpScript(gulpScript, args, label, dependencies, ignoreTaskMissing);
   });
 }
 
@@ -283,11 +284,12 @@ export function runGulpScript(gulpScript: string, args: string[] = [], label?: s
  * Can directly be used as an Rollup Task. 
  * @param globPattern - object with glob patterns as keys and the args for the matching scripts as values.
  * @param respectLocalDependencies - only start functions for Packages, when dependencies finished (default = true).
+ * @param ignoreTaskMissing - ignores if the Task is missing (default = true).
  * @returns A Gulp Task.
  * @public
  */
-export function runScriptsInPackages(globPattern: tools.PackagesScripts, respectLocalDependencies: boolean = true): TaskFunction {
+export function runScriptsInPackages(globPattern: tools.PackagesScripts, respectLocalDependencies: boolean = true, ignoreTaskMissing: boolean = true): TaskFunction {
   return setDisplayName("runScriptsInPackages", async function runScriptsInPackages() {
-    await tools.runScriptsInPackages(globPattern, respectLocalDependencies);
+    await tools.runScriptsInPackages(globPattern, respectLocalDependencies, ignoreTaskMissing);
   });
 }
