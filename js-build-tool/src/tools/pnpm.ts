@@ -5,7 +5,7 @@ import { minimatch } from "../lateImports.js";
 import { exec } from "./exec.js";
 import { getNodeVersionToUse } from "./package.js";
 import { projectPath } from "./paths.js";
-import { isProd } from "./prod.js";
+import { isProd, setProd } from "./prod.js";
 
 /**
  * Install and activate node using the version range specified by package.json engines.pnpm.
@@ -34,6 +34,17 @@ export async function installDependencies(): Promise<void> {
   } else {
     await exec`pnpm install --config.confirmModulesPurge=false`;
   }
+}
+
+/**
+ * A combination of {@link setProd} and {@link installDependencies}.
+ * Set Production mode and after installing pnpm installing all dependencies.
+ * Pnpm version specified by range in package.json engines.pnpm.
+ * @public
+ */
+export async function prodInstallDependencies(): Promise<void> {
+  setProd();
+  await installDependencies();
 }
 
 /**

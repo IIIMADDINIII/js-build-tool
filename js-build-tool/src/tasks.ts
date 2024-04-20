@@ -1,7 +1,7 @@
 
 import { type IConfigFile } from "@microsoft/api-extractor";
 import * as tools from "./tools.js";
-import { series, type TaskFunction } from "./tools/gulp.js";
+import { type TaskFunction } from "./tools/gulp.js";
 import { setDisplayName } from "./tools/misc.js";
 
 import * as electron from "./electron/tasks.js";
@@ -35,9 +35,8 @@ export function installDependencies(): TaskFunction {
   });
 }
 
-
 /**
- * A combination of {@link setProd}, {@link selectPnpm} and {@link installDependencies}.
+ * A combination of {@link setProd} and {@link installDependencies}.
  * Set Production mode and after installing pnpm installing all dependencies.
  * Pnpm version specified by range in package.json engines.pnpm.
  * Can directly be used as an Rollup Task.
@@ -45,7 +44,9 @@ export function installDependencies(): TaskFunction {
  * @public
  */
 export function prodInstallDependencies(): TaskFunction {
-  return setDisplayName("prodInstallDependencies", series(setProd(), installDependencies()));
+  return setDisplayName("prodInstallDependencies", async function prodInstallDependencies() {
+    await tools.prodInstallDependencies();
+  });
 }
 
 /**
