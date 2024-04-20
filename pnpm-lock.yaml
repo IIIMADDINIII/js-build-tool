@@ -9,8 +9,8 @@ importers:
   .:
     devDependencies:
       '@types/js-build-tool-types':
-        specifier: npm:@iiimaddiniii/js-build-tool-types@0.8.0
-        version: '@iiimaddiniii/js-build-tool-types@0.8.0(@types/node@20.12.7)(typescript@5.4.5)'
+        specifier: npm:@iiimaddiniii/js-build-tool-types@0.8.1-0
+        version: '@iiimaddiniii/js-build-tool-types@0.8.1-0(@types/node@20.12.7)(encoding@0.1.13)(typescript@5.4.5)'
 
   js-build-tool:
     dependencies:
@@ -106,8 +106,8 @@ importers:
         specifier: ^4.0.17
         version: 4.0.17
       '@types/js-build-tool-types':
-        specifier: npm:@iiimaddiniii/js-build-tool-types@0.8.0
-        version: '@iiimaddiniii/js-build-tool-types@0.8.0(@types/node@20.12.7)(typescript@5.4.5)'
+        specifier: npm:@iiimaddiniii/js-build-tool-types@0.8.1-0
+        version: '@iiimaddiniii/js-build-tool-types@0.8.1-0(@types/node@20.12.7)(encoding@0.1.13)(typescript@5.4.5)'
       '@types/node':
         specifier: ^20.12.5
         version: 20.12.7
@@ -125,8 +125,8 @@ importers:
         version: 2.6.2
     devDependencies:
       '@types/js-build-tool-types':
-        specifier: npm:@iiimaddiniii/js-build-tool-types@0.8.0
-        version: '@iiimaddiniii/js-build-tool-types@0.8.0(@types/node@20.12.7)(typescript@5.4.5)'
+        specifier: npm:@iiimaddiniii/js-build-tool-types@0.8.1-0
+        version: '@iiimaddiniii/js-build-tool-types@0.8.1-0(@types/node@20.12.7)(encoding@0.1.13)(typescript@5.4.5)'
       '@types/node':
         specifier: ^20.8.10
         version: 20.12.7
@@ -136,9 +136,6 @@ importers:
 
   js-build-tool-types:
     dependencies:
-      '@iiimaddiniii/js-build-tool':
-        specifier: workspace:*
-        version: link:../js-build-tool
       '@types/node':
         specifier: '>=20.8.10'
         version: 20.12.7
@@ -146,9 +143,12 @@ importers:
         specifier: '>=5.2.2'
         version: 5.4.4
     devDependencies:
+      '@iiimaddiniii/js-build-tool':
+        specifier: workspace:*
+        version: link:../js-build-tool
       '@types/js-build-tool-types':
-        specifier: npm:@iiimaddiniii/js-build-tool-types@0.8.0
-        version: '@iiimaddiniii/js-build-tool-types@0.8.0(@types/node@20.12.7)(typescript@5.4.4)'
+        specifier: npm:@iiimaddiniii/js-build-tool-types@0.8.1-0
+        version: '@iiimaddiniii/js-build-tool-types@0.8.1-0(@types/node@20.12.7)(encoding@0.1.13)(typescript@5.4.4)'
 
 packages:
 
@@ -269,11 +269,14 @@ packages:
     resolution: {integrity: sha512-kjotm7XJrJ6v+7knhPaRgaT6q8F8K2jiafwYdNHLzmV0uGLuZY43FK6smNSHUPrhq5kX2slCUy+RGG/xGqmIKA==}
     engines: {node: '>=10.13.0'}
 
-  '@iiimaddiniii/js-build-tool-types@0.8.0':
-    resolution: {integrity: sha512-FOJznH3btu5jZsKALS8s9dO171wKY7CFVxOwFhhnqEI+NYB8f6MaMMqQ7wIt7FVEbdsAnSfJZDWclKPjduRMFg==}
+  '@iiimaddiniii/js-build-tool-types@0.8.1-0':
+    resolution: {integrity: sha512-kWudmMlqKxb3eq3Hji9Sx4RQGOzVeyBbcSgT0RtzjXWhmL8Q+uko7Aqa5vhgLtRwWFSppaCg3fJl6WCmXmE/hA==}
     peerDependencies:
       '@types/node': '>=20.8.10'
       typescript: '>=5.2.2'
+
+  '@iiimaddiniii/js-build-tool@0.8.1-0':
+    resolution: {integrity: sha512-mpvxmnpMywdRLGKe0UUJABwVveoa62jNlEi3MglQBCmGoYz/LI2/eJylMgEOQ7IGcV615GUD6yGKfi/p7m1Yhw==}
 
   '@jridgewell/gen-mapping@0.3.5':
     resolution: {integrity: sha512-IzL8ZoEDIBRWEzlCcRhOaCupYyN5gdIK+Q6fbFdPDg6HqX6jpkItn7DFIpW9LQzXG6Df9sA7+OKnq0qlz/GaQg==}
@@ -3104,15 +3107,59 @@ snapshots:
     dependencies:
       is-negated-glob: 1.0.0
 
-  '@iiimaddiniii/js-build-tool-types@0.8.0(@types/node@20.12.7)(typescript@5.4.4)':
+  '@iiimaddiniii/js-build-tool-types@0.8.1-0(@types/node@20.12.7)(encoding@0.1.13)(typescript@5.4.4)':
     dependencies:
+      '@iiimaddiniii/js-build-tool': 0.8.1-0(@types/node@20.12.7)(encoding@0.1.13)
       '@types/node': 20.12.7
       typescript: 5.4.4
+    transitivePeerDependencies:
+      - bluebird
+      - encoding
+      - supports-color
 
-  '@iiimaddiniii/js-build-tool-types@0.8.0(@types/node@20.12.7)(typescript@5.4.5)':
+  '@iiimaddiniii/js-build-tool-types@0.8.1-0(@types/node@20.12.7)(encoding@0.1.13)(typescript@5.4.5)':
     dependencies:
+      '@iiimaddiniii/js-build-tool': 0.8.1-0(@types/node@20.12.7)(encoding@0.1.13)
       '@types/node': 20.12.7
       typescript: 5.4.5
+    transitivePeerDependencies:
+      - bluebird
+      - encoding
+      - supports-color
+
+  '@iiimaddiniii/js-build-tool@0.8.1-0(@types/node@20.12.7)(encoding@0.1.13)':
+    dependencies:
+      '@electron-forge/core': 7.4.0(encoding@0.1.13)
+      '@electron-forge/maker-wix': 7.4.0
+      '@electron-forge/maker-zip': 7.4.0
+      '@electron-forge/plugin-fuses': 7.4.0(@electron/fuses@1.8.0)
+      '@electron/fuses': 1.8.0
+      '@lit/localize-tools': 0.7.2
+      '@microsoft/api-extractor': 7.43.1(@types/node@20.12.7)
+      '@rollup/plugin-commonjs': 25.0.7(rollup@4.15.0)
+      '@rollup/plugin-json': 6.1.0(rollup@4.15.0)
+      '@rollup/plugin-node-resolve': 15.2.3(rollup@4.15.0)
+      '@rollup/plugin-terser': 0.4.4(rollup@4.15.0)
+      '@rollup/plugin-typescript': 11.1.6(rollup@4.15.0)(tslib@2.6.2)(typescript@5.4.5)
+      '@rollup/pluginutils': 5.1.0(rollup@4.15.0)
+      chalk: 5.3.0
+      execa: 8.0.1
+      fast-glob: 3.3.2
+      fetch-github-release: 1.0.0(encoding@0.1.13)
+      fs-extra: 10.0.0
+      gulp: 5.0.0
+      minimatch: 9.0.4
+      rollup: 4.15.0
+      rollup-plugin-consts: 1.2.0(rollup@4.15.0)
+      rollup-plugin-include-sourcemaps: 0.7.0(@types/node@20.12.7)(rollup@4.15.0)
+      tslib: 2.6.2
+      typescript: 5.4.5
+      yaml: 2.4.1
+    transitivePeerDependencies:
+      - '@types/node'
+      - bluebird
+      - encoding
+      - supports-color
 
   '@jridgewell/gen-mapping@0.3.5':
     dependencies:

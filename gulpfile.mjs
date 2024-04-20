@@ -28,8 +28,7 @@ export async function version() {
 }
 
 export async function publish() {
-  tools.setProd();
-  await tools.installDependencies();
+  await tools.prodInstallDependencies();
   await tools.runScriptsInPackages({ "**": "build" });
   await version();
   await tools.exec`pnpm -r publish`;
