@@ -114,6 +114,14 @@ export type PackagesDependenciesDescription = { fullPath: string; name: string |
  */
 export type PackagesDependencies = Map<string, PackagesDependenciesDescription>;
 
+function addDependencies(depend: unknown, dependencies: string[]) {
+  if (typeof depend !== "object" || depend === null) throw new Error("Could not retrieve dependencies");
+  for (const value of Object.values(depend) as unknown[]) {
+    if (typeof value !== "object" || value === null || !("path" in value) || typeof value.path !== "string") throw new Error("Could not retrieve dependencies");
+    dependencies.push(relative(projectPath, value.path).replaceAll("\\", "/"));
+  }
+}
+
 /**
  * Returns a list of project Packages with dependencies in the following form:
  * {relPath: {relPath: string, fullPath: string; name: string; dependencies: string[];}}
@@ -139,14 +147,9 @@ export async function getPnpmPackagesWithLocalDependencies(): Promise<PackagesDe
     }
     let relPath = relative(projectPath, fullPath).replaceAll("\\", "/");
     let dependencies: string[] = [];
-    if ("dependencies" in dep) {
-      const depend = dep.dependencies;
-      if (typeof depend !== "object" || depend === null) throw new Error("Could not retrieve dependencies");
-      for (const value of Object.values(depend) as unknown[]) {
-        if (typeof value !== "object" || value === null || !("path" in value) || typeof value.path !== "string") throw new Error("Could not retrieve dependencies");
-        dependencies.push(relative(projectPath, value.path).replaceAll("\\", "/"));
-      }
-    }
+    if ("dependencies" in dep) addDependencies(dep.dependencies, dependencies);
+    if ("devDependencies" in dep) addDependencies(dep.devDependencies, dependencies);
+    if ("optionalDependencies" in dep) addDependencies(dep.optionalDependencies, dependencies);
     ret.set(relPath, { relPath, fullPath, name, dependencies });
   }
   return ret;

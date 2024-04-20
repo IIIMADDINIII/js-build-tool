@@ -21,7 +21,7 @@
   },
   "scripts": {
     "build": "pnpm run gulp build",
-    "gulp": "pnpm --package=@iiimaddiniii/js-build-tool-cli@0.7.8 dlx js-build-tool"
+    "gulp": "pnpm --package=@iiimaddiniii/js-build-tool-cli@0.8.0 dlx js-build-tool"
   },
   "repository": {
     "type": "git",
@@ -35,7 +35,7 @@
   "homepage": "https://github.com/IIIMADDINIII/js-build-tool#readme",
   "devDependencies": {
     "@types/node": "^20.8.10",
-    "@types/js-build-tool-types": "npm:@iiimaddiniii/js-build-tool-types@0.7.8",
+    "@types/js-build-tool-types": "npm:@iiimaddiniii/js-build-tool-types@0.8.0",
     "@types/proper-lockfile": "^4.1.4"
   },
   "dependencies": {

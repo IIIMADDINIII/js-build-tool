@@ -4,14 +4,12 @@ export const clean = tools.exitAfter(tasks.cleanWithGit());
 
 export const build = tools.exitAfter(
   tasks.installDependencies(),
-  tools.parallel(tasks.runWorkspaceScript("build", "./js-build-tool"), tasks.runWorkspaceScript("build", "./js-build-tool-cli")),
-  tasks.runWorkspaceScript("build", "./js-build-tool-types"));
+  tasks.runScriptsInPackages({ "**": "build" }));
 
 export const buildCi = tools.exitAfter(
   tasks.cleanWithGit(),
   tasks.prodInstallDependencies(),
-  tools.parallel(tasks.runWorkspaceScript("build", "./js-build-tool"), tasks.runWorkspaceScript("build", "./js-build-tool-cli")),
-  tasks.runWorkspaceScript("build", "./js-build-tool-types"));
+  tasks.runScriptsInPackages({ "**": "build" }));
 
 export async function version() {
   let arg = process.argv.at(-1);
@@ -30,6 +28,8 @@ export async function version() {
 }
 
 export async function publish() {
+  await tools.prodInstallDependencies();
+  await tools.runScriptsInPackages({ "**": "build" });
   await version();
   await tools.exec`pnpm -r publish`;
 }

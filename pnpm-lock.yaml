@@ -9,8 +9,8 @@ importers:
   .:
     devDependencies:
       '@types/js-build-tool-types':
-        specifier: npm:@iiimaddiniii/js-build-tool-types@0.7.8
-        version: '@iiimaddiniii/js-build-tool-types@0.7.8(@types/node@20.12.7)(typescript@5.4.5)'
+        specifier: npm:@iiimaddiniii/js-build-tool-types@0.8.0
+        version: '@iiimaddiniii/js-build-tool-types@0.8.0(@types/node@20.12.7)(typescript@5.4.5)'
 
   js-build-tool:
     dependencies:
@@ -106,8 +106,8 @@ importers:
         specifier: ^4.0.17
         version: 4.0.17
       '@types/js-build-tool-types':
-        specifier: npm:@iiimaddiniii/js-build-tool-types@0.7.8
-        version: '@iiimaddiniii/js-build-tool-types@0.7.8(@types/node@20.12.7)(typescript@5.4.5)'
+        specifier: npm:@iiimaddiniii/js-build-tool-types@0.8.0
+        version: '@iiimaddiniii/js-build-tool-types@0.8.0(@types/node@20.12.7)(typescript@5.4.5)'
       '@types/node':
         specifier: ^20.12.5
         version: 20.12.7
@@ -125,8 +125,8 @@ importers:
         version: 2.6.2
     devDependencies:
       '@types/js-build-tool-types':
-        specifier: npm:@iiimaddiniii/js-build-tool-types@0.7.8
-        version: '@iiimaddiniii/js-build-tool-types@0.7.8(@types/node@20.12.7)(typescript@5.4.5)'
+        specifier: npm:@iiimaddiniii/js-build-tool-types@0.8.0
+        version: '@iiimaddiniii/js-build-tool-types@0.8.0(@types/node@20.12.7)(typescript@5.4.5)'
       '@types/node':
         specifier: ^20.8.10
         version: 20.12.7
@@ -136,6 +136,9 @@ importers:
 
   js-build-tool-types:
     dependencies:
+      '@iiimaddiniii/js-build-tool':
+        specifier: workspace:*
+        version: link:../js-build-tool
       '@types/node':
         specifier: '>=20.8.10'
         version: 20.12.7
@@ -144,8 +147,8 @@ importers:
         version: 5.4.4
     devDependencies:
       '@types/js-build-tool-types':
-        specifier: npm:@iiimaddiniii/js-build-tool-types@0.7.8
-        version: '@iiimaddiniii/js-build-tool-types@0.7.8(@types/node@20.12.7)(typescript@5.4.4)'
+        specifier: npm:@iiimaddiniii/js-build-tool-types@0.8.0
+        version: '@iiimaddiniii/js-build-tool-types@0.8.0(@types/node@20.12.7)(typescript@5.4.4)'
 
 packages:
 
@@ -266,8 +269,8 @@ packages:
     resolution: {integrity: sha512-kjotm7XJrJ6v+7knhPaRgaT6q8F8K2jiafwYdNHLzmV0uGLuZY43FK6smNSHUPrhq5kX2slCUy+RGG/xGqmIKA==}
     engines: {node: '>=10.13.0'}
 
-  '@iiimaddiniii/js-build-tool-types@0.7.8':
-    resolution: {integrity: sha512-pLBhttyWuIsBuRKNhFoX3/LVV425Y0A4telGKhDjjThzZW878Vh/8hJBcJwfOrd/cs3nTChu89VHtJ+oa+qk0w==}
+  '@iiimaddiniii/js-build-tool-types@0.8.0':
+    resolution: {integrity: sha512-FOJznH3btu5jZsKALS8s9dO171wKY7CFVxOwFhhnqEI+NYB8f6MaMMqQ7wIt7FVEbdsAnSfJZDWclKPjduRMFg==}
     peerDependencies:
       '@types/node': '>=20.8.10'
       typescript: '>=5.2.2'
@@ -3101,12 +3104,12 @@ snapshots:
     dependencies:
       is-negated-glob: 1.0.0
 
-  '@iiimaddiniii/js-build-tool-types@0.7.8(@types/node@20.12.7)(typescript@5.4.4)':
+  '@iiimaddiniii/js-build-tool-types@0.8.0(@types/node@20.12.7)(typescript@5.4.4)':
     dependencies:
       '@types/node': 20.12.7
       typescript: 5.4.4
 
-  '@iiimaddiniii/js-build-tool-types@0.7.8(@types/node@20.12.7)(typescript@5.4.5)':
+  '@iiimaddiniii/js-build-tool-types@0.8.0(@types/node@20.12.7)(typescript@5.4.5)':
     dependencies:
       '@types/node': 20.12.7
       typescript: 5.4.5
