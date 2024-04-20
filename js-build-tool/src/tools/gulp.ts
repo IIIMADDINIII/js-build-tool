@@ -229,14 +229,15 @@ export type PackagesScripts = { [globPattern: string]: string[] | string; };
  * Executes scripts in local packages matching the glob pattern.
  * @param globPattern - object with glob patterns as keys and the args for the matching scripts as values.
  * @param respectLocalDependencies - only start functions for Packages, when dependencies finished (default = true).
+ * @param ignoreCurrentGulpFile - do not execute in the current package (default = true).
  * @param ignoreTaskMissing - ignores if the Task is missing (default = true).
  * @public
  */
-export async function runScriptsInPackages(globPattern: PackagesScripts, respectLocalDependencies: boolean = true, ignoreTaskMissing: boolean = true): Promise<void> {
+export async function runScriptsInPackages(globPattern: PackagesScripts, respectLocalDependencies: boolean = true, ignoreCurrentGulpFile: boolean = true, ignoreTaskMissing: boolean = true): Promise<void> {
   const globPatternObject: GlopPatternObject = Object.fromEntries(Object.entries(globPattern)
     .map(([key, args]) => ([key, (relPath) => {
       return runGulpScript(relPath, args, undefined, undefined, ignoreTaskMissing);
     }]))
   );
-  await runForDependencies(globPatternObject, respectLocalDependencies);
+  await runForDependencies(globPatternObject, respectLocalDependencies, ignoreCurrentGulpFile);
 }

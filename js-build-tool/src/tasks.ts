@@ -284,12 +284,13 @@ export function runGulpScript(gulpScript: string, args: string[] = [], label?: s
  * Can directly be used as an Rollup Task. 
  * @param globPattern - object with glob patterns as keys and the args for the matching scripts as values.
  * @param respectLocalDependencies - only start functions for Packages, when dependencies finished (default = true).
+ * @param ignoreCurrentGulpFile - do not execute in the current package (default = true).
  * @param ignoreTaskMissing - ignores if the Task is missing (default = true).
  * @returns A Gulp Task.
  * @public
  */
-export function runScriptsInPackages(globPattern: tools.PackagesScripts, respectLocalDependencies: boolean = true, ignoreTaskMissing: boolean = true): TaskFunction {
+export function runScriptsInPackages(globPattern: tools.PackagesScripts, respectLocalDependencies: boolean = true, ignoreCurrentGulpFile: boolean = true, ignoreTaskMissing: boolean = true): TaskFunction {
   return setDisplayName("runScriptsInPackages", async function runScriptsInPackages() {
-    await tools.runScriptsInPackages(globPattern, respectLocalDependencies, ignoreTaskMissing);
+    await tools.runScriptsInPackages(globPattern, respectLocalDependencies, ignoreCurrentGulpFile, ignoreTaskMissing);
   });
 }

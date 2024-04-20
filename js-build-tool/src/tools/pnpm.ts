@@ -180,15 +180,16 @@ export type GlopPatternObject = { [globPattern: string]: (relPath: string) => Pr
  * If a package has a local dependency, it is delayed until the dependencies run successfully (or respectLocalDependencies is set to false).
  * @param globPatternObject - object mapping from a glob pattern to the function to run.
  * @param respectLocalDependencies - only start functions for Packages, when dependencies finished (default = true).
+ * @param ignoreCurrentGulpFile - do not execute in the current package (default = true).
  * @public
  */
-export async function runForDependencies(globPatternObject: GlopPatternObject, respectLocalDependencies: boolean = true): Promise<void> {
+export async function runForDependencies(globPatternObject: GlopPatternObject, respectLocalDependencies: boolean = true, ignoreCurrentGulpFile: boolean = true): Promise<void> {
   const localPackages = await getPnpmPackagesWithLocalDependencies();
   const promiseCache: Map<PackagesDependenciesDescription, () => Promise<void>> = new Map();
   const Minimatch = (await minimatch()).Minimatch;
   const patterns = new Map(Object.entries(globPatternObject).map(([pattern, fn]) => [new Minimatch(pattern), fn]));
   function runTask(pack: PackagesDependenciesDescription): Promise<void> {
-    if (!respectLocalDependencies) return getPatternRunner(pack.relPath, patterns)();
+    if (!respectLocalDependencies) return getPatternRunner(pack.relPath, patterns, ignoreCurrentGulpFile)();
     const cache = promiseCache.get(pack);
     if (cache !== undefined) return cache();
     promiseCache.set(pack, () => Promise.reject("Cyclic Dependencies are not supported."));
@@ -201,7 +202,7 @@ export async function runForDependencies(globPatternObject: GlopPatternObject, r
       });
       deps = Promise.all(dependencies);
     }
-    const promise = deps.then(getPatternRunner(pack.relPath, patterns));
+    const promise = deps.then(getPatternRunner(pack.relPath, patterns, ignoreCurrentGulpFile));
     promiseCache.set(pack, () => promise);
     return promise;
   }
@@ -212,8 +213,10 @@ export async function runForDependencies(globPatternObject: GlopPatternObject, r
  * Helper function to run all tasks for a relPath
  * @param relPath - the relative path to execute.
  * @param patterns - map of all Patterns to check against.
+ * @param ignoreCurrentGulpFile - do not execute in the current package.
  */
-function getPatternRunner(relPath: string, patterns: Map<import("minimatch").Minimatch, (relPath: string) => Promise<unknown>>): () => Promise<void> {
+function getPatternRunner(relPath: string, patterns: Map<import("minimatch").Minimatch, (relPath: string) => Promise<unknown>>, ignoreCurrentGulpFile: boolean): () => Promise<void> {
+  if (relPath === "" && ignoreCurrentGulpFile) return () => Promise.resolve();
   const path = relPath + "/";
   const fns = [...patterns.entries()].filter(([minimatch, _]) => minimatch.match(path)).map(([_, fn]) => fn);
   return async function run(): Promise<void> {
