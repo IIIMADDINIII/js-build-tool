@@ -89,8 +89,7 @@ export async function runForgePublish(options: PublishOptions = {}, config?: For
  */
 export async function runForgeStart(options: StartOptions = {}, config?: ForgeConfig): Promise<void> {
   options = makeInteractiveDefault(options);
-  if (options.interactive)
-    registerForgeConfigForDirectory(options.dir, config);
+  registerForgeConfigForDirectory(options.dir, config);
   const spawned = await (await forge()).api.start(options);
   // Wait until electron process exits
   await new Promise<void>((resolve, reject) => {

@@ -174,7 +174,7 @@ export async function getPnpmPackages(): Promise<string[] | undefined> {
   try {
     const pack = <unknown>JSON.parse((await exec({ stdio: "pipe", verbose: false })`pnpm list -r --json --depth -1`).stdout);
     if (!Array.isArray(pack)) throw new Error("Could not retrieve dependencies");
-    return pack.map((pack) => relative(projectPath, pack));
+    return pack.map((pack) => relative(projectPath, pack.path));
   } catch {
     return undefined;
   }

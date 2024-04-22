@@ -1,6 +1,6 @@
 import type { ForgeConfig, ForgeConfigMaker, ForgeConfigPlugin, ForgePackagerOptions, IForgeMaker, StartOptions } from "@electron-forge/shared-types";
 import * as path from "path";
-import { FusesPlugin, MakerZIP, fuses } from "../../lateImports.js";
+import { FusesPlugin, MakerZIP, fastGlob, fuses } from "../../lateImports.js";
 import { getAllPackageExportsPaths, getPackageMain } from "../../tools/package.js";
 import { projectPath } from "../../tools/paths.js";
 import { getPnpmPackages } from "../../tools/pnpm.js";
@@ -32,8 +32,8 @@ export interface CreateSetupsOptions {
   /**
   * List of files to also package in to the Asar file.
   * By default only the main package.json and sub-packages and the exported members get included.
-  * Every package needs to be listed explicitly (wildcard is not supported).
-  * @default []
+  * File Path can also be a glob pattern.
+  * @default [".\/assets\/**\/*"]
   */
   additionalFilesToPackage: string[];
   /**
@@ -110,7 +110,8 @@ async function generateIgnoreFunction(options: CreateSetupOptionsNorm): Promise<
     filesToInclude.addAllPaths(packageMain);
   }
   if (options.additionalFilesToPackage !== undefined) {
-    filesToInclude.addAllPaths(...options.additionalFilesToPackage);
+    const files = await (await fastGlob()).default(options.additionalFilesToPackage, { cwd: options.dir });
+    filesToInclude.addAllPaths(...files);
   }
   return function ignore(file: string): boolean {
     return !filesToInclude.hasPath(file.substring(1));
@@ -196,7 +197,7 @@ function deduplicateStringArray<T extends string>(arr: T[]): T[] {
 
 function normalizeCreateSetupOptions(options?: CreateSetupsOptions): CreateSetupOptionsNorm {
   return {
-    additionalFilesToPackage: getDefault(options?.additionalFilesToPackage, []),
+    additionalFilesToPackage: getDefault(options?.additionalFilesToPackage, [".\/assets\/**\/*"]),
     ignorePackages: getDefault(options?.ignorePackages, ["common"]),
     makeZips: getDefault(options?.makeZips, true),
     targets: deduplicateStringArray(getDefault(options?.targets, ["win32-x64", "win32-arm64", "linux-x64", "linux-arm64", "darwin-x64"])),
