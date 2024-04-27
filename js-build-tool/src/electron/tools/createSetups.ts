@@ -35,35 +35,49 @@ export interface CreateSetupsOptions {
   * File Path can also be a glob pattern.
   * @default [".\/assets\/**\/*"]
   */
-  additionalFilesToPackage: string[];
+  additionalFilesToPackage?: string[];
+  /**
+   * All files matching this minimatch glob pattern will not be bundled in to the asar file.
+   * Instead they will be put unter app.asar.unpacked but are still available under the path /app.asar/.
+   * Multiple patterns can be listed by using "{pattern1,pattern2}".
+   * @default undefined
+   */
+  externalFilesGlobPattern?: string | undefined;
+  /**
+   * All directories matching this minimatch glob pattern will not be bundled in to the asar file.
+   * Instead they will be put unter app.asar.unpacked but are still available under the path /app.asar/.
+   * Multiple patterns can be listed by using "{pattern1,pattern2}".
+   * @default undefined
+   */
+  externalDirsGlobPattern?: string | undefined;
   /**
   * Line inside of pnpm-workspace.yaml to not include.
   * Every package needs to be listed explicitly (wildcard is not supported).
   * @default ["common"]
   */
-  ignorePackages: string[];
+  ignorePackages?: string[];
   /**
   * Make zip files.
   * @default true
   */
-  makeZips: boolean;
+  makeZips?: boolean;
   /**
   * list of platform-architecture combinations to build.
   * @default ["win32-x64","win32-arm64","linux-x64","linux-arm64","darwin-x64"]
   */
-  targets: CreateSetupsOptionsTarget[];
+  targets?: CreateSetupsOptionsTarget[];
   /**
   * The directory where the electron app is.
   * @default process.cwd()
   */
-  dir: string;
+  dir?: string;
   /**
    * Enable electron to run as node via the ELECTRON_RUN_AS_NODE env variable.
    * This feature is needed for process.fork to work.
    * Before setting this to true try to use the electron Utility Processes.
    * @default false
    */
-  fuseRunAsNode: boolean;
+  fuseRunAsNode?: boolean;
 }
 
 type CreateSetupOptionsNorm = Required<CreateSetupsOptions>;
@@ -120,7 +134,10 @@ async function generateIgnoreFunction(options: CreateSetupOptionsNorm): Promise<
 
 async function createPackagerConfig(options: CreateSetupOptionsNorm): Promise<ForgePackagerOptions> {
   return {
-    asar: true,
+    asar: {
+      ...(options.externalFilesGlobPattern === undefined ? {} : { unpack: options.externalFilesGlobPattern }),
+      ...(options.externalDirsGlobPattern === undefined ? {} : { unpackDir: options.externalDirsGlobPattern }),
+    },
     derefSymlinks: true,
     icon: "icons/appIcon",
     ignore: await generateIgnoreFunction(options),
@@ -134,7 +151,7 @@ function addPluginMarker<T extends {}>(instance: T): T {
   return instance;
 }
 
-async function createMakersConfig(options: CreateSetupsOptions, platform: CreateSetupsOptionsPlatform, _arch: CreateSetupsOptionsArch): Promise<ForgeConfigMaker[]> {
+async function createMakersConfig(options: CreateSetupOptionsNorm, platform: CreateSetupsOptionsPlatform, _arch: CreateSetupsOptionsArch): Promise<ForgeConfigMaker[]> {
   const ret: IForgeMaker[] = [];
   if (options.makeZips) {
     if (process.platform === "win32" && platform === "darwin") {
@@ -146,7 +163,7 @@ async function createMakersConfig(options: CreateSetupsOptions, platform: Create
   return ret;
 }
 
-async function createFusePlugin(options: CreateSetupsOptions): Promise<ForgeConfigPlugin> {
+async function createFusePlugin(options: CreateSetupOptionsNorm): Promise<ForgeConfigPlugin> {
   return addPluginMarker(new (await FusesPlugin()).FusesPlugin({
     version: (await fuses()).FuseVersion.V1,
     [(await fuses()).FuseV1Options.RunAsNode]: options.fuseRunAsNode,
@@ -160,7 +177,7 @@ async function createFusePlugin(options: CreateSetupsOptions): Promise<ForgeConf
   }));
 }
 
-async function createPluginsConfig(options: CreateSetupsOptions): Promise<ForgeConfigPlugin[]> {
+async function createPluginsConfig(options: CreateSetupOptionsNorm): Promise<ForgeConfigPlugin[]> {
   return [await createFusePlugin(options)];
 }
 
@@ -184,6 +201,7 @@ function getRunningTarget(): CreateSetupsOptionsTarget {
  */
 export async function createForgeConfig(options: CreateSetupOptionsNorm, target: CreateSetupsOptionsTarget = getRunningTarget()): Promise<ForgeConfig> {
   const [platform, arch] = getPlatformArch(target);
+  console.log(await createPackagerConfig(options));
   return {
     packagerConfig: await createPackagerConfig(options),
     makers: await createMakersConfig(options, platform, arch),
@@ -198,6 +216,8 @@ function deduplicateStringArray<T extends string>(arr: T[]): T[] {
 function normalizeCreateSetupOptions(options?: CreateSetupsOptions): CreateSetupOptionsNorm {
   return {
     additionalFilesToPackage: getDefault(options?.additionalFilesToPackage, [".\/assets\/**\/*"]),
+    externalFilesGlobPattern: getDefault(options?.externalFilesGlobPattern, undefined),
+    externalDirsGlobPattern: getDefault(options?.externalDirsGlobPattern, undefined),
     ignorePackages: getDefault(options?.ignorePackages, ["common"]),
     makeZips: getDefault(options?.makeZips, true),
     targets: deduplicateStringArray(getDefault(options?.targets, ["win32-x64", "win32-arm64", "linux-x64", "linux-arm64", "darwin-x64"])),
