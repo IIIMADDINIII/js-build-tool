@@ -201,7 +201,6 @@ function getRunningTarget(): CreateSetupsOptionsTarget {
  */
 export async function createForgeConfig(options: CreateSetupOptionsNorm, target: CreateSetupsOptionsTarget = getRunningTarget()): Promise<ForgeConfig> {
   const [platform, arch] = getPlatformArch(target);
-  console.log(await createPackagerConfig(options));
   return {
     packagerConfig: await createPackagerConfig(options),
     makers: await createMakersConfig(options, platform, arch),
