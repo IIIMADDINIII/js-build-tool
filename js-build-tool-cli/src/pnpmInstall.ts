@@ -17,7 +17,7 @@ export async function pnpmInstall(dependenciesDir: string, dependencies: { [key:
  * @param dependenciesDir - folder containing the node_modules;
  */
 export function addBinToPath(dependenciesDir: string): void {
-  const path = (process.env["path"] || "").split(delimiter);
+  const path = (process.env["PATH"] || "").split(delimiter);
   path.unshift(resolve(dependenciesDir, "node_modules", ".bin"));
-  process.env["path"] = path.join(delimiter);
+  process.env["PATH"] = path.join(delimiter);
 }

@@ -9,10 +9,10 @@ import url from 'url';
  * @public
  */
 export function addToPath(folder: string, append: boolean = false): void {
-  const path = (process.env["path"] || "").split(delimiter);
+  const path = (process.env["PATH"] || "").split(delimiter);
   if (append) { path.push(resolve(folder)); }
   else { path.unshift(resolve(folder)); }
-  process.env["path"] = path.join(delimiter);
+  process.env["PATH"] = path.join(delimiter);
 }
 
 /**
