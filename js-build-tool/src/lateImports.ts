@@ -26,6 +26,7 @@ export const fastGlob = createCachedImportFunction<{ default: typeof import("fas
 export const consts = createCachedImportFunction<typeof import("rollup-plugin-consts")>("rollup-plugin-consts");
 export const sourceMaps = createCachedImportFunction<typeof import("rollup-plugin-include-sourcemaps")>("rollup-plugin-include-sourcemaps");
 export const MakerZIP = createCachedImportFunction<typeof import("@electron-forge/maker-zip")>("@electron-forge/maker-zip");
+export const MakerWix = createCachedImportFunction<typeof import("@electron-forge/maker-wix")>("@electron-forge/maker-wix");
 export const FusesPlugin = createCachedImportFunction<typeof import("@electron-forge/plugin-fuses")>("@electron-forge/plugin-fuses");
 export const fuses = createCachedImportFunction<typeof import("@electron/fuses")>("@electron/fuses");
 export const forge = createCachedImportFunction<typeof import("@electron-forge/core")>("@electron-forge/core");

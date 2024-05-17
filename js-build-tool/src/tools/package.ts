@@ -1,6 +1,7 @@
 
 import type { Dependency, JSONSchemaForNPMPackageJsonFiles } from "@schemastore/package";
-import { file, readJson } from "./file.js";
+import { randomUUID } from "crypto";
+import { file, readJson, writeJson } from "./file.js";
 
 /**
  * The type of a package.json file.
@@ -36,7 +37,7 @@ export async function readPackageJson(path: string = "package.json", cache: bool
  * @public
  */
 export async function getPackageExports(path: string = "package.json", cache: boolean = true): Promise<JSONSchemaForNPMPackageJsonFiles["exports"]> {
-  let packageJson = await readPackageJson(path, cache);
+  const packageJson = await readPackageJson(path, cache);
   return packageJson.exports;
 }
 
@@ -54,7 +55,7 @@ export async function getTopLevelExports(path: string = "package.json", cache: b
   return Object.entries(exports)
     .filter(([_key, value]) => {
       if (typeof value !== "object" || value === null) return true;
-      let keys = Object.keys(value);
+      const keys = Object.keys(value);
       return keys.length > 1 || !keys.includes("types");
     })
     .map(([key, _value]) => key);
@@ -107,7 +108,7 @@ export async function getAllPackageExportsPaths(path: string = "package.json", c
  * @public
  */
 export async function getDependencies(path: string = "package.json", cache: boolean = true): Promise<Dependency> {
-  let packageJson = await readPackageJson(path, cache);
+  const packageJson = await readPackageJson(path, cache);
   let dependencies = packageJson.dependencies;
   if (dependencies == undefined) dependencies = {};
   return dependencies;
@@ -121,7 +122,7 @@ export async function getDependencies(path: string = "package.json", cache: bool
  * @public
  */
 export async function getDevDependencies(path: string = "package.json", cache: boolean = true): Promise<Dependency> {
-  let packageJson = await readPackageJson(path, cache);
+  const packageJson = await readPackageJson(path, cache);
   let dependencies = packageJson.devDependencies;
   if (dependencies == undefined) dependencies = {};
   return dependencies;
@@ -147,7 +148,7 @@ export async function getPackageType(path: string = "package.json", cache: boole
  * @public
  */
 export async function getNodeVersionToUse(path: string = "package.json", cache: boolean = true): Promise<string | undefined> {
-  let packageJson = await readPackageJson(path, cache);
+  const packageJson = await readPackageJson(path, cache);
   return packageJson["enginesToUse"]?.["node"];
 }
 
@@ -159,7 +160,7 @@ export async function getNodeVersionToUse(path: string = "package.json", cache: 
  * @public
  */
 export async function getPackageVersion(path: string = "package.json", cache: boolean = true): Promise<string | undefined> {
-  let packageJson = await readPackageJson(path, cache);
+  const packageJson = await readPackageJson(path, cache);
   return packageJson.version;
 }
 
@@ -171,7 +172,7 @@ export async function getPackageVersion(path: string = "package.json", cache: bo
  * @public
  */
 export async function getPackageName(path: string = "package.json", cache: boolean = true): Promise<string | undefined> {
-  let packageJson = await readPackageJson(path, cache);
+  const packageJson = await readPackageJson(path, cache);
   return packageJson.name;
 }
 
@@ -183,6 +184,24 @@ export async function getPackageName(path: string = "package.json", cache: boole
  * @public
  */
 export async function getPackageMain(path: string = "package.json", cache: boolean = true): Promise<string | undefined> {
-  let packageJson = await readPackageJson(path, cache);
+  const packageJson = await readPackageJson(path, cache);
   return packageJson.main;
+}
+
+/**
+ * Reads the UUID of the upgradeCode field in the Package.json.
+ * generates a new UUID and saved the Package.json if it does not exist.
+ * @param path - path to the package.json file (default = "./package.json").
+ * @param cache - wether to use the cached package.json data (default = true).
+ * @returns the UUID in the Package.json.
+ */
+export async function getUpgradeCode(path: string = "package.json", cache: boolean = true): Promise<string> {
+  let packageJson = await readPackageJson(path, cache);
+  const data: unknown = packageJson["upgradeCode"];
+  if (typeof data === "string") return data;
+  packageJson = await readPackageJson(path, false);
+  packageJson["upgradeCode"] = randomUUID();
+  writeJson(path, packageJson);
+  await readPackageJson(path, false);
+  return packageJson["upgradeCode"];
 }

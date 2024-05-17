@@ -1,11 +1,13 @@
+import type { MakerWixConfig } from "@electron-forge/maker-wix";
 import type { ForgeConfig, ForgeConfigMaker, ForgeConfigPlugin, ForgePackagerOptions, IForgeMaker, StartOptions } from "@electron-forge/shared-types";
 import * as path from "path";
-import { FusesPlugin, MakerZIP, fastGlob, fuses } from "../../lateImports.js";
-import { getAllPackageExportsPaths, getPackageMain } from "../../tools/package.js";
+import { FusesPlugin, MakerWix, MakerZIP, fastGlob, fuses } from "../../lateImports.js";
+import { getAllPackageExportsPaths, getPackageMain, getUpgradeCode } from "../../tools/package.js";
 import { projectPath } from "../../tools/paths.js";
 import { getPnpmPackages } from "../../tools/pnpm.js";
 import { getDefault } from "../../util.js";
 import { runForgeMake, runForgePackage, runForgeStart } from "../tools/forge.js";
+import { prepareWixTools } from "./dependencies.js";
 
 /**
  * Architectures which are supported.
@@ -60,7 +62,29 @@ export interface CreateSetupsOptions {
   * Make zip files.
   * @default true
   */
-  makeZips?: boolean;
+  makeZip?: boolean;
+  /**
+  * Make wix Setups files, only for windows on windows.
+  * @default true
+  */
+  makeWix?: boolean;
+  /**
+   * Customize the the Wix Installer.
+   */
+  wixOptions?: {
+    /**
+     * Customization of the UI.
+     * @see https://www.npmjs.com/package/electron-wix-msi
+     * @default {}
+     */
+    ui?: Exclude<MakerWixConfig["ui"], undefined>;
+    /**
+     * extra featured for the installer.
+     * @see https://www.npmjs.com/package/electron-wix-msi
+     * @default undefined
+     */
+    features?: MakerWixConfig["features"] | undefined;
+  },
   /**
   * list of platform-architecture combinations to build.
   * @default ["win32-x64","win32-arm64","linux-x64","linux-arm64","darwin-x64"]
@@ -80,7 +104,7 @@ export interface CreateSetupsOptions {
   fuseRunAsNode?: boolean;
 }
 
-type CreateSetupOptionsNorm = Required<CreateSetupsOptions>;
+type CreateSetupOptionsNorm = Required<Omit<CreateSetupsOptions, "wixOptions">> & { wixOptions: Required<Exclude<CreateSetupsOptions["wixOptions"], undefined>>; };
 
 class PathSet extends Set<string> {
   #path: string;
@@ -153,11 +177,25 @@ function addPluginMarker<T extends {}>(instance: T): T {
 
 async function createMakersConfig(options: CreateSetupOptionsNorm, platform: CreateSetupsOptionsPlatform, _arch: CreateSetupsOptionsArch): Promise<ForgeConfigMaker[]> {
   const ret: IForgeMaker[] = [];
-  if (options.makeZips) {
+  if (options.makeZip) {
     if (process.platform === "win32" && platform === "darwin") {
       console.warn("Building Darwin zips on windows is not supported => Skipped");
     } else {
       ret.push(addPluginMarker(new (await MakerZIP()).MakerZIP()));
+    }
+  }
+  if (options.makeWix && platform === "win32") {
+    if (process.platform !== "win32") {
+      console.warn("Building Wix Installers is only possible on windows => Skipped");
+    } else {
+      await prepareWixTools();
+      const config: MakerWixConfig = {
+        icon: "icons/installerIcon.ico",
+        upgradeCode: await getUpgradeCode(),
+        ui: options.wixOptions.ui,
+      };
+      if (options.wixOptions.features !== undefined) config.features = options.wixOptions.features;
+      ret.push(addPluginMarker(new (await MakerWix()).MakerWix(config)));
     }
   }
   return ret;
@@ -218,7 +256,12 @@ function normalizeCreateSetupOptions(options?: CreateSetupsOptions): CreateSetup
     externalFilesGlobPattern: getDefault(options?.externalFilesGlobPattern, undefined),
     externalDirsGlobPattern: getDefault(options?.externalDirsGlobPattern, undefined),
     ignorePackages: getDefault(options?.ignorePackages, ["common"]),
-    makeZips: getDefault(options?.makeZips, true),
+    makeZip: getDefault(options?.makeZip, true),
+    makeWix: getDefault(options?.makeWix, true),
+    wixOptions: {
+      ui: getDefault(options?.wixOptions?.ui, {}),
+      features: getDefault(options?.wixOptions?.features, undefined),
+    },
     targets: deduplicateStringArray(getDefault(options?.targets, ["win32-x64", "win32-arm64", "linux-x64", "linux-arm64", "darwin-x64"])),
     dir: getDefault(options?.dir, projectPath),
     fuseRunAsNode: getDefault(options?.fuseRunAsNode, false),
