@@ -144,7 +144,7 @@ async function addPackagesToFilesToInclude(options: CreateSetupOptionsNorm, file
     const exports = (await getAllPackageExportsPaths(jsonPath)).map((p) => path.resolve(packPath, p));
     if (options.includePackageSourcemaps) {
       const mapFiles = exports.map((v) => v + ".map");
-      return filesToInclude.addAllPaths(jsonPath, ...exports, ...mapFiles);
+      exports.push(...mapFiles);
     }
     return filesToInclude.addAllPaths(jsonPath, ...exports);
   }
