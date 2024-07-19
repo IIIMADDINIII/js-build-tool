@@ -24,12 +24,12 @@ export async function version() {
     tools.exec({ cwd: tools.file("./js-build-tool-types") })`pnpm version -f --no-git-tag-version ${version}`,
   ]);
   await tools.createCommit({ message: `v${version}`, all: true });
-  await tools.exec`git tag -m v${version} v${version}`;
 }
 
 export async function publish() {
   await tools.prodInstallDependencies();
   await tools.runScriptsInPackages({ "**": "build" });
+  tasks.ensureGitIsClean();
   await version();
   await tools.exec`pnpm -r publish`;
 }
