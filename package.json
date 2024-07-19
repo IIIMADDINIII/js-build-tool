@@ -1,5 +1,5 @@
 {
-  "version": "0.9.8",
+  "version": "0.9.9",
   "description": "Tool for building my javascript projects",
   "scripts": {
     "clean": "pnpm run gulp clean",
