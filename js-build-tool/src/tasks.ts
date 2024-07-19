@@ -221,15 +221,31 @@ export function createCommit(options: CreateCommitOptions): TaskFunction {
 
 /**
  * Extract the Translation Messages using @lit/localize-tools extract command.
+ * Used defaults from buildTranslationPackage.
  * Only Runtime Mode is Supported.
  * Can directly be used as an Rollup Task.
  * @param config - The config for @lit/localize-tools.
  * @returns A Gulp Task.
  * @public
  */
-export function litLocalizeExtract(config?: LitLocalizeConfig): TaskFunction {
-  return setDisplayName("litLocalizeExtract", async function litLocalizeExtract() {
-    await tools.litLocalizeExtract(config);
+export function litLocalizeExtractPackage(config?: LitLocalizeConfig): TaskFunction {
+  return setDisplayName("litLocalizeExtractPackage", async function litLocalizeExtractPackage() {
+    await tools.litLocalizeExtractPackage(config);
+  });
+}
+
+/**
+ * Extract the Translation Messages using @lit/localize-tools extract command.
+ * Used defaults from buildTranslationSource.
+ * Only Runtime Mode is Supported.
+ * Can directly be used as an Rollup Task.
+ * @param config - The config for @lit/localize-tools.
+ * @returns A Gulp Task.
+ * @public
+ */
+export function litLocalizeExtractSource(config?: LitLocalizeConfig): TaskFunction {
+  return setDisplayName("litLocalizeExtractSource", async function litLocalizeExtractSource() {
+    await tools.litLocalizeExtractSource(config);
   });
 }
 

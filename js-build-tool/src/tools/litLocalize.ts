@@ -133,15 +133,8 @@ async function resolveLitLocalizeConfig(config?: LitLocalizeConfig, source: bool
   };
 }
 
-/**
- * Extract the Translation Messages using @lit/localize-tools extract command.
- * Only Runtime Mode is Supported.
- * @param config - The config for @lit/localize-tools.
- * @public
- */
-export async function litLocalizeExtract(config?: LitLocalizeConfig): Promise<void> {
-  //    RuntimeLitLocalizer = (await import(pathToFileURL(resolve(buildToolDependenciesPath, "node_modules", "@lit", "localize-tools", "lib", "modes", "runtime.js")).toString()))?.RuntimeLitLocalizer;
-  const localizer = new (await RuntimeLitLocalizer()).RuntimeLitLocalizer(await resolveLitLocalizeConfig(config));
+async function litLocalizeExtract(config?: LitLocalizeConfig, source: boolean = false): Promise<void> {
+  const localizer = new (await RuntimeLitLocalizer()).RuntimeLitLocalizer(await resolveLitLocalizeConfig(config, source));
   const { messages, errors } = localizer.extractSourceMessages();
   console.log('Extracting messages');
   if (errors.length > 0) {
@@ -151,6 +144,28 @@ export async function litLocalizeExtract(config?: LitLocalizeConfig): Promise<vo
   console.log(`Extracted ${messages.length} messages`);
   console.log(`Writing interchange files`);
   await localizer.writeInterchangeFiles();
+}
+
+/**
+ * Extract the Translation Messages using @lit/localize-tools extract command.
+ * Used defaults from buildTranslationPackage.
+ * Only Runtime Mode is Supported.
+ * @param config - The config for @lit/localize-tools.
+ * @public
+ */
+export async function litLocalizeExtractPackage(config?: LitLocalizeConfig): Promise<void> {
+  await litLocalizeExtract(config, false);
+}
+
+/**
+ * Extract the Translation Messages using @lit/localize-tools extract command.
+ * Used defaults from buildTranslationSource.
+ * Only Runtime Mode is Supported.
+ * @param config - The config for @lit/localize-tools.
+ * @public
+ */
+export async function litLocalizeExtractSource(config?: LitLocalizeConfig): Promise<void> {
+  await litLocalizeExtract(config, true);
 }
 
 /**
