@@ -249,7 +249,6 @@ export function litLocalizeBuild(config?: LitLocalizeConfig): TaskFunction {
 
 /**
 * Calls litLocalizeBuild, transformTranslationFilesToUseDependencyInjection and writePackageJsonExports.
- * Also overrides the baseDir default to "..".
  * Will generate a folder dist with a file for every translation, when called from a sub package named localize with default values.
  * Also Converts the generated output from litLocalizeBuild to use dependency injection (a function named templates is exported wich needs to be called with a str and html templateTag implementation as augments).
  * Can directly be used as an Rollup Task.
@@ -260,6 +259,21 @@ export function litLocalizeBuild(config?: LitLocalizeConfig): TaskFunction {
 export function buildTranslationPackage(config?: LitLocalizeConfig): TaskFunction {
   return setDisplayName("buildTranslationPackage", async function buildTranslationPackage() {
     await tools.buildTranslationPackage(config);
+  });
+}
+
+/**
+ * Calls litLocalizeBuild and transformTranslationFilesToUseDependencyInjection.
+ * Will generate a folder locales inside src with a file for every translation, when called with default values.
+ * Also Converts the generated output from litLocalizeBuild to use dependency injection (a function named templates is exported wich needs to be called with a str and html templateTag implementation as augments).
+ * Can directly be used as an Rollup Task.
+ * @param config - configuration of the litLocalizeBuild.
+ * @returns A Gulp Task.
+ * @public
+ */
+export function buildTranslationSource(config?: LitLocalizeConfig): TaskFunction {
+  return setDisplayName("buildTranslationSource", async function buildTranslationSource() {
+    await tools.buildTranslationSource(config);
   });
 }
 

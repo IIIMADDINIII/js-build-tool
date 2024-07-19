@@ -14,6 +14,8 @@ import { projectPath } from "./paths.js";
 export interface LitLocalizeConfig {
   /**
    * Base directory where the Paths a resolved against.
+   * Defaults to "." when used with buildTranslationSource.
+   * ".." is used with buildTranslationPackage.
    */
   baseDir?: string;
   /**
@@ -51,7 +53,8 @@ export interface LitXliffConfig {
   /**
    * Directory on disk to read/write .xlf XML files. For each target locale,
    * the file path "<xliffDir>/<locale>.xlf" will be used.
-   * @default "./locales/translations"
+   * Defaults to "./translations" if used with buildTranslationSource.
+   * "./locales/translations" is used as the default with buildTranslationPackage.
    */
   xliffDir?: string;
   /**
@@ -82,6 +85,9 @@ export interface OutputConfig {
    *
    * - "js": Emit JavaScript modules with ".js" file extension.
    * - "ts": Emit TypeScript modules with ".ts" file extension.
+   * 
+   * Defaults to "ts" when used with buildTranslationSource.
+   * "js" is used as the default with buildTranslationPackage.
    * @default "js"
    */
   language?: 'js' | 'ts';
@@ -89,7 +95,9 @@ export interface OutputConfig {
    * Output directory for generated modules. Into this directory will be
    * generated a <locale>.ts for each `targetLocale`, each a module that exports
    * the translations in that locale keyed by message ID.
-   * @default "./locales/dist"
+   * 
+   * Defaults to "./src/locales" if used with buildTranslationSource.
+   * "./locales/dist" is used as default with buildTranslationPackage.
    */
   outputDir?: string;
 }
@@ -99,12 +107,12 @@ export interface OutputConfig {
  * @param config - the Config to Resolve.
  * @returns the resolved Config.
  */
-async function resolveLitLocalizeConfig(config?: LitLocalizeConfig): Promise<Config & { interchange: XliffConfig; output: RuntimeOutputConfig; }> {
-  const baseDir = resolve(projectPath, config?.baseDir === undefined ? "" : config?.baseDir);
+async function resolveLitLocalizeConfig(config?: LitLocalizeConfig, source: boolean = false): Promise<Config & { interchange: XliffConfig; output: RuntimeOutputConfig; }> {
+  const baseDir = resolve(projectPath, config?.baseDir === undefined ? source ? "." : ".." : config?.baseDir);
   const sourceLocale = config?.sourceLocale || "en-x-dev";
   const interchange: XliffConfig = {
     format: "xliff",
-    xliffDir: "./locales/translations",
+    xliffDir: source ? "./translations" : "./locales/translations",
     placeholderStyle: "x",
     ...config?.interchange
   };
@@ -118,8 +126,8 @@ async function resolveLitLocalizeConfig(config?: LitLocalizeConfig): Promise<Con
     interchange,
     output: {
       mode: "runtime",
-      outputDir: "./locales/dist",
-      language: "js",
+      outputDir: source ? "./src/locales" : "./locales/dist",
+      language: source ? "ts" : "js",
       ...config?.output
     },
   };
@@ -173,7 +181,7 @@ export async function litLocalizeBuild(config?: LitLocalizeConfig): Promise<void
  */
 export async function transformTranslationFilesToUseDependencyInjection(translationDir: string): Promise<void> {
   await Promise.all((await fs.readdir(translationDir, { withFileTypes: true }))
-    .filter((e) => e.isFile() && e.name.endsWith(".js"))
+    .filter((e) => e.isFile() && (e.name.endsWith(".js") || e.name.endsWith(".ts")))
     .map(async ({ name }) => {
       const file = resolve(translationDir, name);
       let content = await fs.readFile(file, { encoding: "utf8" });
@@ -193,7 +201,7 @@ export async function transformTranslationFilesToUseDependencyInjection(translat
 export async function writePackageJsonExports(translationDir: string) {
   const packageFile = file("package.json");
   const entries = (await fs.readdir(translationDir, { withFileTypes: true }))
-    .filter((e) => e.isFile() && e.name.endsWith(".js"))
+    .filter((e) => e.isFile() && (e.name.endsWith(".js") || e.name.endsWith(".ts")))
     .map(({ name }) => {
       const relativePath = "./" + relative(dirname(packageFile), resolve(translationDir, name)).replaceAll("\\", "/");
       const key: string = "./" + name.slice(0, -3);
@@ -210,21 +218,33 @@ export async function writePackageJsonExports(translationDir: string) {
   await writeJson(packageFile, pack, true);
 }
 
-
 /**
  * Calls litLocalizeBuild, transformTranslationFilesToUseDependencyInjection and writePackageJsonExports.
- * Also overrides the baseDir default to "..".
  * Will generate a folder dist with a file for every translation, when called from a sub package named localize with default values.
  * Also Converts the generated output from litLocalizeBuild to use dependency injection (a function named templates is exported wich needs to be called with a str and html templateTag implementation as augments).
  * @param config - configuration of the litLocalizeBuild.
  * @public
  */
 export async function buildTranslationPackage(config?: LitLocalizeConfig): Promise<void> {
-  const conf = await resolveLitLocalizeConfig({ baseDir: "..", ...config });
+  const conf = await resolveLitLocalizeConfig({ baseDir: "..", ...config }, false);
   await litLocalizeBuild({ baseDir: "..", ...config });
   const translationDir = conf.resolve(conf.output.outputDir);
   await transformTranslationFilesToUseDependencyInjection(translationDir);
   await writePackageJsonExports(translationDir);
+}
+
+/**
+ * Calls litLocalizeBuild and transformTranslationFilesToUseDependencyInjection.
+ * Will generate a folder locales inside src with a file for every translation, when called with default values.
+ * Also Converts the generated output from litLocalizeBuild to use dependency injection (a function named templates is exported wich needs to be called with a str and html templateTag implementation as augments).
+ * @param config - configuration of the litLocalizeBuild.
+ * @public
+ */
+export async function buildTranslationSource(config?: LitLocalizeConfig): Promise<void> {
+  const conf = await resolveLitLocalizeConfig(config, true);
+  await litLocalizeBuild(conf);
+  const translationDir = conf.resolve(conf.output.outputDir);
+  await transformTranslationFilesToUseDependencyInjection(translationDir);
 }
 
 /**
