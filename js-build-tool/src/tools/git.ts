@@ -32,3 +32,27 @@ export interface CreateCommitOptions {
 export async function createCommit(options: CreateCommitOptions) {
   await exec`git commit ${options.all === false ? "" : "--all"} --message ${options.message}`;
 }
+
+/**
+ * Returns true if the Git Working Directory is Clean.
+ * @returns true if git working directory is clean
+ * @public
+ */
+export async function isGitClean(): Promise<boolean> {
+  const stdout = (await exec({ stdio: "pipe" })`git status --porcelain=v1 -uno`).stdout;
+  for (const line of stdout.trim().split(/\r?\n+/)) {
+    if (line.trim() !== "") {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * Throes an error if the Git Working Directory is not clean.
+ * @public
+ */
+export async function ensureGitIsClean(): Promise<void> {
+  if (await isGitClean()) return;
+  throw new Error("Git Working Directory is not clean");
+}

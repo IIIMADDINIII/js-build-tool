@@ -295,3 +295,15 @@ export function runScriptsInPackages(globPattern: tools.PackagesScripts, respect
     await tools.runScriptsInPackages(globPattern, respectLocalDependencies, ignoreCurrentGulpFile, ignoreTaskMissing);
   });
 }
+
+/**
+ * Throes an error if the Git Working Directory is not clean.
+ * Can directly be used as an Rollup Task. 
+ * @returns A Gulp Task.
+ * @public
+ */
+export function ensureGitIsClean(): TaskFunction {
+  return setDisplayName("ensureGitIsClean", async function ensureGitIsClean() {
+    await tools.ensureGitIsClean();
+  });
+}
