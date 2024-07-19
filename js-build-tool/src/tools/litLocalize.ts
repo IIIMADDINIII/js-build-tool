@@ -202,8 +202,12 @@ export async function transformTranslationFilesToUseDependencyInjection(translat
       let content = await fs.readFile(file, { encoding: "utf8" });
       // Replace all import statements with an empty string
       content = content.replaceAll(/^[^\S\r\n]*import[^\r\n]*$/mg, "");
-      // Find export and surround it with a function 
-      content = content.replace(/^[^\S\r\n]*export([\s\S]*)/mg, "let cache = undefined;\nexport function templates(str, html) {\n  if (cache !== undefined) return cache;\n $1cache = {templates};\n  return cache;\n}");
+      // Find export and surround it with a function
+      if (name.endsWith("js")) {
+        content = content.replace(/^[^\S\r\n]*export([\s\S]*)/mg, `let cache = undefined;\nexport function templates(str, html) {\n  if (cache !== undefined) return cache;\n $1cache = {templates};\n  return cache;\n}`);
+      } else {
+        content = content.replace(/^[^\S\r\n]*export([\s\S]*)/mg, `let cache: { templates: { [key: string]: string | import("@lit/localize").StrResult | import("lit").TemplateResult<1>; }; } | undefined  = undefined;\nexport function templates(str: typeof import("@lit/localize").str, html: typeof import("lit").html) {\n  if (cache !== undefined) return cache;\n $1cache = {templates};\n  return cache;\n}`);
+      }
       await fs.writeFile(file, content);
     }));
 }
