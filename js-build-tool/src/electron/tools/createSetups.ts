@@ -2,6 +2,7 @@ import type { MakerWixConfig } from "@electron-forge/maker-wix";
 import type { ForgeConfig, ForgeConfigMaker, ForgeConfigPlugin, ForgePackagerOptions, IForgeMaker, StartOptions } from "@electron-forge/shared-types";
 import * as path from "path";
 import { FusesPlugin, MakerWix, MakerZIP, fastGlob, fuses } from "../../lateImports.js";
+import { isProd } from "../../tools.js";
 import { getAllPackageExportsPaths, getPackageMain, getUpgradeCode } from "../../tools/package.js";
 import { projectPath } from "../../tools/paths.js";
 import { getPnpmPackages } from "../../tools/pnpm.js";
@@ -58,6 +59,12 @@ export interface CreateSetupsOptions {
   * @default ["common"]
   */
   ignorePackages?: string[];
+  /**
+   * Include *.map files for exported package files.
+   * In production mode defaults to false.
+   * If not in Production defaults to true.
+   */
+  includePackageSourcemaps?: boolean;
   /**
   * Make zip files.
   * @default true
@@ -135,7 +142,11 @@ async function addPackagesToFilesToInclude(options: CreateSetupOptionsNorm, file
     const packPath = path.resolve(options.dir, pack);
     const jsonPath = path.resolve(packPath, "package.json");
     const exports = (await getAllPackageExportsPaths(jsonPath)).map((p) => path.resolve(packPath, p));
-    filesToInclude.addAllPaths(jsonPath, ...exports);
+    if (options.includePackageSourcemaps) {
+      const mapFiles = exports.map((v) => v + ".map");
+      return filesToInclude.addAllPaths(jsonPath, ...exports, ...mapFiles);
+    }
+    return filesToInclude.addAllPaths(jsonPath, ...exports);
   }
 }
 
@@ -256,6 +267,7 @@ function normalizeCreateSetupOptions(options?: CreateSetupsOptions): CreateSetup
     externalFilesGlobPattern: getDefault(options?.externalFilesGlobPattern, undefined),
     externalDirsGlobPattern: getDefault(options?.externalDirsGlobPattern, undefined),
     ignorePackages: getDefault(options?.ignorePackages, ["common"]),
+    includePackageSourcemaps: getDefault(options?.includePackageSourcemaps, !isProd()),
     makeZip: getDefault(options?.makeZip, true),
     makeWix: getDefault(options?.makeWix, true),
     wixOptions: {
