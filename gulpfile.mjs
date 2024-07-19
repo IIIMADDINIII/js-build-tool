@@ -29,7 +29,7 @@ export async function version() {
 export async function publish() {
   await tools.prodInstallDependencies();
   await tools.runScriptsInPackages({ "**": "build" });
-  tasks.ensureGitIsClean();
+  await tools.ensureGitIsClean();
   await version();
   await tools.exec`pnpm -r publish`;
 }
