@@ -206,7 +206,7 @@ export async function transformTranslationFilesToUseDependencyInjection(translat
       if (name.endsWith("js")) {
         content = content.replace(/^[^\S\r\n]*export([\s\S]*)/mg, `let cache = undefined;\nexport function templates(str, html) {\n  if (cache !== undefined) return cache;\n $1cache = {templates};\n  return cache;\n}`);
       } else {
-        content = content.replace(/^[^\S\r\n]*export([\s\S]*)/mg, `let cache: { templates: { [key: string]: string | import("@lit/localize").StrResult | import("lit").TemplateResult<1>; }; } | undefined  = undefined;\nexport function templates(str: typeof import("@lit/localize").str, html: typeof import("lit").html) {\n  if (cache !== undefined) return cache;\n $1cache = {templates};\n  return cache;\n}`);
+        content = content.replace(/^[^\S\r\n]*export([\s\S]*)/mg, `let cache: { templates: { [key: string]: string | import("@lit/localize").StrResult | import("lit").TemplateResult<1>; }; } | undefined  = undefined;\n//@ts-ignore\nexport function templates(str: typeof import("@lit/localize").str, html: typeof import("lit").html) {\n  if (cache !== undefined) return cache;\n $1cache = {templates};\n  return cache;\n}`);
       }
       await fs.writeFile(file, content);
     }));
