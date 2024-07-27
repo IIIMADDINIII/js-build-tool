@@ -755,7 +755,7 @@ function getUrlPluginDefaultOptions(): RollupUrlOptions {
   return {
     limit: 0,
     fileName: "assets/[name]-[hash][extname]",
-    publicPath: "./assets/"
+    publicPath: "./"
   };
 }
 
