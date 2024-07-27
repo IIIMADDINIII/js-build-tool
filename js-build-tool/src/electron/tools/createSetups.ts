@@ -66,6 +66,11 @@ export interface CreateSetupsOptions {
    */
   includePackageSourcemaps?: boolean;
   /**
+   * include all files in assets directories, wich are besides an export file.
+   * @default true;
+   */
+  includePackageAssets?: boolean;
+  /**
   * Make zip files.
   * @default true
   */
@@ -147,10 +152,11 @@ async function addPackagesToFilesToInclude(options: CreateSetupOptionsNorm, file
       const mapFiles = exports.map((v) => v + ".map");
       files.push(...mapFiles);
     }
-    for (const ex of exports) {
-      const glob = path.relative(options.dir, path.resolve(ex, "../assets/**/*")).replaceAll("\\", "/");
-      console.log(glob, await (await fastGlob()).default(glob, { cwd: options.dir }));
-      files.push(...await (await fastGlob()).default(glob, { cwd: options.dir }));
+    if (options.includePackageAssets) {
+      for (const ex of exports) {
+        const glob = path.relative(options.dir, path.resolve(ex, "../assets/**/*")).replaceAll("\\", "/");
+        files.push(...await (await fastGlob()).default(glob, { cwd: options.dir }));
+      }
     }
     filesToInclude.addAllPaths(jsonPath, ...files);
   }
@@ -274,6 +280,7 @@ function normalizeCreateSetupOptions(options?: CreateSetupsOptions): CreateSetup
     externalDirsGlobPattern: getDefault(options?.externalDirsGlobPattern, undefined),
     ignorePackages: getDefault(options?.ignorePackages, ["common"]),
     includePackageSourcemaps: getDefault(options?.includePackageSourcemaps, !isProd()),
+    includePackageAssets: getDefault(options?.includePackageAssets, true),
     makeZip: getDefault(options?.makeZip, true),
     makeWix: getDefault(options?.makeWix, true),
     wixOptions: {
