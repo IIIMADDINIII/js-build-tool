@@ -754,6 +754,8 @@ function getNodeResolveDefaultOptions(environment: ExecutionEnvironment): Rollup
 function getUrlPluginDefaultOptions(): RollupUrlOptions {
   return {
     limit: 0,
+    fileName: "[name]-[hash][extname]",
+    destDir: "assets",
   };
 }
 
