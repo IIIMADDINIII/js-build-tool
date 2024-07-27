@@ -148,7 +148,7 @@ async function addPackagesToFilesToInclude(options: CreateSetupOptionsNorm, file
       files.push(...mapFiles);
     }
     for (const ex of exports) {
-      const glob = path.resolve(ex, "./assets/**/*");
+      const glob = path.resolve(ex, "../assets/**/*");
       console.log(glob, await (await fastGlob()).default(glob, { cwd: options.dir }));
       files.push(...await (await fastGlob()).default(glob, { cwd: options.dir }));
     }
