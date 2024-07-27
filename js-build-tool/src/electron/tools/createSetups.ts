@@ -142,11 +142,16 @@ async function addPackagesToFilesToInclude(options: CreateSetupOptionsNorm, file
     const packPath = path.resolve(options.dir, pack);
     const jsonPath = path.resolve(packPath, "package.json");
     const exports = (await getAllPackageExportsPaths(jsonPath)).map((p) => path.resolve(packPath, p));
+    const files = [...exports];
     if (options.includePackageSourcemaps) {
       const mapFiles = exports.map((v) => v + ".map");
-      exports.push(...mapFiles);
+      files.push(...mapFiles);
     }
-    filesToInclude.addAllPaths(jsonPath, ...exports);
+    for (const ex of exports) {
+      const glob = path.resolve(ex, "./assets/**/*");
+      files.push(...await (await fastGlob()).default(glob, { cwd: options.dir }));
+    }
+    filesToInclude.addAllPaths(jsonPath, ...files);
   }
 }
 
