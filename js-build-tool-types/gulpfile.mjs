@@ -7,15 +7,15 @@ async function createIndexDts() {
   const module = oldFileContent.substring(indexOfFirstImport);
   const newFileContent = `
 declare module "consts:production" {
-  let production: boolean;
+  const production: boolean;
   export default production;
 }
 declare module "consts:development" {
-  let development: boolean;
+  const development: boolean;
   export default development;
 }
 declare module "consts:testing" {
-  let testing: boolean;
+  const testing: boolean;
   export default testing;
 }
 

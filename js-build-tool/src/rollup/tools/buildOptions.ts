@@ -677,12 +677,12 @@ async function getDefaultPlugins(defaultExportOpts: DefaultExportOpts): Promise<
   let plugins = [
     manageDependencies(defaultExportOpts.manageDependenciesPlugin),
     (await consts()).default(defaultExportOpts.constsPlugin),
+    (await rollupUrl()).default(defaultExportOpts.urlPlugin),
     (await json()).default(defaultExportOpts.jsonPlugin),
     (await commonjs()).default(defaultExportOpts.commonjsPlugin),
     (await typescript()).default(defaultExportOpts.typescriptPlugin),
     (await sourceMaps()).default(defaultExportOpts.sourceMapsPlugin),
     (await nodeResolve()).nodeResolve(defaultExportOpts.nodeResolvePlugin),
-    (await rollupUrl()).default(defaultExportOpts.urlPlugin),
   ];
   if (defaultExportOpts.minify) {
     plugins.push((await terser()).default(defaultExportOpts.terserPlugin));
