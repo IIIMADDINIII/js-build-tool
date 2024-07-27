@@ -34,3 +34,5 @@ export const fetchGithubRelease = createCachedImportFunction<typeof import("fetc
 export const RuntimeLitLocalizer = createCachedImportFunction<typeof import("@lit/localize-tools/lib/modes/runtime.js")>("@lit/localize-tools/lib/modes/runtime.js");
 export const minimatch = createCachedImportFunction<typeof import("minimatch")>("minimatch");
 export const chalk = createCachedImportFunction<typeof import("chalk")>("chalk");
+export const rollupUrl = createCachedImportFunction<typeof import("@rollup/plugin-url")>("@rollup/plugin-url");
+

@@ -50,6 +50,9 @@ importers:
       '@rollup/plugin-typescript':
         specifier: 11.1.6
         version: 11.1.6(rollup@4.15.0)(tslib@2.6.2)(typescript@5.4.5)
+      '@rollup/plugin-url':
+        specifier: 8.0.2
+        version: 8.0.2(rollup@4.15.0)
       '@rollup/pluginutils':
         specifier: 5.1.0
         version: 5.1.0(rollup@4.15.0)
@@ -443,6 +446,15 @@ packages:
       rollup:
         optional: true
       tslib:
+        optional: true
+
+  '@rollup/plugin-url@8.0.2':
+    resolution: {integrity: sha512-5yW2LP5NBEgkvIRSSEdJkmxe5cUNZKG3eenKtfJvSkxVm/xTTu7w+ayBtNwhozl1ZnTUCU0xFaRQR+cBl2H7TQ==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
+    peerDependenciesMeta:
+      rollup:
         optional: true
 
   '@rollup/pluginutils@5.1.0':
@@ -1780,6 +1792,10 @@ packages:
     resolution: {integrity: sha512-LS9X+dc8KLxXCb8dni79fLIIUA5VyZoyjSMCwTluaXA0o27cCK0bhXkpgw+sTXVpPy/lSO57ilRixqk0vDmtRA==}
     engines: {node: '>=6'}
 
+  make-dir@3.1.0:
+    resolution: {integrity: sha512-g3FeP20LNwhALb/6Cz6Dd4F2ngze0jz7tbzrD2wAV+o9FeNHe4rL+yK2md0J/fiSf1sa1ADhXqi5+oVwOM/eGw==}
+    engines: {node: '>=8'}
+
   make-fetch-happen@10.2.1:
     resolution: {integrity: sha512-NgOPbRiaQM10DYXvN3/hhGVI2M5MtITFryzBGxHM5p4wnFxsVCbxkrBrDsk+EZ5OB4jEOT7AjDxtdF+KVEFT7w==}
     engines: {node: ^12.13.0 || ^14.15.0 || >=16.0.0}
@@ -1814,6 +1830,11 @@ packages:
   mime-db@1.52.0:
     resolution: {integrity: sha512-sPU4uV7dYlvtWJxwwxHD0PuihVNiE7TyAbQ5SWxDCB9mUYvOgroQOwYQQOKPJ8CIbE+1ETVlOoK1UC2nU3gYvg==}
     engines: {node: '>= 0.6'}
+
+  mime@3.0.0:
+    resolution: {integrity: sha512-jSCU7/VB1loIWBZe14aEYHU/+1UMEHoaO7qxCOVJOw9GgH72VAWppxNcjU+x9a2k3GSIBXNKxXQFqRvvZ7vr3A==}
+    engines: {node: '>=10.0.0'}
+    hasBin: true
 
   mimic-fn@2.1.0:
     resolution: {integrity: sha512-OqbOk5oEQeAZ8WXWydlu9HJjz9WVdEIvamMCcXmuqUYjTknH/sqsWvhQ3vgwKFRR1HpjvNBKQ37nbJgYzGqGcg==}
@@ -3351,6 +3372,14 @@ snapshots:
       rollup: 4.15.0
       tslib: 2.6.2
 
+  '@rollup/plugin-url@8.0.2(rollup@4.15.0)':
+    dependencies:
+      '@rollup/pluginutils': 5.1.0(rollup@4.15.0)
+      make-dir: 3.1.0
+      mime: 3.0.0
+    optionalDependencies:
+      rollup: 4.15.0
+
   '@rollup/pluginutils@5.1.0(rollup@4.15.0)':
     dependencies:
       '@types/estree': 1.0.5
@@ -4802,6 +4831,10 @@ snapshots:
       pify: 4.0.1
       semver: 5.7.2
 
+  make-dir@3.1.0:
+    dependencies:
+      semver: 6.3.1
+
   make-fetch-happen@10.2.1:
     dependencies:
       agentkeepalive: 4.5.0
@@ -4851,6 +4884,8 @@ snapshots:
       picomatch: 2.3.1
 
   mime-db@1.52.0: {}
+
+  mime@3.0.0: {}
 
   mimic-fn@2.1.0: {}
 

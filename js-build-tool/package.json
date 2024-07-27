@@ -48,6 +48,7 @@
     "@rollup/plugin-terser": "0.4.4",
     "@rollup/plugin-typescript": "11.1.6",
     "@rollup/pluginutils": "5.1.0",
+    "@rollup/plugin-url": "8.0.2",
     "execa": "8.0.1",
     "fast-glob": "3.3.2",
     "fetch-github-release": "1.0.0",

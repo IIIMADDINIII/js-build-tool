@@ -25,7 +25,11 @@ const rollupOptions = {
     "terser",
     "@microsoft/api-extractor-model",
     "@electron-forge/core",
-    "@electron-forge/shared-types"],
+    "@electron-forge/shared-types",
+    "@rollup/plugin-url",
+    "@electron/packager",
+    "@electron-forge/maker-wix",
+    "@jridgewell/source-map"],
 };
 
 export const build = tools.exitAfter(

@@ -4,10 +4,11 @@ import { type RollupJsonOptions } from "@rollup/plugin-json";
 import { type RollupNodeResolveOptions } from '@rollup/plugin-node-resolve';
 import { type Options as TerserOptions } from "@rollup/plugin-terser";
 import { type RollupTypescriptOptions } from "@rollup/plugin-typescript";
+import type { RollupUrlOptions } from "@rollup/plugin-url";
 import path from "path";
 import type { Plugin, TreeshakingOptions, TreeshakingPreset } from "rollup";
 import { type SourcemapsPluginOptions } from 'rollup-plugin-include-sourcemaps';
-import { commonjs, consts, fastGlob, json, nodeResolve, sourceMaps, terser, typescript } from "../../lateImports.js";
+import { commonjs, consts, fastGlob, json, nodeResolve, rollupUrl, sourceMaps, terser, typescript } from "../../lateImports.js";
 import { fs } from "../../tools/file.js";
 import { getDependencies, getDevDependencies, getPackageType, getTopLevelExports } from "../../tools/package.js";
 import { isProd } from "../../tools/prod.js";
@@ -375,6 +376,11 @@ export interface DefaultExportOpts {
    */
   nodeResolvePlugin: RollupNodeResolveOptions;
   /**
+   * Overrides the Options of the node resolve plugin.
+   * @see {@link https://www.npmjs.com/package/@rollup/plugin-node-resolve | @rollup/plugin-node-resolve}
+   */
+  urlPlugin: RollupUrlOptions;
+  /**
    * Overrides the default Tree shaking options for rollup
    * @see {@link https://rollupjs.org/configuration-options/#treeshake |  Rollup config treeshake}
    * @default true
@@ -577,6 +583,7 @@ async function getDefaultExportOpts(defaultConfigOpts: DefaultConfigOpts, config
     incremental: getDefault(exportOpts.incremental, false),
     sourceMapsPlugin: getDefault(exportOpts.sourceMapsPlugin, {}),
     nodeResolvePlugin: getDefault(exportOpts.nodeResolvePlugin, getNodeResolveDefaultOptions(environment)),
+    urlPlugin: getDefault(exportOpts.urlPlugin, getUrlPluginDefaultOptions()),
     manageDependenciesPlugin: {},
     typescriptPlugin: {},
     plugins: [],
@@ -675,6 +682,7 @@ async function getDefaultPlugins(defaultExportOpts: DefaultExportOpts): Promise<
     (await typescript()).default(defaultExportOpts.typescriptPlugin),
     (await sourceMaps()).default(defaultExportOpts.sourceMapsPlugin),
     (await nodeResolve()).nodeResolve(defaultExportOpts.nodeResolvePlugin),
+    (await rollupUrl()).default(defaultExportOpts.urlPlugin),
   ];
   if (defaultExportOpts.minify) {
     plugins.push((await terser()).default(defaultExportOpts.terserPlugin));
@@ -741,6 +749,12 @@ function getNodeResolveDefaultOptions(environment: ExecutionEnvironment): Rollup
     return { browser: true };
   }
   return {};
+}
+
+function getUrlPluginDefaultOptions(): RollupUrlOptions {
+  return {
+    limit: 0,
+  };
 }
 
 async function getDefaultInputFileExt(inputFileDir: string, inputFileName: string): Promise<string> {
