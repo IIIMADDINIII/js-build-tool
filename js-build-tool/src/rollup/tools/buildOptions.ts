@@ -376,6 +376,13 @@ export interface DefaultExportOpts {
    */
   nodeResolvePlugin: RollupNodeResolveOptions;
   /**
+   * if a file is imported matching one of these glob patterns, it will be copied as an asset and the import returns the relative url.
+   * files are placed besides the js file in an assets folder.
+   * is implemented using the rollup/plugin-url package.
+   * @default ["**\/*.svg", " **\/*.png", "**\/*.jpg", " **\/*.jpeg", "**\/*.gif", " **\/*.webp"]
+   */
+  filesToIncludeAsAssets: string[];
+  /**
    * Overrides the Options of the node resolve plugin.
    * @see {@link https://www.npmjs.com/package/@rollup/plugin-node-resolve | @rollup/plugin-node-resolve}
    */
@@ -548,6 +555,7 @@ async function getDefaultExportOpts(defaultConfigOpts: DefaultConfigOpts, config
   const inputFileName = getDefault(exportOpts.inputFileName, getDefaultFileName(exportName, defaultExportName));
   const inputFileDir = getDefault(exportOpts.inputFileDir, defaultConfigOpts.inputBasePath);
   const inputFileExt = getDefault(exportOpts.inputFileExt, await getDefaultInputFileExt(inputFileDir, inputFileName));
+  const filesToIncludeAsAssets = getDefault(exportOpts.filesToIncludeAsAssets, ["**/*.svg", "**/*.png", "**/*.jpg", "**/*.jpeg", "**/*.gif", "**/*.webp"]);
   let defaultExportOpts: DefaultExportOpts = {
     isTest,
     environment,
@@ -583,7 +591,8 @@ async function getDefaultExportOpts(defaultConfigOpts: DefaultConfigOpts, config
     incremental: getDefault(exportOpts.incremental, false),
     sourceMapsPlugin: getDefault(exportOpts.sourceMapsPlugin, {}),
     nodeResolvePlugin: getDefault(exportOpts.nodeResolvePlugin, getNodeResolveDefaultOptions(environment)),
-    urlPlugin: getDefault(exportOpts.urlPlugin, getUrlPluginDefaultOptions()),
+    filesToIncludeAsAssets,
+    urlPlugin: getDefault(exportOpts.urlPlugin, getUrlPluginDefaultOptions(filesToIncludeAsAssets)),
     manageDependenciesPlugin: {},
     typescriptPlugin: {},
     plugins: [],
@@ -751,8 +760,9 @@ function getNodeResolveDefaultOptions(environment: ExecutionEnvironment): Rollup
   return {};
 }
 
-function getUrlPluginDefaultOptions(): RollupUrlOptions {
+function getUrlPluginDefaultOptions(includes: string[]): RollupUrlOptions {
   return {
+    include: includes,
     limit: 0,
     fileName: "assets/[name]-[hash][extname]",
     publicPath: "./"
