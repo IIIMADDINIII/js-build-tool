@@ -207,7 +207,9 @@ export async function runGulpScript(gulpScript: string, tasks: string[] | string
       addToPath(resolve(tempDir, "node_modules", ".bin"));
     }
     try {
-      await exec({ stdio: ["inherit", await prefixIo(prefix), await prefixIo(prefix)], reject: false, env: { GULP_FILE: gulpFilePath }, verbose: "none", preferLocal: false })`gulp -f ${gulpFilePath} --cwd ${cwd} ${tasks}`;
+      const result = await exec({ stdio: ["inherit", ["inherit", await prefixIo(prefix)], ["inherit", await prefixIo(prefix)]], reject: false, env: { GULP_FILE: gulpFilePath }, verbose: "none", preferLocal: false })`gulp -f ${gulpFilePath} --cwd ${cwd} ${tasks}`;
+      const exitCode = result.exitCode ?? 0;
+      if (exitCode !== 0) throw new Error(`Script exited with code: ${exitCode}`);
     } catch (e) {
       if ((typeof e !== "object") || (e === null) || !("exitCode" in e) || (typeof e.exitCode !== "number")) throw e;
       if (e.exitCode !== 0) throw new Error(`Script exited with code: ${e.exitCode}`);
