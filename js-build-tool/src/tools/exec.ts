@@ -1,6 +1,4 @@
-import { $, execaNode, type ExecaChildProcess, } from "execa";
-import { EOL } from "os";
-import { createInterface } from "readline";
+import { $, execaNode } from "execa";
 import { chalk } from "../lateImports.js";
 
 /**
@@ -16,7 +14,7 @@ import { chalk } from "../lateImports.js";
  * ```
  * @public
  */
-export const exec = $({ verbose: true, stdio: "inherit", cleanup: true });
+export const exec = $({ verbose: "short", stdio: "inherit", cleanup: true }) as unknown as typeof $;
 
 /**
  * Utility for executing nodejs scripts.
@@ -25,28 +23,16 @@ export const exec = $({ verbose: true, stdio: "inherit", cleanup: true });
 export const execNode = ((scriptPath: string, args: string[], options: {}) => {
   const opts = options || args;
   const arg = opts === args ? [] : args;
-  return execaNode(scriptPath, arg, { verbose: true, stdio: "inherit", cleanup: true, ...opts });
+  return execaNode(scriptPath, arg, { verbose: "short", stdio: "inherit", cleanup: true, ...opts });
 }) as unknown as typeof execaNode;
 
-/**
- * Prints the Output of the Execa Task to the console with a prefix.
- * @param task - the Task to print the Output.
- * @param prefix - prefix to Prepend.
- * @public
- */
-export async function prefixTaskOutput(task: ExecaChildProcess, prefix: string) {
+
+export async function prefixIo(prefix: string): Promise<(line: unknown) => Generator<string, void, unknown>> {
   const dim = (await chalk()).default.gray;
-  if (task.stdout !== null) {
-    const rl = createInterface({ input: task.stdout });
-    rl.on("line", (line) => {
-      process.stdout.write(dim(prefix) + line + EOL);
-    });
-  }
-  if (task.stderr !== null) {
-    const rl = createInterface({ input: task.stderr });
-    rl.on("line", (line) => {
-      process.stderr.write(dim(prefix) + line + EOL);
-    });
-  }
+  return function* (line: unknown) {
+    if (typeof line !== "string") throw new Error("line is not a string");
+    yield dim(prefix) + line;
+  };
 }
+
 

@@ -144,7 +144,7 @@ function addDependencies(depend: unknown, dependencies: string[]) {
  * @public
  */
 export async function getPnpmPackagesWithLocalDependencies(): Promise<PackagesDependencies> {
-  const dependencies = <unknown>JSON.parse((await exec({ stdio: "pipe", verbose: false })`pnpm list -r --only-projects --json`).stdout);
+  const dependencies = <unknown>JSON.parse((await exec({ stdio: "pipe", verbose: "none" })`pnpm list -r --only-projects --json`).stdout);
   if (!Array.isArray(dependencies)) throw new Error("Could not retrieve dependencies");
   const ret: PackagesDependencies = new Map();
   for (const dep of dependencies as unknown[]) {
@@ -172,7 +172,7 @@ export async function getPnpmPackagesWithLocalDependencies(): Promise<PackagesDe
  */
 export async function getPnpmPackages(): Promise<string[] | undefined> {
   try {
-    const pack = <unknown>JSON.parse((await exec({ stdio: "pipe", verbose: false })`pnpm list -r --json --depth -1`).stdout);
+    const pack = <unknown>JSON.parse((await exec({ stdio: "pipe", verbose: "none" })`pnpm list -r --json --depth -1`).stdout);
     if (!Array.isArray(pack)) throw new Error("Could not retrieve dependencies");
     return pack.map((pack) => relative(projectPath, pack.path));
   } catch {

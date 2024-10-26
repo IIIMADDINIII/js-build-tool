@@ -1,7 +1,7 @@
 import { copyFile, mkdir, stat } from "fs/promises";
 import gulp from "gulp";
 import { dirname, resolve } from "path";
-import { exec, prefixTaskOutput } from "./exec.js";
+import { exec, prefixIo } from "./exec.js";
 import { file } from "./file.js";
 import { addToPath, buildDir } from "./paths.js";
 import { pnpmInstall, runForDependencies, type GlopPatternObject } from "./pnpm.js";
@@ -168,7 +168,7 @@ function getDisplayName(gulpScript: string, tasks: string[] = [], label?: string
  * @returns 
  */
 async function isMissingTask(gulpFilePath: string, cwd: string, tasks: string[]): Promise<boolean> {
-  const result = await exec({ stdio: "pipe", env: { GULP_FILE: gulpFilePath }, verbose: false, preferLocal: false })`gulp -f ${gulpFilePath} --cwd ${cwd} --tasks-json --depth 0`;
+  const result = await exec({ stdio: "pipe", env: { GULP_FILE: gulpFilePath }, verbose: "none", preferLocal: false })`gulp -f ${gulpFilePath} --cwd ${cwd} --tasks-json --depth 0`;
   const data = <unknown>JSON.parse(result.stdout);
   if (typeof data !== "object" || data === null || !("nodes" in data)) throw new Error("Could not retrieve available tasks");
   const nodes = data.nodes;
@@ -207,8 +207,7 @@ export async function runGulpScript(gulpScript: string, tasks: string[] | string
       addToPath(resolve(tempDir, "node_modules", ".bin"));
     }
     try {
-      const task = exec({ stdio: ["inherit", "pipe", "pipe"], reject: false, env: { GULP_FILE: gulpFilePath }, verbose: false, preferLocal: false })`gulp -f ${gulpFilePath} --cwd ${cwd} ${tasks}`;
-      await prefixTaskOutput(task, prefix);
+      const task = exec({ stdio: ["inherit", await prefixIo(prefix), await prefixIo(prefix)], reject: false, env: { GULP_FILE: gulpFilePath }, verbose: "none", preferLocal: false })`gulp -f ${gulpFilePath} --cwd ${cwd} ${tasks}`;
       const result = await task;
       if (result.exitCode !== 0) throw new Error(`Script exited with code: ${result.exitCode}`);
     } catch (e) {

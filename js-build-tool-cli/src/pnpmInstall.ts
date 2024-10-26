@@ -9,7 +9,7 @@ import { delimiter, resolve } from "path";
  */
 export async function pnpmInstall(dependenciesDir: string, dependencies: { [key: string]: string; }): Promise<void> {
   await writeFile(resolve(dependenciesDir, "package.json"), JSON.stringify({ dependencies }));
-  await $({ cleanup: true, cwd: dependenciesDir, verbose: false, stdio: "inherit" })`pnpm install --config.confirmModulesPurge=false --config.package-import-method=copy`;
+  await $({ cleanup: true, cwd: dependenciesDir, verbose: "none", stdio: "inherit" })`pnpm install --config.confirmModulesPurge=false --config.package-import-method=copy`;
 }
 
 /**
