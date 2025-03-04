@@ -1,6 +1,6 @@
 {
   "name": "@iiimaddiniii/js-build-tool-cli",
-  "version": "1.0.3-1",
+  "version": "1.0.3",
   "description": "Template for creating a NodeJs package",
   "bin": {
     "js-build-tool": "./dist/index.js"
