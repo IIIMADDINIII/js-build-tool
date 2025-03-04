@@ -3,7 +3,7 @@ import type { XliffConfig } from "@lit/localize-tools/lib/types/formatters.js";
 import type { Locale } from "@lit/localize-tools/lib/types/locale.js";
 import { dirname, relative, resolve } from "path";
 import { RuntimeLitLocalizer } from "../lateImports.js";
-import { file, fs, writeJson } from "./file.js";
+import { file, fs, write, writeJson } from "./file.js";
 import { readPackageJson } from "./package.js";
 import { projectPath } from "./paths.js";
 
@@ -213,24 +213,41 @@ export async function transformTranslationFilesToUseDependencyInjection(translat
 }
 
 /**
+ * Content of the declarations files for translation files.
+ */
+const TRANSLATION_DECLARATION_SOURCE = `type StrResult = { strTag: true; strings: TemplateStringsArray; values: unknown[]; };
+type StrFn = (strings: TemplateStringsArray, ...values: unknown[]) => StrResult;
+type TemplateResult = { ['_$litType$']: 1; strings: TemplateStringsArray; values: unknown[]; };
+type HtmlFn = (strings: TemplateStringsArray, ...values: unknown[]) => TemplateResult;
+type TemplateLike = string | TemplateResult | StrResult;
+type TemplateMap = { [id: string]: TemplateLike; };
+type LocaleModule = { templates: TemplateMap; };
+export function templates(str: StrFn, html: HtmlFn): LocaleModule;`;
+
+/**
  * Sets the exports field of a Package.json file to the files in the translationDir.
  * @param translationDir - folder with the Translation files to write to the Exports field.
  * @public
  */
-export async function writePackageJsonExports(translationDir: string) {
+export async function writePackageJsonExportsAndDeclarations(translationDir: string) {
   const packageFile = file("package.json");
-  const entries = (await fs.readdir(translationDir, { withFileTypes: true }))
-    .filter((e) => e.isFile() && (e.name.endsWith(".js") || e.name.endsWith(".ts")))
-    .map(({ name }) => {
+  const entries = await Promise.all((await fs.readdir(translationDir, { withFileTypes: true }))
+    .filter((e) => e.isFile() && (e.name.endsWith(".js")))
+    .map(async ({ name }) => {
       const relativePath = "./" + relative(dirname(packageFile), resolve(translationDir, name)).replaceAll("\\", "/");
-      const key: string = "./" + name.slice(0, -3);
+      const withoutExtension = name.slice(0, -3);
+      const key = "./" + withoutExtension;
+      const typesFile = resolve(translationDir, withoutExtension + ".d.ts");
+      const relativeTypes = "./" + relative(dirname(packageFile), typesFile).replaceAll("\\", "/");
+      await write(typesFile, TRANSLATION_DECLARATION_SOURCE);
       const value = {
         import: {
+          types: relativeTypes,
           default: relativePath
         }
       };
       return [key, value];
-    });
+    }));
   const exports = Object.fromEntries(entries);
   const pack = await readPackageJson(packageFile);
   pack.exports = exports;
@@ -249,7 +266,7 @@ export async function buildTranslationPackage(config?: LitLocalizeConfig): Promi
   await litLocalizeBuild({ baseDir: "..", ...config });
   const translationDir = conf.resolve(conf.output.outputDir);
   await transformTranslationFilesToUseDependencyInjection(translationDir);
-  await writePackageJsonExports(translationDir);
+  await writePackageJsonExportsAndDeclarations(translationDir);
 }
 
 /**
