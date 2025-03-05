@@ -202,6 +202,8 @@ export async function transformTranslationFilesToUseDependencyInjection(translat
   await Promise.all((await fs.readdir(translationDir, { withFileTypes: true }))
     .filter((e) => e.isFile() && (e.name.endsWith(".js") || (e.name.endsWith(".ts") && !e.name.endsWith(".d.ts"))))
     .map(async ({ name }) => {
+      const withoutExtension = name.slice(0, -3);
+      if (withoutExtension === "index") return;
       const file = resolve(translationDir, name);
       let content = await fs.readFile(file, { encoding: "utf8" });
       // Replace all import statements with an empty string
@@ -214,7 +216,6 @@ export async function transformTranslationFilesToUseDependencyInjection(translat
         isTs = true;
       }
       await write(file, content);
-      const withoutExtension = name.slice(0, -3);
       imports.push(`import { templates as l${index} } from "./${withoutExtension}.js";`);
       exports.push(`  "${withoutExtension}": l${index},`);
       index++;
@@ -244,17 +245,15 @@ export function templates(str: StrFn, html: HtmlFn): LocaleModule;`;
 export async function writePackageJsonExportsAndDeclarations(translationDir: string, sourceLocale: string) {
   const packageFile = file("package.json");
   const names = (await fs.readdir(translationDir, { withFileTypes: true }))
-    .filter((e) => e.isFile() && (e.name.endsWith(".js")));
-  const indexDeclarationSource =
-    `export const locales: {\n${names.map(
-      ({ name }) =>
-        `  "${name.slice(0, -3)}": typeof import("./${name}").templates;`)
-      .join("\n")
-    }\n};\nexport const sourceLocale: "${sourceLocale}";`;
-  const entries = await Promise.all(names.map(async ({ name }) => {
+    .filter((e) => e.isFile() && (e.name.endsWith(".js")))
+    .map(({ name }) => ({ name, withoutExtension: name.slice(0, -3) }));
+  const declarationLines = names
+    .filter(({ withoutExtension }) => withoutExtension !== "index")
+    .map(({ name, withoutExtension }) => `  "${withoutExtension}": typeof import("./${name}").templates;`);
+  const indexDeclarationSource = `export const locales: {\n${declarationLines.join("\n")}\n};\nexport const sourceLocale: "${sourceLocale}";`;
+  const entries = await Promise.all(names.map(async ({ name, withoutExtension }) => {
     const isIndex = name === "index.js";
     const relativePath = "./" + relative(dirname(packageFile), resolve(translationDir, name)).replaceAll("\\", "/");
-    const withoutExtension = name.slice(0, -3);
     const key = isIndex ? "." : "./" + withoutExtension;
     const typesFile = resolve(translationDir, withoutExtension + ".d.ts");
     const relativeTypes = "./" + relative(dirname(packageFile), typesFile).replaceAll("\\", "/");
