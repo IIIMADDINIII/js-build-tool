@@ -15,8 +15,8 @@
     }
   },
   "imports": {
-    "#dependencies": {
-      "default": "./dependencies.json"
+    "#install": {
+      "default": "./install.json"
     }
   },
   "scripts": {

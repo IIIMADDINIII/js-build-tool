@@ -3,7 +3,8 @@ import { tools, tasks, rollup } from "@iiimaddiniii/js-build-tool";
 
 async function copyDependencies() {
   const dependencies = await tools.getDependencies("../js-build-tool/package.json");
-  tools.writeJson("dependencies.json", dependencies);
+  const onlyBuiltDependencies = (await tools.readPackageJson("../package.json"))?.pnpm?.onlyBuiltDependencies;
+  tools.writeJson("install.json", { dependencies, pnpm: { onlyBuiltDependencies } });
 }
 
 /**

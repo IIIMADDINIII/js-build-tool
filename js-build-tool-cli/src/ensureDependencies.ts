@@ -1,4 +1,4 @@
-import dependencies from "#dependencies";
+import install from "#install";
 import { mkdir, readFile, stat, writeFile } from "fs/promises";
 import { tmpdir } from "os";
 import { join, resolve } from "path";
@@ -34,8 +34,8 @@ export async function ensureDependencies(): Promise<string> {
       try {
         if (retryCount !== 0) process.stdout.write("\n");
         process.stdout.write(`Preparing Dependencies in ${dependenciesDir}\n`);
-        (dependencies as { [key: string]: string; })["@iiimaddiniii/js-build-tool"] = ownVersion || ">=0";
-        await pnpmInstall(dependenciesDir, dependencies);
+        (install.dependencies as { [dep: string]: string; })["@iiimaddiniii/js-build-tool"] = ownVersion || ">=0";
+        await pnpmInstall(dependenciesDir, install);
         try {
           await writeFile(doneFile, "");
         } finally {

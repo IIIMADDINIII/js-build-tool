@@ -3,7 +3,7 @@
 /js-build-tool/node_modules/
 /js-build-tool-cli/dist/
 /js-build-tool-cli/node_modules/
-/js-build-tool-cli/dependencies.json
+/js-build-tool-cli/install.json
 /js-build-tool-types/node_modules/
 /js-build-tool-types/index.d.ts
 /js-build-tool-types/pnpm-lock.yaml

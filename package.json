@@ -21,5 +21,10 @@
   "homepage": "https://github.com/IIIMADDINIII/js-build-tool#readme",
   "devDependencies": {
     "@types/js-build-tool-types": "npm:@iiimaddiniii/js-build-tool-types@1.0.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@bitdisaster/exe-icon-extractor"
+    ]
   }
 }

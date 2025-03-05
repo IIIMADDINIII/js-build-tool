@@ -14,17 +14,25 @@ import { addBinToPath, pnpmInstall } from "./pnpmInstall.js";
 export async function installCustomDependencies(tempDir: string): Promise<string[]> {
   await mkdir(tempDir, { recursive: true });
   const dependencies: { [key: string]: string; } = {};
+  const onlyBuiltDependencies: string[] = [];
   const remainingArgs = process.argv.slice(2).filter((arg) => {
-    const match = arg.match(/^-(-package|p)=(?<p>@?[^@]+)(@(?<v>.*))?$/);
+    const match = arg.match(/^(-(-package|p)=(?<p>@?[^@]+)(@(?<v>.*))?|-(-build|b)=(?<b>@?[^@]+))$/);
     const p = match?.groups?.["p"];
     const v = match?.groups?.["v"];
-    if (match === null || p === undefined) return true;
-    dependencies[p] = v === undefined ? ">=0" : v;
-    return false;
+    const b = match?.groups?.["b"];
+    if (p !== undefined) {
+      dependencies[p] = v === undefined ? ">=0" : v;
+      return false;
+    }
+    if (b !== undefined) {
+      onlyBuiltDependencies.push(b);
+      return false;
+    }
+    return true;
   });
   if (Object.getOwnPropertyNames(dependencies).length !== 0) {
     process.stdout.write(`Installing additional dependencies in ${tempDir}\n`);
-    await pnpmInstall(tempDir, dependencies);
+    await pnpmInstall(tempDir, { dependencies, pnpm: { onlyBuiltDependencies } });
     addBinToPath(tempDir);
   }
   return remainingArgs;

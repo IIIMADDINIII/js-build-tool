@@ -7,8 +7,8 @@ import { delimiter, resolve } from "path";
  * @param dependenciesDir - Folder where to install the Dependencies.
  * @param dependencies - Dependencies to install.
  */
-export async function pnpmInstall(dependenciesDir: string, dependencies: { [key: string]: string; }): Promise<void> {
-  await writeFile(resolve(dependenciesDir, "package.json"), JSON.stringify({ dependencies }));
+export async function pnpmInstall(dependenciesDir: string, packageJson: unknown): Promise<void> {
+  await writeFile(resolve(dependenciesDir, "package.json"), JSON.stringify(packageJson));
   await $({ cleanup: true, cwd: dependenciesDir, verbose: "none", stdio: "inherit" })`pnpm install --config.confirmModulesPurge=false --config.package-import-method=copy`;
 }
 
