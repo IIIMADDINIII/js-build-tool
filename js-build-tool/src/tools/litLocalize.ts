@@ -194,9 +194,13 @@ export async function litLocalizeBuild(config?: LitLocalizeConfig): Promise<void
  * @param translationDir - folder with the Translation files to transform.
  * @public
  */
-export async function transformTranslationFilesToUseDependencyInjection(translationDir: string): Promise<void> {
+export async function transformTranslationFilesToUseDependencyInjection(translationDir: string, sourceLocale: string): Promise<void> {
+  let isTs = false;
+  let imports: string[] = [];
+  let exports: string[] = [];
+  let index = 0;
   await Promise.all((await fs.readdir(translationDir, { withFileTypes: true }))
-    .filter((e) => e.isFile() && (e.name.endsWith(".js") || e.name.endsWith(".ts")))
+    .filter((e) => e.isFile() && (e.name.endsWith(".js") || (e.name.endsWith(".ts") && !e.name.endsWith(".d.ts"))))
     .map(async ({ name }) => {
       const file = resolve(translationDir, name);
       let content = await fs.readFile(file, { encoding: "utf8" });
@@ -206,10 +210,18 @@ export async function transformTranslationFilesToUseDependencyInjection(translat
       if (name.endsWith("js")) {
         content = content.replace(/^[^\S\r\n]*export([\s\S]*)/mg, `let cache = undefined;\nexport function templates(str, html) {\n  if (cache !== undefined) return cache;\n $1cache = {templates};\n  return cache;\n}`);
       } else {
-        content = content.replace(/^[^\S\r\n]*export([\s\S]*)/mg, `let cache: import("@lit/localize").LocaleModule | undefined  = undefined;\n//@ts-ignore\nexport function templates(str: typeof import("@lit/localize").str, html: typeof import("lit").html) {\n  if (cache !== undefined) return cache;\n $1cache = {templates};\n  return cache;\n}`);
+        content = content.replace(/^[^\S\r\n]*export([\s\S]*)/mg, `let cache: import("@lit/localize").LocaleModule | undefined  = undefined;\n//@ts-ignore\nexport function templates(str: typeof import("@lit/localize").str, html: typeof import("lit").html): import("@lit/localize").LocaleModule {\n  if (cache !== undefined) return cache;\n $1cache = {templates};\n  return cache;\n}`);
+        isTs = true;
       }
-      await fs.writeFile(file, content);
+      await write(file, content);
+      const withoutExtension = name.slice(0, -3);
+      imports.push(`import { templates as l${index} } from "./${withoutExtension}.js";`);
+      exports.push(`  "${withoutExtension}": l${index},`);
+      index++;
     }));
+  const indexFile = resolve(translationDir, isTs ? "index.ts" : "index.js");
+  const content = `${imports.join("\n")}\nexport const locales = {\n${exports.join("\n")}\n};\nexport const sourceLocale = "${sourceLocale}";`;
+  await write(indexFile, content);
 }
 
 /**
@@ -229,25 +241,33 @@ export function templates(str: StrFn, html: HtmlFn): LocaleModule;`;
  * @param translationDir - folder with the Translation files to write to the Exports field.
  * @public
  */
-export async function writePackageJsonExportsAndDeclarations(translationDir: string) {
+export async function writePackageJsonExportsAndDeclarations(translationDir: string, sourceLocale: string) {
   const packageFile = file("package.json");
-  const entries = await Promise.all((await fs.readdir(translationDir, { withFileTypes: true }))
-    .filter((e) => e.isFile() && (e.name.endsWith(".js")))
-    .map(async ({ name }) => {
-      const relativePath = "./" + relative(dirname(packageFile), resolve(translationDir, name)).replaceAll("\\", "/");
-      const withoutExtension = name.slice(0, -3);
-      const key = "./" + withoutExtension;
-      const typesFile = resolve(translationDir, withoutExtension + ".d.ts");
-      const relativeTypes = "./" + relative(dirname(packageFile), typesFile).replaceAll("\\", "/");
-      await write(typesFile, TRANSLATION_DECLARATION_SOURCE);
-      const value = {
-        import: {
-          types: relativeTypes,
-          default: relativePath
-        }
-      };
-      return [key, value];
-    }));
+  const names = (await fs.readdir(translationDir, { withFileTypes: true }))
+    .filter((e) => e.isFile() && (e.name.endsWith(".js")));
+  const indexDeclarationSource =
+    `export const locales: {\n${names.map(
+      ({ name }) =>
+        `  "${name.slice(0, -3)}": typeof import("./${name}").templates;`)
+      .join("\n")
+    }\n};\nexport const sourceLocale: "${sourceLocale}";`;
+  const entries = await Promise.all(names.map(async ({ name }) => {
+    const isIndex = name === "index.js";
+    const relativePath = "./" + relative(dirname(packageFile), resolve(translationDir, name)).replaceAll("\\", "/");
+    const withoutExtension = name.slice(0, -3);
+    const key = isIndex ? "." : "./" + withoutExtension;
+    const typesFile = resolve(translationDir, withoutExtension + ".d.ts");
+    const relativeTypes = "./" + relative(dirname(packageFile), typesFile).replaceAll("\\", "/");
+    const declarationContent = isIndex ? indexDeclarationSource : TRANSLATION_DECLARATION_SOURCE;
+    await write(typesFile, declarationContent);
+    const value = {
+      import: {
+        types: relativeTypes,
+        default: relativePath
+      }
+    };
+    return [key, value];
+  }));
   const exports = Object.fromEntries(entries);
   const pack = await readPackageJson(packageFile);
   pack.exports = exports;
@@ -265,8 +285,8 @@ export async function buildTranslationPackage(config?: LitLocalizeConfig): Promi
   const conf = await resolveLitLocalizeConfig({ baseDir: "..", ...config }, false);
   await litLocalizeBuild({ baseDir: "..", ...config });
   const translationDir = conf.resolve(conf.output.outputDir);
-  await transformTranslationFilesToUseDependencyInjection(translationDir);
-  await writePackageJsonExportsAndDeclarations(translationDir);
+  await transformTranslationFilesToUseDependencyInjection(translationDir, conf.sourceLocale);
+  await writePackageJsonExportsAndDeclarations(translationDir, conf.sourceLocale);
 }
 
 /**
@@ -280,7 +300,7 @@ export async function buildTranslationSource(config?: LitLocalizeConfig): Promis
   const conf = await resolveLitLocalizeConfig(config, true);
   await litLocalizeBuild(conf);
   const translationDir = conf.resolve(conf.output.outputDir);
-  await transformTranslationFilesToUseDependencyInjection(translationDir);
+  await transformTranslationFilesToUseDependencyInjection(translationDir, conf.sourceLocale);
 }
 
 /**
