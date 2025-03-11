@@ -1,12 +1,11 @@
 import type { MakerWixConfig } from "@electron-forge/maker-wix";
-import type { ForgeConfig, ForgeConfigMaker, ForgeConfigPlugin, ForgePackagerOptions, IForgeMaker, StartOptions } from "@electron-forge/shared-types";
+import type { ForgeConfig, ForgeConfigMaker, ForgeConfigPlugin, ForgeHookMap, ForgePackagerOptions, IForgeMaker, StartOptions } from "@electron-forge/shared-types";
 import * as path from "path";
 import { FusesPlugin, MakerWix, MakerZIP, fastGlob, fuses } from "../../lateImports.js";
 import { isProd } from "../../tools.js";
-import { getAllPackageExportsPaths, getPackageMain, getUpgradeCode } from "../../tools/package.js";
+import { getAllPackageExportsPaths, getPackageMain, getPackageVersion, getUpgradeCode } from "../../tools/package.js";
 import { projectPath } from "../../tools/paths.js";
 import { getPnpmPackages } from "../../tools/pnpm.js";
-import { getDefault } from "../../util.js";
 import { runForgeMake, runForgePackage, runForgeStart } from "../tools/forge.js";
 import { prepareWixTools } from "./dependencies.js";
 
@@ -33,11 +32,11 @@ export type CreateSetupsOptionsTarget = Exclude<`${CreateSetupsOptionsPlatform}-
  */
 export interface CreateSetupsOptions {
   /**
-  * List of files to also package in to the Asar file.
-  * By default only the main package.json and sub-packages and the exported members get included.
-  * File Path can also be a glob pattern.
-  * @default [".\/assets\/**\/*"]
-  */
+   * List of files to also package in to the Asar file.
+   * By default only the main package.json and sub-packages and the exported members get included.
+   * File Path can also be a glob pattern.
+   * @default [".\/assets\/**\/*"]
+   */
   additionalFilesToPackage?: string[];
   /**
    * All files matching this minimatch glob pattern will not be bundled in to the asar file.
@@ -54,10 +53,10 @@ export interface CreateSetupsOptions {
    */
   externalDirsGlobPattern?: string | undefined;
   /**
-  * Line inside of pnpm-workspace.yaml to not include.
-  * Every package needs to be listed explicitly (wildcard is not supported).
-  * @default ["common"]
-  */
+   * Line inside of pnpm-workspace.yaml to not include.
+   * Every package needs to be listed explicitly (wildcard is not supported).
+   * @default ["common"]
+   */
   ignorePackages?: string[];
   /**
    * Include *.map files for exported package files.
@@ -71,14 +70,20 @@ export interface CreateSetupsOptions {
    */
   includePackageAssets?: boolean;
   /**
-  * Make zip files.
-  * @default true
-  */
+   * Version for the Setup and the Software.
+   * Can be Semantic (x.x.x) or windows Style (x.x.x.x).
+   * Takes the version from package.json by default.
+   */
+  version?: string;
+  /**
+   * Make zip files.
+   * @default true
+   */
   makeZip?: boolean;
   /**
-  * Make wix Setups files, only for windows on windows.
-  * @default true
-  */
+   * Make wix Setups files, only for windows on windows.
+   * @default true
+   */
   makeWix?: boolean;
   /**
    * Customize the the Wix Installer.
@@ -114,6 +119,15 @@ export interface CreateSetupsOptions {
    * @default false
    */
   fuseRunAsNode?: boolean;
+  /**
+   * Options to override the package Config of electron forge.
+   * @default {}
+   */
+  packageOptions?: ForgePackagerOptions;
+  /**
+   * Hooks for Forge to be able to Modify data before it is used.
+   */
+  hooks?: ForgeHookMap;
 }
 
 type CreateSetupOptionsNorm = Required<Omit<CreateSetupsOptions, "wixOptions">> & { wixOptions: Required<Exclude<CreateSetupsOptions["wixOptions"], undefined>>; };
@@ -188,6 +202,8 @@ async function createPackagerConfig(options: CreateSetupOptionsNorm): Promise<Fo
     derefSymlinks: true,
     icon: "icons/appIcon",
     ignore: await generateIgnoreFunction(options),
+    appVersion: options.version,
+    ...options.packageOptions,
   };
 }
 
@@ -216,6 +232,7 @@ async function createMakersConfig(options: CreateSetupOptionsNorm, platform: Cre
         icon: "icons/installerIcon.ico",
         upgradeCode: await getUpgradeCode(),
         ui: options.wixOptions.ui,
+        version: options.version,
       };
       if (options.wixOptions.features !== undefined) config.features = options.wixOptions.features;
       ret.push(addPluginMarker(new (await MakerWix()).MakerWix(config)));
@@ -266,6 +283,17 @@ export async function createForgeConfig(options: CreateSetupOptionsNorm, target:
     packagerConfig: await createPackagerConfig(options),
     makers: await createMakersConfig(options, platform, arch),
     plugins: await createPluginsConfig(options),
+    hooks: {
+      ...options.hooks,
+      // Override Package Version field with argument supplied Version
+      async readPackageJson(forgeConfig, packageJson) {
+        packageJson = {
+          ...packageJson,
+          version: options.version,
+        };
+        if (typeof options.hooks.readPackageJson === "function") packageJson = await options.hooks.readPackageJson(forgeConfig, packageJson) ?? packageJson;
+      }
+    }
   };
 }
 
@@ -273,23 +301,26 @@ function deduplicateStringArray<T extends string>(arr: T[]): T[] {
   return [...(new Set(arr)).values()];
 }
 
-function normalizeCreateSetupOptions(options?: CreateSetupsOptions): CreateSetupOptionsNorm {
+async function normalizeCreateSetupOptions(options: CreateSetupsOptions = {}): Promise<CreateSetupOptionsNorm> {
   return {
-    additionalFilesToPackage: getDefault(options?.additionalFilesToPackage, [".\/assets\/**\/*"]),
-    externalFilesGlobPattern: getDefault(options?.externalFilesGlobPattern, undefined),
-    externalDirsGlobPattern: getDefault(options?.externalDirsGlobPattern, undefined),
-    ignorePackages: getDefault(options?.ignorePackages, ["common"]),
-    includePackageSourcemaps: getDefault(options?.includePackageSourcemaps, !isProd()),
-    includePackageAssets: getDefault(options?.includePackageAssets, true),
-    makeZip: getDefault(options?.makeZip, true),
-    makeWix: getDefault(options?.makeWix, true),
+    additionalFilesToPackage: options.additionalFilesToPackage ?? [".\/assets\/**\/*"],
+    externalFilesGlobPattern: options.externalFilesGlobPattern,
+    externalDirsGlobPattern: options.externalDirsGlobPattern,
+    ignorePackages: options.ignorePackages ?? ["common"],
+    includePackageSourcemaps: options.includePackageSourcemaps ?? !isProd(),
+    includePackageAssets: options.includePackageAssets ?? true,
+    version: options.version ?? await getPackageVersion() ?? "1.0.0",
+    makeZip: options.makeZip ?? true,
+    makeWix: options.makeWix ?? true,
     wixOptions: {
-      ui: getDefault(options?.wixOptions?.ui, {}),
-      features: getDefault(options?.wixOptions?.features, undefined),
+      ui: options.wixOptions?.ui ?? {},
+      features: options.wixOptions?.features,
     },
-    targets: deduplicateStringArray(getDefault(options?.targets, ["win32-x64", "win32-arm64", "linux-x64", "linux-arm64", "darwin-x64"])),
-    dir: getDefault(options?.dir, projectPath),
-    fuseRunAsNode: getDefault(options?.fuseRunAsNode, false),
+    targets: deduplicateStringArray(options.targets ?? ["win32-x64", "win32-arm64", "linux-x64", "linux-arm64", "darwin-x64"]),
+    dir: options.dir ?? projectPath,
+    fuseRunAsNode: options.fuseRunAsNode ?? false,
+    packageOptions: options.packageOptions ?? {},
+    hooks: options.hooks ?? {},
   };
 }
 
@@ -303,7 +334,7 @@ function getPlatformArch(target: CreateSetupsOptionsTarget): [CreateSetupsOption
  * @public
  */
 export async function createSetups(options?: CreateSetupsOptions): Promise<void> {
-  const optionsNorm = normalizeCreateSetupOptions(options);
+  const optionsNorm = await normalizeCreateSetupOptions(options);
   for (const target of optionsNorm.targets) {
     const [platform, arch] = getPlatformArch(target);
     const forgeConfig = await createForgeConfig(optionsNorm, target);
@@ -331,6 +362,6 @@ export async function createSetups(options?: CreateSetupsOptions): Promise<void>
  * @public
  */
 export async function start(startOptions?: StartOptions, configOptions?: CreateSetupsOptions) {
-  const optionsNorm = normalizeCreateSetupOptions(configOptions);
+  const optionsNorm = await normalizeCreateSetupOptions(configOptions);
   await runForgeStart({ dir: optionsNorm.dir, ...startOptions }, await createForgeConfig(optionsNorm));
 }

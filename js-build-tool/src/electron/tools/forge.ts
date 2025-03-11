@@ -62,7 +62,7 @@ export async function runForgePublish(options: PublishOptions = {}, config?: For
  */
 export async function runForgeStart(options: StartOptions = {}, config?: ForgeConfig): Promise<void> {
   options = makeInteractiveDefault(options);
-  registerOptionalConfig(options, config, async () => {
+  await registerOptionalConfig(options, config, async () => {
     const spawned = await (await forge()).api.start(options);
     await new Promise<void>((resolve, reject) => {
       function listenForExit(child: ElectronProcess) {

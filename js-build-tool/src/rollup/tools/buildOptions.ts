@@ -12,7 +12,6 @@ import { commonjs, consts, fastGlob, json, nodeResolve, rollupUrl, sourceMaps, t
 import { fs } from "../../tools/file.js";
 import { getDependencies, getDevDependencies, getPackageType, getTopLevelExports } from "../../tools/package.js";
 import { isProd } from "../../tools/prod.js";
-import { getDefault } from "../../util.js";
 import { manageDependencies, type ManageDependenciesConfig } from "../plugins.js";
 
 /**
@@ -518,11 +517,10 @@ function makeArray<T>(input: T | T[]): T[] {
   return [input];
 }
 
-export async function getDefaultConfigOpts(configOpts?: ConfigOpts): Promise<DefaultConfigOpts> {
-  if (configOpts === undefined) configOpts = {};
+export async function getDefaultConfigOpts(configOpts: ConfigOpts = {}): Promise<DefaultConfigOpts> {
   let defaultConfigOpts: DefaultConfigOpts = {
-    testFileGlobPatterns: makeArray(getDefault(configOpts.testFileGlobPatterns, "**/*.test.?ts")),
-    inputBasePath: getDefault(configOpts.inputBasePath, "./src/"),
+    testFileGlobPatterns: makeArray(configOpts.testFileGlobPatterns ?? "**/*.test.?ts"),
+    inputBasePath: configOpts.inputBasePath ?? "./src/",
     exports: {},
     tests: {},
     additionalExports: {},
@@ -530,7 +528,7 @@ export async function getDefaultConfigOpts(configOpts?: ConfigOpts): Promise<Def
   };
   defaultConfigOpts.exports = await getDefaultExportsOpts(defaultConfigOpts, configOpts, configOpts.exports || await getDefaultExports());
   defaultConfigOpts.tests = await getDefaultExportsOpts(defaultConfigOpts, configOpts, configOpts.tests || await getDefaultTests(defaultConfigOpts));
-  defaultConfigOpts.additionalExports = await getDefaultExportsOpts(defaultConfigOpts, configOpts, getDefault(configOpts.additionalExports, {}));
+  defaultConfigOpts.additionalExports = await getDefaultExportsOpts(defaultConfigOpts, configOpts, configOpts.additionalExports ?? {});
   defaultConfigOpts.entryPoints = { ...defaultConfigOpts.exports, ...defaultConfigOpts.tests, ...defaultConfigOpts.additionalExports };
   return defaultConfigOpts;
 }
@@ -547,64 +545,64 @@ async function getDefaultExportsOpts(defaultConfigOpts: DefaultConfigOpts, confi
 async function getDefaultExportOpts(defaultConfigOpts: DefaultConfigOpts, configOpts: ConfigOpts, exportName: string, exportOpts: ExportOpts): Promise<[string, DefaultExportOpts]> {
   exportOpts = { ...configOpts, ...exportOpts };
   [exportName, exportOpts] = await runHookOptions(exportName, exportOpts);
-  const isTest = getDefault(exportOpts.isTest, false);
-  const environment = getDefault(exportOpts.environment, "node");
-  const type = getDefault(exportOpts.type, "lib");
+  const isTest = exportOpts.isTest ?? false;
+  const environment = exportOpts.environment ?? "node";
+  const type = exportOpts.type ?? "lib";
   const prod = isProd();
-  const defaultExportName = getDefault(exportOpts.defaultExportName, "index");
-  const inputFileName = getDefault(exportOpts.inputFileName, getDefaultFileName(exportName, defaultExportName));
-  const inputFileDir = getDefault(exportOpts.inputFileDir, defaultConfigOpts.inputBasePath);
-  const inputFileExt = getDefault(exportOpts.inputFileExt, await getDefaultInputFileExt(inputFileDir, inputFileName));
-  const filesToIncludeAsAssets = getDefault(exportOpts.filesToIncludeAsAssets, ["**/*.svg", "**/*.png", "**/*.jpg", "**/*.jpeg", "**/*.gif", "**/*.webp"]);
+  const defaultExportName = exportOpts.defaultExportName ?? "index";
+  const inputFileName = exportOpts.inputFileName ?? getDefaultFileName(exportName, defaultExportName);
+  const inputFileDir = exportOpts.inputFileDir ?? defaultConfigOpts.inputBasePath;
+  const inputFileExt = exportOpts.inputFileExt ?? await getDefaultInputFileExt(inputFileDir, inputFileName);
+  const filesToIncludeAsAssets = exportOpts.filesToIncludeAsAssets ?? ["**/*.svg", "**/*.png", "**/*.jpg", "**/*.jpeg", "**/*.gif", "**/*.webp"];
   let defaultExportOpts: DefaultExportOpts = {
     isTest,
     environment,
     type,
     prod,
-    minify: getDefault(exportOpts.minify, prod && !isTest),
+    minify: exportOpts.minify ?? (prod && !isTest),
     defaultExportName,
     inputFileDir,
     inputFileName,
     inputFileExt,
     inputFile: path.resolve(inputFileDir, inputFileName + inputFileExt),
-    sourceMap: getDefault(exportOpts.sourceMap, !prod || isTest),
-    sourceMapType: getDefault(exportOpts.sourceMapType, isTest ? "inline" : "external"),
-    buildTest: getDefault(exportOpts.buildTest, false),
-    terserPlugin: getDefault(exportOpts.terserPlugin, { format: { comments: false } }),
-    externalDependencies: getDefault(exportOpts.externalDependencies, []),
-    blacklistDependencies: getDefault(exportOpts.blacklistDependencies, []),
-    allowedDevDependencies: getDefault(exportOpts.allowedDevDependencies, []),
-    testDependencies: getDefault(exportOpts.testDependencies, ["@jest/globals"]),
-    blacklistDevDependencies: getDefault(exportOpts.blacklistDevDependencies, true),
-    constsPlugin: getDefault(exportOpts.constsPlugin, { production: prod, development: !prod, testing: isTest }),
-    jsonPlugin: getDefault(exportOpts.jsonPlugin, {}),
-    commonjsPlugin: getDefault(exportOpts.commonjsPlugin, {}),
-    generateDeclaration: getDefault(exportOpts.generateDeclaration, (!prod || type === "lib") && !isTest),
-    bundleDeclarations: getDefault(exportOpts.bundleDeclarations, true),
-    declarationDir: getDefault(exportOpts.declarationDir, "decl"),
-    defaultLib: getDefault(exportOpts.defaultLib, ["ESNext"]),
-    browserLib: getDefault(exportOpts.browserLib, ["DOM"]),
-    nodeLib: getDefault(exportOpts.nodeLib, []),
-    tsconfig: getDefault(exportOpts.tsconfig, "./tsconfig.json"),
-    tsOutDir: getDefault(exportOpts.tsOutDir, isTest ? "./tests/" : "./dist/"),
-    tsBuildInfoFileName: getDefault(exportOpts.tsBuildInfoFileName, inputFileName.replaceAll(/[\/\\]/g, "+") + ".tsbuildinfo"),
-    incremental: getDefault(exportOpts.incremental, false),
-    sourceMapsPlugin: getDefault(exportOpts.sourceMapsPlugin, {}),
-    nodeResolvePlugin: getDefault(exportOpts.nodeResolvePlugin, getNodeResolveDefaultOptions(environment)),
+    sourceMap: exportOpts.sourceMap ?? (!prod || isTest),
+    sourceMapType: exportOpts.sourceMapType ?? isTest ? "inline" : "external",
+    buildTest: exportOpts.buildTest ?? false,
+    terserPlugin: exportOpts.terserPlugin ?? { format: { comments: false } },
+    externalDependencies: exportOpts.externalDependencies ?? [],
+    blacklistDependencies: exportOpts.blacklistDependencies ?? [],
+    allowedDevDependencies: exportOpts.allowedDevDependencies ?? [],
+    testDependencies: exportOpts.testDependencies ?? ["@jest/globals"],
+    blacklistDevDependencies: exportOpts.blacklistDevDependencies ?? true,
+    constsPlugin: exportOpts.constsPlugin ?? { production: prod, development: !prod, testing: isTest },
+    jsonPlugin: exportOpts.jsonPlugin ?? {},
+    commonjsPlugin: exportOpts.commonjsPlugin ?? {},
+    generateDeclaration: exportOpts.generateDeclaration ?? ((!prod || type === "lib") && !isTest),
+    bundleDeclarations: exportOpts.bundleDeclarations ?? true,
+    declarationDir: exportOpts.declarationDir ?? "decl",
+    defaultLib: exportOpts.defaultLib ?? ["ESNext"],
+    browserLib: exportOpts.browserLib ?? ["DOM"],
+    nodeLib: exportOpts.nodeLib ?? [],
+    tsconfig: exportOpts.tsconfig ?? "./tsconfig.json",
+    tsOutDir: exportOpts.tsOutDir ?? (isTest ? "./tests/" : "./dist/"),
+    tsBuildInfoFileName: exportOpts.tsBuildInfoFileName ?? inputFileName.replaceAll(/[\/\\]/g, "+") + ".tsbuildinfo",
+    incremental: exportOpts.incremental ?? false,
+    sourceMapsPlugin: exportOpts.sourceMapsPlugin ?? {},
+    nodeResolvePlugin: exportOpts.nodeResolvePlugin ?? getNodeResolveDefaultOptions(environment),
     filesToIncludeAsAssets,
-    urlPlugin: getDefault(exportOpts.urlPlugin, getUrlPluginDefaultOptions(filesToIncludeAsAssets)),
+    urlPlugin: exportOpts.urlPlugin ?? getUrlPluginDefaultOptions(filesToIncludeAsAssets),
     manageDependenciesPlugin: {},
     typescriptPlugin: {},
     plugins: [],
     outputs: [],
     isSingleFormat: false,
-    treeShakeOptions: getDefault(exportOpts.treeShakeOptions, true),
+    treeShakeOptions: exportOpts.treeShakeOptions ?? true,
   };
-  defaultExportOpts.manageDependenciesPlugin = getDefault(exportOpts.manageDependenciesPlugin, await getManageDependenciesDefaultOptions(defaultExportOpts));
-  defaultExportOpts.typescriptPlugin = getDefault(exportOpts.typescriptPlugin, getTypescriptDefaultOptions(defaultExportOpts));
-  defaultExportOpts.plugins = getDefault(exportOpts.plugins, await getDefaultPlugins(defaultExportOpts));
-  const outputsOpts = getDefault(exportOpts.outputs, await getDefaultOutputs(inputFileName, inputFileExt));
-  defaultExportOpts.isSingleFormat = getDefault(exportOpts.isSingleFormat, countFormats(outputsOpts) === 1);
+  defaultExportOpts.manageDependenciesPlugin = exportOpts.manageDependenciesPlugin ?? await getManageDependenciesDefaultOptions(defaultExportOpts);
+  defaultExportOpts.typescriptPlugin = exportOpts.typescriptPlugin ?? getTypescriptDefaultOptions(defaultExportOpts);
+  defaultExportOpts.plugins = exportOpts.plugins ?? await getDefaultPlugins(defaultExportOpts);
+  const outputsOpts = exportOpts.outputs ?? await getDefaultOutputs(inputFileName, inputFileExt);
+  defaultExportOpts.isSingleFormat = exportOpts.isSingleFormat ?? countFormats(outputsOpts) === 1;
   defaultExportOpts.outputs = await getDefaultOutputsOpts(defaultExportOpts, exportOpts, outputsOpts);
   return [exportName, defaultExportOpts];
 };
@@ -621,14 +619,14 @@ async function getDefaultOutputOpts(defaultExportOpts: DefaultExportOpts, export
   let defaultOutputOpts: DefaultOutputOpts = {
     outputFileName: outputOpts.outputFileName,
     outputFormat: outputOpts.outputFormat,
-    cjsOutputDir: getDefault(outputOpts.cjsOutputDir, "./dist/cjs/"),
-    mjsOutputDir: getDefault(outputOpts.mjsOutputDir, "./dist/esm/"),
-    singleOutputDir: getDefault(outputOpts.singleOutputDir, "./dist/"),
-    cjsOutputExt: getDefault(outputOpts.cjsOutputExt, ".js"),
-    mjsOutputExt: getDefault(outputOpts.mjsOutputExt, ".js"),
-    singleOutputExt: getDefault(outputOpts.singleOutputExt, ".js"),
-    testOutputDir: getDefault(outputOpts.testOutputDir, "./tests/"),
-    bundleDeclarationPackages: getDefault(outputOpts.bundleDeclarationPackages, []),
+    cjsOutputDir: outputOpts.cjsOutputDir ?? "./dist/cjs/",
+    mjsOutputDir: outputOpts.mjsOutputDir ?? "./dist/esm/",
+    singleOutputDir: outputOpts.singleOutputDir ?? "./dist/",
+    cjsOutputExt: outputOpts.cjsOutputExt ?? ".js",
+    mjsOutputExt: outputOpts.mjsOutputExt ?? ".js",
+    singleOutputExt: outputOpts.singleOutputExt ?? ".js",
+    testOutputDir: outputOpts.testOutputDir ?? "./tests/",
+    bundleDeclarationPackages: outputOpts.bundleDeclarationPackages ?? [],
     outputFileDir: "",
     outputFileExt: "",
     file: "",
