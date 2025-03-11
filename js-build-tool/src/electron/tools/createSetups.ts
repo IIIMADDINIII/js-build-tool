@@ -292,6 +292,7 @@ export async function createForgeConfig(options: CreateSetupOptionsNorm, target:
           version: options.version,
         };
         if (typeof options.hooks.readPackageJson === "function") packageJson = await options.hooks.readPackageJson(forgeConfig, packageJson) ?? packageJson;
+        return packageJson;
       }
     }
   };
